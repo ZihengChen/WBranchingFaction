@@ -1,0 +1,30 @@
+index,var,lower,upper,step,xlabel
+0,jet1_eta,-5,5,0.2,jet1_eta
+1,jet1_pt,0,200,5,jet1_pt [GeV]
+2,jet2_eta,-5,5,0.2,jet2_eta
+3,jet2_pt,0,200,5,jet2_pt [GeV]
+4,jet3_eta,-5,5,0.2,jet3_eta
+5,jet3_pt,0,200,5,jet3_pt [GeV]
+6,jet4_eta,-5,5,0.2,jet4_eta
+7,jet4_pt,0,200,5,jet4_pt [GeV]
+
+8,dijet_m,0,200,5,dijet_m [GeV]
+9,trijet_mass1,50,500,10,trijet_mass1 [GeV]
+10,trijet_mass2,50,500,10,trijet_mass2 [GeV]
+
+11,lepton1_mt,0,150,5,lepton1_mt [GeV]
+12,lepton1_eta,-5,5,0.2,lepton1_eta
+13,lepton1_phi,-3,3,0.2,lepton1_phi
+14,lepton1_pt,0,150,5,lepton1_pt [GeV]
+
+
+15,nBJets,0,10,1,nBjets
+16,nElectrons,0,10,1,nElectrons
+17,nJets,0,10,1,nJets
+18,nMuons,0,10,1,nMuons
+19,nPV,0,40,1,nPV
+
+20,deltaphi_jet_b1,0,4,0.1,deltaphi_jet_b1
+21,deltaphi_jet_b2,0,4,0.1,deltaphi_jet_b2
+22,deltar_jet_b1,0,5,0.1,deltar_jet_b1
+23,deltar_jet_b2,0,5,0.1,deltar_jet_b2
