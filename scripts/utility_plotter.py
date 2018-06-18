@@ -175,13 +175,17 @@ class SelectionCounter:
             gens.append(hist.GetBinContent(i))
         return gens
         
-    def countSlt_ByTauDecay(self,measuredf, withweights=True):
+    def countSlt_ByTauDecay(self,measuredf, withweights=True, withSF=False):
         yields = []
 
         if withweights is True:
             for i in range(1,22,1):
                 temp = measuredf[ measuredf.genCategory == i ]
-                w    = np.sum(temp.eventWeight/temp.eventWeightSF)
+                if withSF:
+                    w    = np.sum(temp.eventWeight)
+                else:
+                    w    = np.sum(temp.eventWeight/temp.eventWeightSF)
+
                 if w is nan:
                     w = 0
                 yields.append(w)
