@@ -19,8 +19,8 @@ class NSignal:
         self.btm = btm
         self.bth = 1-bte-btm
 
-        #self.quadCoeff = self.QuadCoeffFromAnalytics()
-        self.quadCoeff = self.__QuadCoeffFromBMatrix()
+        self.quadCoeff = self.__QuadCoeffFromAnalytics()
+        self.quadCoeffFromBMatrix = self.__QuadCoeffFromBMatrix()
         self.measuredNSignal = self.PredictNSignal() # for initialize, further setup may needed
     
     # 1. Predict N signal
@@ -261,7 +261,7 @@ class BFCalc3D_Toolbox:
         return a, aVar
 
 
-    def GetNData(self, trigger,usetag):
+    def GetNData(self, trigger,usetag, shiftEnergyScale=None):
 
         n,nVar = [],[]
 
@@ -281,7 +281,7 @@ class BFCalc3D_Toolbox:
                 pickledir  =  "/mnt/data/zchen/Analysis/pickle/emu/"
             else:
                 pickledir  =  "/mnt/data/zchen/Analysis/pickle/{}/".format(selection)
-            cuts = GetSelectionCut(selection) + "& (nBJets{})".format(nbjet)
+            cuts = GetSelectionCut(selection,shiftEnergyScale) + "& (nBJets{})".format(nbjet)
             
             Data = LoadDataframe(pickledir + "data2016").query(cuts)
             if selection in ["emu","emu2"]:
@@ -365,15 +365,15 @@ class BFCalc3D_Toolbox:
 
 
         if trigger is "mu":
-            titles=[r"$A_{\mu e} [\%]$", 
-                    r"$A_{\mu \mu} [\%]$",
-                    r"$A_{\mu \tau_h} [\%]$",
-                    r"$A_{\mu h} [\%]$"]
+            titles=[r"$A_{\mu e} [10^{-2}]$", 
+                    r"$A_{\mu \mu} [10^{-2}]$",
+                    r"$A_{\mu \tau_h} [10^{-2}]$",
+                    r"$A_{\mu h} [10^{-2}]$"]
         else:
-            titles=[r"$A_{e e} [\%]$", 
-                    r"$A_{e \mu} [\%]$",
-                    r"$A_{e \tau_h} [\%]$",
-                    r"$A_{e h} [\%]$"]
+            titles=[r"$A_{e e} [10^{-2}]$", 
+                    r"$A_{e \mu} [10^{-2}]$",
+                    r"$A_{e \tau_h} [10^{-2}]$",
+                    r"$A_{e h} [10^{-2}]$"]
         
         for islt, mtx in enumerate([a_e,a_m,a_t,a_h]):
 
