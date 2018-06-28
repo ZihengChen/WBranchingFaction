@@ -261,7 +261,7 @@ class BFCalc3D_Toolbox:
         return a, aVar
 
 
-    def GetNData(self, trigger,usetag, shiftEnergyScale=None):
+    def GetNData(self, trigger,usetag, shiftEnergyScale=None, shiftJet=None):
 
         n,nVar = [],[]
 
@@ -281,7 +281,7 @@ class BFCalc3D_Toolbox:
                 pickledir  =  "/mnt/data/zchen/Analysis/pickle/emu/"
             else:
                 pickledir  =  "/mnt/data/zchen/Analysis/pickle/{}/".format(selection)
-            cuts = GetSelectionCut(selection,shiftEnergyScale) + "& (nBJets{})".format(nbjet)
+            cuts = GetSelectionCut(selection,nbjet,shiftEnergyScale,shiftJet)
             
             Data = LoadDataframe(pickledir + "data2016").query(cuts)
             if selection in ["emu","emu2"]:
@@ -294,10 +294,10 @@ class BFCalc3D_Toolbox:
         nVar = np.array(nVar)
         return n, nVar
 
-    def GetNMcbg(self, trigger,usetag):
+    def GetNMcbg(self, trigger,usetag, shiftEnergyScale=None, shiftJet=None):
         n,nVar = [],[]
 
-        if "1b" in usetag:
+        if "1b" in usetag: 
             nbjet = "==1"
         if "2b" in usetag:
             nbjet = ">1"
@@ -312,7 +312,7 @@ class BFCalc3D_Toolbox:
                 pickledir  =  "/mnt/data/zchen/Analysis/pickle/emu/"
             else:
                 pickledir  =  "/mnt/data/zchen/Analysis/pickle/{}/".format(selection)
-            cuts = GetSelectionCut(selection) + "& (nBJets{})".format(nbjet)
+            cuts = GetSelectionCut(selection,nbjet,shiftEnergyScale,shiftJet)
             MCzz = LoadDataframe(pickledir + "mcdiboson").query(cuts)
             MCdy = LoadDataframe(pickledir + "mcdy").query(cuts)
             MCbg = pd.concat([MCzz,MCdy],ignore_index=True)
@@ -358,7 +358,7 @@ class BFCalc3D_Toolbox:
                             smear[slt,j,i] = smear[slt,i,j]
         return smear
             
-    def Plot_Imshow4Matrix(self, a, trigger):
+    def Plot_Imshow4Matrix(self, a, trigger, showError=False):
         a_e,a_m,a_t,a_h = a[0],a[1],a[2],a[3]
 
         plt.figure(facecolor="w",figsize=(12,3))
@@ -374,6 +374,19 @@ class BFCalc3D_Toolbox:
                     r"$A_{e \mu} [10^{-2}]$",
                     r"$A_{e \tau_h} [10^{-2}]$",
                     r"$A_{e h} [10^{-2}]$"]
+
+        if showError is True:
+            if trigger is "mu":
+                titles=[r"$\delta A_{\mu e} / A_{\mu e} [\%]$", 
+                        r"$\delta A_{\mu \mu} / A_{\mu \mu} [\%]$",
+                        r"$\delta A_{\mu \tau_h} / A_{\mu \tau_h} [\%]$",
+                        r"$\delta A_{\mu h} / A_{\mu h} [\%]$"]
+            else:
+                titles=[r"$\delta A_{e e} /A_{e e} [\%]$", 
+                        r"$\delta A_{e \mu}/A_{e \mu} [\%]$",
+                        r"$\delta A_{e \tau_h}/A_{e \tau_h} [\%]$",
+                        r"$\delta A_{e h}/A_{e h} [\%]$"]
+
         
         for islt, mtx in enumerate([a_e,a_m,a_t,a_h]):
 

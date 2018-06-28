@@ -180,6 +180,48 @@ class BFCalc3D_Error:
         errs = np.array(errs)
         return errs
 
+
+    def errSystem_Jet(self,errSource="JES"):
+        errs = []
+        for trigger in ["mu","e"]:
+            for tag in ["1b","2b"]:
+                
+                a,aVar  = self.tb.GetAcc(trigger,tag)
+                ndata,ndataVar = self.tb.GetNData(trigger,tag)
+                nmcbg,nmcbgVar = self.tb.GetNMcbg(trigger,tag)
+                nfake,nfakeVar = self.tb.GetNFake(trigger,tag)
+
+                # bf0 = BFCalc3D_ThreeSelectorRatios(a)
+                # BW0 = bf0.SolveQuadEqn(bf0.SetMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+
+                atemp,atempVar = self.tb.GetAcc(trigger,tag,errSource+"Up")
+                nmcbgtemp,nmcbgtempVar = self.tb.GetNMcbg(trigger,tag,shiftJet=errSource+"Up")
+                bftemp = BFCalc3D_ThreeSelectorRatios( atemp )
+                BW1 = bftemp.SolveQuadEqn(bftemp.SetMeasuredX(nData=ndata, nMcbg=nmcbgtemp+nfake))
+
+
+                atemp,atempVar = self.tb.GetAcc(trigger,tag,errSource+"Down")
+                nmcbgtemp,nmcbgtempVar = self.tb.GetNMcbg(trigger,tag,shiftJet=errSource+"Down")
+                bftemp = BFCalc3D_ThreeSelectorRatios( atemp )
+                BW2 = bftemp.SolveQuadEqn(bftemp.SetMeasuredX(nData=ndata, nMcbg=nmcbgtemp+nfake))
+
+                errs.append(np.abs(BW1-BW2)/2)
+                
+        errs = np.array(errs)
+        return errs#, 1/np.sum(1/errs**2,axis=0)**0.5
+
+    def io_printErrorForExcelFormat(self,error):
+        error = np.abs(err/0.1086 * 100)
+
+        for i in range(error.shape[1]):
+            print("{:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}" \
+                .format(error[0,i,0],error[0,i,1],error[0,i,2],
+                        error[1,i,0],error[1,i,1],error[1,i,2],
+                        error[2,i,0],error[2,i,1],error[2,i,2],
+                        error[3,i,0],error[3,i,1],error[3,i,2]
+                    ))
+
+
     # def temp(self):
     #     errs = []
     #     for trigger in ["mu","e"]:
