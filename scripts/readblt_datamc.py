@@ -18,7 +18,7 @@ class BLTReader:
 
     def __init__(self, inputRootFileName, selection, includeTTTheory=False, readInverseMuISO=False):
 
-        self.dataDirectory = "/mnt/data/zchen/Analysis/"
+        self.dataDirectory = "/home/zchen/Documents/Analysis/workplace/data/"
 
         self.inputRootFileName = inputRootFileName
         self.inputRootFile = root.TFile(self.dataDirectory+"root/"+inputRootFileName)
@@ -38,14 +38,14 @@ class BLTReader:
         
     def outputNGen(self):
         names = ["t","tt"] 
-        nGens = [ee.getNGen("t_tw")+ee.getNGen("tbar_tw"),ee.getNGen("ttbar_inclusive")] 
+        nGens = [self.getNGen("t_tw")+self.getNGen("tbar_tw"),self.getNGen("ttbar_inclusive")] 
         
-        if includeTTTheory:
+        if self.includeTTTheory:
             names = names + self.mcttTheorylist
             nGens = nGens + [self.getNGen(name) for name in self.mcttTheorylist]
 
         df = pd.DataFrame({"name":names, "ngen":nGens })
-        df.to_pickle(ee.dataDirectory+"pickle/ngen.pkl")
+        df.to_pickle(self.dataDirectory+"pickle/ngen.pkl")
         
     def getNGen(self,name):
         histogram = self.inputRootFile.Get('GenCategory_'+name)
