@@ -51,11 +51,7 @@ def fill_lepton_vars(tree, name, SF):
     out_dict['nPV']          =  tree.nPV
     out_dict['triggerLepton'] = tree.triggerLeptonStatus
 
-    weight = SF * tree.eventWeight
-   #if name in ['zjets_m-50','zjets_m-10to50']:
-   #     if 0< tree.nPartons < 5:
-   #        weight  = 0
-    out_dict['eventWeight']  =  weight
+    out_dict['eventWeight']  =  SF * tree.eventWeight
     out_dict['eventWeightSF']=  SF
 
     out_dict['met']          =  tree.met

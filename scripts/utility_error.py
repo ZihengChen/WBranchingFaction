@@ -210,8 +210,34 @@ class BFCalc3D_Error:
         errs = np.array(errs)
         return errs#, 1/np.sum(1/errs**2,axis=0)**0.5
 
+
+    def errSystem_QCDPDF(self,errSource="Renorm"):
+        errs = []
+        for trigger in ["mu","e"]:
+            for tag in ["1b","2b"]:
+                
+                a,aVar  = self.tb.GetAcc(trigger,tag)
+                ndata,ndataVar = self.tb.GetNData(trigger,tag)
+                nmcbg,nmcbgVar = self.tb.GetNMcbg(trigger,tag)
+                nfake,nfakeVar = self.tb.GetNFake(trigger,tag)
+
+                atemp,atempVar = self.tb.GetAcc(trigger,tag,errSource+"Up")
+                bftemp = BFCalc3D_ThreeSelectorRatios( atemp )
+                BW1 = bftemp.SolveQuadEqn(bftemp.SetMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+
+
+                atemp,atempVar = self.tb.GetAcc(trigger,tag,errSource+"Down")
+                bftemp = BFCalc3D_ThreeSelectorRatios( atemp )
+                BW2 = bftemp.SolveQuadEqn(bftemp.SetMeasuredX(nData=ndata, nMcbg=nmcb+nfake))
+
+                errs.append(np.abs(BW1-BW2)/2)
+
+        errs = np.array(errs)
+        return errs
+
+
     def io_printErrorForExcelFormat(self,error):
-        error = np.abs(err/0.1086 * 100)
+        error = np.abs(error/0.1086 * 100)
 
         for i in range(error.shape[1]):
             print("{:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}" \
