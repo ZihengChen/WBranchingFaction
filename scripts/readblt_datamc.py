@@ -64,10 +64,10 @@ class BLTReader:
         if self.readInverseMuISO:
             for name in self.datalist:
                 self.makePickle(name)
-        
         else:
             for name in self.datalist + self.mclist:
                 self.makePickle(name)
+        print(self.selection + " finished!")
 
     # MARK-1 -- ntuple to pickle
     def makePickle(self,name):
@@ -81,18 +81,14 @@ class BLTReader:
         if tree.GetEntriesFast() > 0:
             ntuple = self.fillNtuple(tree, name, scaleFactor)
             dataframe = pd.DataFrame(ntuple)
-            dataframe.to_pickle('{0}/ntuple_{1}.pkl'.format(outputPath, name))
+            dataframe.to_pickle( outputPath+'ntuple_{}.pkl'.format(name))
+            print(outputPath+'ntuple_{}.pkl is SAVED!'.format(name))
 
     # MARK-2 -- tree to ntuple
     def fillNtuple(self, tree, name, scaleFactor):
         n = int(tree.GetEntriesFast())
         # loop over all events
-        for i in tqdm.trange(n,
-                    desc       = self.selection+' selection *** '+name,
-                    leave      = True,
-                    unit_scale = True,
-                    ncols      = 100,
-                    total      = n):
+        for i in range(n):
 
             tree.GetEntry(i)
             entry = {}
@@ -399,7 +395,7 @@ class BLTReader:
                 }
 
     def __getOutputPath(self,name):
-        outputPath  = self.dataDirectory+"pickle/"
+        outputPath  = self.dataDirectory+"pickle/"+self.selection+"/"
         if name in self.datalist:
             if self.readInverseMuISO:
                 outputPath += "data2016_inverseISO/"
