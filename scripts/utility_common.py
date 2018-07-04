@@ -1,30 +1,30 @@
 import glob
-import pandas as pd
 import os, sys
-#import ray.dataframe as pd
+
+import pandas as pd
 from pylab import *
 
-def make_directory(filePath, clear=True):
+def makeDirectory(filePath, clear=True):
     if not os.path.exists(filePath):
         os.system('mkdir -p '+filePath)
     
     if clear and len(os.listdir(filePath)) != 0:
         os.system('rm '+filePath+'/*')
 
+def dataDirectory(isLocal=True):
+    if isLocal:
+        # on my local macbook
+        dataDir = "/Users/zihengchen/Documents/Analysis/workplace/data/"
+    else: 
+        # on bahumut
+        dataDir = "/home/zchen/Documents/Analysis/workplace/data/"
+    return dataDir
 
-def LoadDataframe(pikledir):
-    path = pikledir
-    pickle_list = glob.glob(path + "/*.pkl")
+def fakeRate():
+    return 0.05
 
-    df = pd.DataFrame()
-    temp_list = []
-    for temp_file in pickle_list:
-        temp_df = pd.read_pickle(temp_file)
-        temp_list.append(temp_df)
-    
-    df = pd.concat(temp_list,ignore_index=True)
-    return df
 
+'''
 def GetPlotDir(selection, nbjetcut):
     plotoutdir = '../../plot/{}/'.format(selection)
     if nbjetcut == '>=1':
@@ -122,3 +122,4 @@ def GetSelectionCut(slt, nbjetcut, shiftEnergyScale=None, shiftJet=None):
 
 
     # cuts = GetSelectionCut(selection) + "& (nBJets{})".format(nbjetcut)
+'''

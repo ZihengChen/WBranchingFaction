@@ -4,21 +4,14 @@ import numpy as np
 import pandas as pd
 import ROOT as root
 
-
-
-def makeDirectory(filePath, clear=True):
-    if not os.path.exists(filePath):
-        os.system('mkdir -p '+filePath)
-    
-    if clear and len(os.listdir(filePath)) != 0:
-        os.system('rm '+filePath+'/*')
+import utility_common as common
 
 
 class BLTReader:
 
     def __init__(self, inputRootFileName, selection, includeTTTheory=False, readInverseMuISO=False):
 
-        self.dataDirectory = "/home/zchen/Documents/Analysis/workplace/data/"
+        self.dataDirectory = common.dataDirectory(isLocal=False) 
 
         self.inputRootFileName = inputRootFileName
         self.inputRootFile = root.TFile(self.dataDirectory+"root/"+inputRootFileName)
@@ -29,8 +22,8 @@ class BLTReader:
         
         self.readInverseMuISO = readInverseMuISO
         self.includeTTTheory = includeTTTheory
-        self.__setCrossection()
-        self.__setNameList()
+        self._setCrossection()
+        self._setNameList()
         
     #############################
     ## Save number of Gen 
@@ -71,8 +64,8 @@ class BLTReader:
 
     # MARK-1 -- ntuple to pickle
     def makePickle(self,name):
-        scaleFactor = self.__getScaleFactor(name)
-        outputPath = self.__getOutputPath(name)
+        scaleFactor = self._getScaleFactor(name)
+        outputPath = self._getOutputPath(name)
 
         makeDirectory(outputPath, clear=False)
 
@@ -100,7 +93,7 @@ class BLTReader:
                 continue
 
             # and this event to the ntuple
-            entry.update(self.__fillAllVariables(tree, name, scaleFactor))
+            entry.update(self._fillAllVariables(tree, name, scaleFactor))
             n -= 1
             yield entry
 
@@ -109,7 +102,7 @@ class BLTReader:
     ## private helper functions
     #############################
 
-    def __fillAllVariables(self, tree, name, scaleFactor):
+    def _fillAllVariables(self, tree, name, scaleFactor):
 
         out_dict = {}
         
@@ -324,7 +317,7 @@ class BLTReader:
         return out_dict
 
 
-    def __getScaleFactor(self,name):
+    def _getScaleFactor(self,name):
         if name in self.datalist:
             scaleFactor = 1
         if name in self.mclist:
@@ -338,7 +331,7 @@ class BLTReader:
         return scaleFactor
         
     
-    def __setCrossection(self):
+    def _setCrossection(self):
         self.xsTable = { 
 
                     'ww'              : 12178,
@@ -394,7 +387,7 @@ class BLTReader:
                     'qcd_ht2000'      : 25240,
                 }
 
-    def __getOutputPath(self,name):
+    def _getOutputPath(self,name):
         outputPath  = self.dataDirectory+"pickle/"+self.selection+"/"
         if name in self.datalist:
             if self.readInverseMuISO:
@@ -412,10 +405,10 @@ class BLTReader:
         elif name in self.mcttbosonlist:
             outputPath += "mcttboson/"
         elif name in self.mcttTheorylist:
-            outputPath += "mcttTheory/"
+            outputPath += "mctt/"
         return outputPath
 
-    def __setNameList(self):
+    def _setNameList(self):
         ## 1. define the datalist
         if self.selection in ["mumu","mutau","mu4j"]:
             self.datalist = [
