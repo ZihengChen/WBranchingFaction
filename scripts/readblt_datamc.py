@@ -465,7 +465,7 @@ class BLTReader:
         self.mclist = self.mcttbosonlist + self.mcdibosonlist + self.mcdylist + self.mctlist + self.mcttlist 
         
         if self.includeTTTheory:
-            self.mclist + self.mcttTheorylist
+            self.mclist = self.mclist + self.mcttTheorylist
 
 
 
