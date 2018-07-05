@@ -31,13 +31,7 @@ class DFCutter:
         # MARK -- read pickles given selection and name
         # for tt read dedicated pickle
         if self.name == "mctt":
-            # for tt theoretical variation
-            if variation in [ 'fsrup','fsrdown','isrup','isrdown','up','down','hdampdown','hdampup']:
-                pickName = self.pickleDirectry + "ntuple_ttbar_inclusive_{}.pkl".format(variation)
-            # use nominal tt sample
-            else:
-                pickName = self.pickleDirectry + "ntuple_ttbar_inclusive.pkl"
-            dataFrame = pd.read_pickle(pickName)
+            dataFrame = pd.read_pickle(self.pickleDirectry + "ntuple_ttbar_inclusive.pkl")
         # for not tt, read all pickles in a directory
         else:
             pickles = glob.glob( self.pickleDirectry + "/*.pkl")
@@ -114,19 +108,25 @@ class DFCutter:
             df.nBJets = df["nBJets"+variation]
 
         # variate tt theoretical LHE weights
-        if (self.name== "mctt") and (variation in ["RenormUp","RenormDown","FactorUp","FactorDown","PDFUp","PDFDown"]):
-            
-            variableNames = {
-                "RenormUp"  : "qcd_weight_up_nom",
-                "RenormDown": "qcd_weight_down_nom",
-                "FactorUp"  : "qcd_weight_nom_up",
-                "FactorDown": "qcd_weight_nom_down",
-                "PDFUp"     : "pdf_weight_up",
-                "PDFDown"   : "pdf_weight_down"
-                }
-            variableName = variableNames[variation]
-            df.eventWeight = df.eventWeight * df[variableName]
+        if (self.name== "mctt"):
+            if (variation in ["RenormUp","RenormDown","FactorUp","FactorDown","PDFUp","PDFDown"]):
 
+                variableNames = {
+                    "RenormUp"  : "qcd_weight_up_nom",
+                    "RenormDown": "qcd_weight_down_nom",
+                    "FactorUp"  : "qcd_weight_nom_up",
+                    "FactorDown": "qcd_weight_nom_down",
+                    "PDFUp"     : "pdf_weight_up",
+                    "PDFDown"   : "pdf_weight_down"
+                    }
+                variableName = variableNames[variation]
+                df.eventWeight = df.eventWeight * df[variableName]
+            
+            # for tt theoretical variation
+            if variation in [ 'FSRUp','FSRDown','ISRUp','ISRDown','UEUp','UEDown','MEPSUp','MEPSDown']:
+                pickName = self.pickleDirectry + "ntuple_ttbar_inclusive_{}.pkl".format(variation)
+                df = pd.read_pickle(pickName)
+        
         return df
 
 

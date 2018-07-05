@@ -133,29 +133,6 @@ class BFSovler3D_Error:
         return errs
 
 
-    def errSystem_ttTheory(self,errSource="isr"):
-        errs = []
-
-        counts1 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"up"))
-        counts2 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"down"))
-
-        for icata in range(4):
-            # up tuning
-            slv1 = BFSolver3D( counts1.acc[icata] )
-            BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata]+counts1.nfake[icata]))
-
-            # down tuning
-            slv2 = BFSolver3D( counts2.acc[icata] )
-            BW2  = slv2.solveQuadEqn(slv2.setMeasuredX(nData=counts2.ndata[icata], nMcbg=counts2.nmcbg[icata]+counts2.nfake[icata]))
-
-            # differentce between up and down tuning
-            errs.append((BW1-BW2)/2)
-                
-        errs = np.array(errs)
-        return errs
-
-    
- 
     def errSystem_energyScale(self,errSource="e"):
         errs = []
 
@@ -176,35 +153,17 @@ class BFSovler3D_Error:
         return errs
 
 
-    def errSystem_jet(self,errSource="JES"):
+    def errSystem_upDownVariation(self,errSource="JES"):
+        '''
+        "ISR","FSR","UE","MEPS","JES","JER","BTag","Mistag","Renorm","Factor","PDF"
+        '''
+
 
         counts1 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"Up"))
         counts2 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"Down"))
 
 
         errs = []
-        for icata in range(4):
-                
-            # up tuning
-            slv1 = BFSolver3D( counts1.acc[icata] )
-            BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata]+counts1.nfake[icata]))
-            # down tuning
-            slv2 = BFSolver3D( counts2.acc[icata] )
-            BW2  = slv2.solveQuadEqn(slv2.setMeasuredX(nData=counts2.ndata[icata], nMcbg=counts2.nmcbg[icata]+counts2.nfake[icata]))
-            # differentce between up and down tuning
-            errs.append((BW1-BW2)/2)
-                
-        errs = np.array(errs)
-        return errs
-
-
-    def errSystem_lheWeight(self,errSource="Renorm"):
-
-        counts1 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"Up"))
-        counts2 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"Down"))
-
-        errs = []
-
         for icata in range(4):
                 
             # up tuning

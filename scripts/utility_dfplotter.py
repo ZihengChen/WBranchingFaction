@@ -10,12 +10,12 @@ class DFPlotter:
         self.nbjet = nbjet
         self._setConfiguration() 
 
-    def getDataFrameList(self):
-        Data = DFCutter(self.selection, self.nbjet, "data2016").getDataFrame()
-        MCzz = DFCutter(self.selection, self.nbjet, "mcdiboson").getDataFrame()
-        MCdy = DFCutter(self.selection, self.nbjet, "mcdy").getDataFrame()
-        MCt  = DFCutter(self.selection, self.nbjet, "mct").getDataFrame()
-        MCtt = DFCutter(self.selection, self.nbjet, "mctt").getDataFrame()
+    def getDataFrameList(self,variation=''):
+        Data = DFCutter(self.selection, self.nbjet, "data2016").getDataFrame(variation)
+        MCzz = DFCutter(self.selection, self.nbjet, "mcdiboson").getDataFrame(variation)
+        MCdy = DFCutter(self.selection, self.nbjet, "mcdy").getDataFrame(variation)
+        MCt  = DFCutter(self.selection, self.nbjet, "mct").getDataFrame(variation)
+        MCtt = DFCutter(self.selection, self.nbjet, "mctt").getDataFrame(variation)
 
         # get signal MC dataframes
         MCsg = pd.concat([MCt,MCtt],ignore_index=True)
@@ -24,7 +24,7 @@ class DFPlotter:
         # combine all dataframes as a list
         dfList = [MCzz,MCdy] + MCsgList + [Data]
         if self.hasFake:
-            Fake = DFCutter(self.selection, self.nbjet, "data2016_inverseISO").getDataFrame()
+            Fake = DFCutter(self.selection, self.nbjet, "data2016_inverseISO").getDataFrame(variation)
             dfList = [Fake] + dfList
         return dfList
 

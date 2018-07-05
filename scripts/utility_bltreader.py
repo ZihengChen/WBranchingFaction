@@ -74,9 +74,13 @@ class BLTReader:
         if tree.GetEntriesFast() > 0:
             ntuple = self.fillNtuple(tree, name, scaleFactor)
             dataframe = pd.DataFrame(ntuple)
-            dataframe.to_pickle( outputPath+'ntuple_{}.pkl'.format(name))
-            print(outputPath+'ntuple_{}.pkl is SAVED!'.format(name))
 
+            outfileName = name
+            if name in self.mcttTheorylist:
+                outfileName = self.mcttTheorylistFileNames[name]
+
+            dataframe.to_pickle( outputPath+'ntuple_{}.pkl'.format(outfileName))
+            
     # MARK-2 -- tree to ntuple
     def fillNtuple(self, tree, name, scaleFactor):
         n = int(tree.GetEntriesFast())
@@ -459,6 +463,19 @@ class BLTReader:
         
         if self.includeTTTheory:
             self.mclist + self.mcttTheorylist
+
+        self.mcttTheorylistFileNames = {
+            'ttbar_inclusive_fsrdown' : 'ttbar_inclusive_FSRDown',
+            'ttbar_inclusive_fsrup'   : 'ttbar_inclusive_FSRUp',
+            'ttbar_inclusive_isrdown' : 'ttbar_inclusive_ISRDown',
+            'ttbar_inclusive_isrup'   : 'ttbar_inclusive_ISRUp',,
+            'ttbar_inclusive_hdampdown':'ttbar_inclusive_MEPSDown',
+            'ttbar_inclusive_hdampup' : 'ttbar_inclusive_MEPSUp' ,
+            'ttbar_inclusive_down'    : 'ttbar_inclusive_UEDown',
+            'ttbar_inclusive_up'      : 'ttbar_inclusive_UEUp'
+        }
+    
+
 
 
 
