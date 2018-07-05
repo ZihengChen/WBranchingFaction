@@ -33,7 +33,7 @@ class DFCutter:
         if self.name == "mctt":
             # for tt theoretical variation
             if variation in [ 'fsrup','fsrdown','isrup','isrdown','up','down','hdampdown','hdampup']:
-                pickName = self.pickleDirectry + "ntuple_ttbar_inclusive_{}.pkl".formate(variation)
+                pickName = self.pickleDirectry + "ntuple_ttbar_inclusive_{}.pkl".format(variation)
             # use nominal tt sample
             else:
                 pickName = self.pickleDirectry + "ntuple_ttbar_inclusive.pkl"
@@ -85,6 +85,48 @@ class DFCutter:
         return sltcut[self.selection] + njveto + nbveto
 
     def _variateDataFrame(self, df, variation):
+        # variate e,m,t energy correction
+        if variation == 'EPtDown':
+            if self.selection in ['ee','etau','e4j']:
+                df.lepton1_pt = df.lepton1_pt * 0.995
+
+            if self.selection == ['ee','emu']:
+                df.lepton2_pt = df.lepton2_pt * 0.995
+        
+        if variation == 'MuPtDown':
+            if self.selection in ['mumu','emu','mutau','mu4j']:
+                df.lepton1_pt = df.lepton1_pt * 0.995
+
+            if self.selection == ['mumu']:
+                df.lepton2_pt = df.lepton2_pt * 0.995
+            
+        if variation == 'TauPtDown':
+            if self.selection in ['mutau','etau']:
+                df.lepton2_pt = df.lepton2_pt * 0.99
+
+        # variate Jet Energy corrections
+        if variation in ["JESUp","JESDown","JERUp","JERDown"]:
+            df.nJets  = df["nJets" +variation]
+            df.nBJets = df["nBJets"+variation]
+        
+        # variate bTagging 
+        if variation in ["BTagUp","BTagDown","MistagUp","MistagDown"]:
+            df.nBJets = df["nBJets"+variation]
+
+        # variate tt theoretical LHE weights
+        if (self.name== "mctt") and (variation in ["RenormUp","RenormDown","FactorUp","FactorDown","PDFUp","PDFDown"]):
+            
+            variableNames = {
+                "RenormUp"  : "qcd_weight_up_nom",
+                "RenormDown": "qcd_weight_down_nom",
+                "FactorUp"  : "qcd_weight_nom_up",
+                "FactorDown": "qcd_weight_nom_down",
+                "PDFUp"     : "pdf_weight_up",
+                "PDFDown"   : "pdf_weight_down"
+                }
+            variableName = variableNames[variation]
+            df.eventWeight = df.eventWeight * df[variableName]
+
         return df
 
 

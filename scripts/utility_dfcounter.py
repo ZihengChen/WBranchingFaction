@@ -7,7 +7,7 @@ def countDataFrames(variation=""):
     records = []
     for trigger in ["mu","e"]:
         for usetag in ["1b","2b"]:
-            print( "counting "+trigger+usetag + " ...")
+            #print( "counting "+trigger+usetag + " ...")
 
             counter = DFCounter(trigger,usetag)
             counter.setVariation(variation)
@@ -133,14 +133,14 @@ class DFCounter():
     #############################
 
 
-    def _countDataFrameByTauDecay(self, df, normToLumin=True, withWeights=True, withWeightsVaration=1.0):
+    def _countDataFrameByTauDecay(self, df, normToLumin=True, withWeights=True):
 
         yields = []
         for i in range(1,22,1):
             temp = df[ df.genCategory == i ]
             if withWeights:
                 # withWeights=True, normToLumin=True
-                countingWeight = temp.eventWeight * withWeightsVaration
+                countingWeight = temp.eventWeight
                 if not normToLumin:
                     # withWeights=True, normToLumin=False
                     countingWeight = countingWeight/temp.eventWeightSF

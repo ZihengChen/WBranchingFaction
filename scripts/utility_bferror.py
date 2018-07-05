@@ -1,3 +1,4 @@
+import utility_common as common
 from pylab import *
 from utility_bfsolver import *
 from tqdm import tqdm, trange
@@ -5,8 +6,9 @@ from tqdm import tqdm, trange
 class BFSovler3D_Error:
     def __init__(self):
         self.tb = BFSolver_Toolbox()
+        self.dataDir = common.dataDirectory() 
 
-        counts = pd.read_pickle("/Users/zihengchen/Documents/Analysis/workplace/data/count/count_.pkl")
+        counts = pd.read_pickle( self.dataDir + "count/count_.pkl")
         
         self.a, self.aVar = counts.acc, counts.accVar
         self.ndata, self.ndataVar = counts.ndata, counts.ndataVar
@@ -78,10 +80,10 @@ class BFSovler3D_Error:
         errs = []
         for icata in range(4):
 
-            a,aVar  = self.a[icata], self.aVar[icata]
-            ndata,ndataVar = self.ndata[icata],self.ndataVar[icata]
-            nmcbg,nmcbgVar = self.nmcbg[icata],self.nmcbgVar[icata]
-            nfake,nfakeVar = self.nfake[icata],self.nfakeVar[icata]
+            a     = self.a[icata]
+            ndata = self.ndata[icata]
+            nmcbg = self.nmcbg[icata]
+            nfake = self.nfake[icata]
 
             slv = BFSolver3D(a)
             if errSource == "mcbg":
@@ -100,14 +102,14 @@ class BFSovler3D_Error:
         errs = np.array(errs)
         return errs
 
-    def errSystem_objectEff(self,errSource="e"):
+    def errSystem_objectEff(self,errSource):
         errs = []
         for icata in range(4):
 
-            a,aVar  = self.a[icata], self.aVar[icata]
-            ndata,ndataVar = self.ndata[icata],self.ndataVar[icata]
-            nmcbg,nmcbgVar = self.nmcbg[icata],self.nmcbgVar[icata]
-            nfake,nfakeVar = self.nfake[icata],self.nfakeVar[icata]
+            a     = self.a[icata]
+            ndata = self.ndata[icata]
+            nmcbg = self.nmcbg[icata]
+            nfake = self.nfake[icata]
 
             slv = BFSolver3D(a)
                 
@@ -130,112 +132,93 @@ class BFSovler3D_Error:
         errs = np.array(errs)
         return errs
 
-    ''' 
-    def errSystem_TTTheory(self,errSource="isr"):
+
+    def errSystem_ttTheory(self,errSource="isr"):
         errs = []
-        for trigger in ["mu","e"]:
-            for tag in ["1b","2b"]:
-                
-                a,aVar  = self.tb.GetAcc(trigger,tag)
-                ndata,ndataVar = self.tb.GetNData(trigger,tag)
-                nmcbg,nmcbgVar = self.tb.GetNMcbg(trigger,tag)
-                nfake,nfakeVar = self.tb.GetNFake(trigger,tag)
 
-                # bf0 = BFSolver3D(a)
-                # BW0 = bf0.solveQuadEqn(bf0.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+        counts1 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"up"))
+        counts2 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"down"))
 
-                atemp,atempVar = self.tb.GetAcc(trigger,tag,errSource+"up")
-                bftemp = BFSolver3D( atemp )
-                BW1 = bftemp.solveQuadEqn(bftemp.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+        for icata in range(4):
+            # up tuning
+            slv1 = BFSolver3D( counts1.acc[icata] )
+            BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata]+counts1.nfake[icata]))
 
+            # down tuning
+            slv2 = BFSolver3D( counts2.acc[icata] )
+            BW2  = slv2.solveQuadEqn(slv2.setMeasuredX(nData=counts2.ndata[icata], nMcbg=counts2.nmcbg[icata]+counts2.nfake[icata]))
 
-                atemp,atempVar = self.tb.GetAcc(trigger,tag,errSource+"down")
-                bftemp = BFSolver3D( atemp )
-                BW2 = bftemp.solveQuadEqn(bftemp.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-
-                errs.append(np.abs(BW1-BW2)/2)
+            # differentce between up and down tuning
+            errs.append((BW1-BW2)/2)
                 
         errs = np.array(errs)
-        return errs#, 1/np.sum(1/errs**2,axis=0)**0.5
+        return errs
 
     
-
-    def errSystem_EnergyScale(self,errSource="e"):
+ 
+    def errSystem_energyScale(self,errSource="e"):
         errs = []
-        for trigger in ["mu","e"]:
-            for tag in ["1b","2b"]:
-                
-                a,aVar  = self.tb.GetAcc(trigger,tag)
-                ndata,ndataVar = self.tb.GetNData(trigger,tag)
-                nmcbg,nmcbgVar = self.tb.GetNMcbg(trigger,tag)
-                nfake,nfakeVar = self.tb.GetNFake(trigger,tag)
 
-                bf0 = BFSolver3D(a)
-                BW0 = bf0.solveQuadEqn(bf0.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+        counts1 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"PtDown"))
 
-                ndataTemp,ndataVarTemp = self.tb.GetNData(trigger,tag,shiftEnergyScale=errSource)
-                BW = bf0.solveQuadEqn(bf0.setMeasuredX(nData=ndataTemp, nMcbg=nmcbg+nfake))
-
-                errs.append(BW-BW0) 
+        for icata in range(4):
+            
+            # nominal tuning
+            slv  = BFSolver3D(self.a[icata])
+            BW   = slv.solveQuadEqn(slv.setMeasuredX(nData=self.ndata[icata], nMcbg=self.nmcbg[icata]+self.nfake[icata]))
+            # down tuning
+            slv1 = BFSolver3D( counts1.acc[icata] )
+            BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata]+counts1.nfake[icata]))
+            # difference between down and nominal
+            errs.append(BW1-BW) 
 
         errs = np.array(errs)
         return errs
 
 
-    def errSystem_Jet(self,errSource="JES"):
+    def errSystem_jet(self,errSource="JES"):
+
+        counts1 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"Up"))
+        counts2 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"Down"))
+
+
         errs = []
-        for trigger in ["mu","e"]:
-            for tag in ["1b","2b"]:
+        for icata in range(4):
                 
-                a,aVar  = self.tb.GetAcc(trigger,tag)
-                ndata,ndataVar = self.tb.GetNData(trigger,tag)
-                nmcbg,nmcbgVar = self.tb.GetNMcbg(trigger,tag)
-                nfake,nfakeVar = self.tb.GetNFake(trigger,tag)
-
-                # bf0 = BFSolver3D(a)
-                # BW0 = bf0.solveQuadEqn(bf0.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-
-                atemp,atempVar = self.tb.GetAcc(trigger,tag,errSource+"Up")
-                nmcbgtemp,nmcbgtempVar = self.tb.GetNMcbg(trigger,tag,shiftJet=errSource+"Up")
-                bftemp = BFSolver3D( atemp )
-                BW1 = bftemp.solveQuadEqn(bftemp.setMeasuredX(nData=ndata, nMcbg=nmcbgtemp+nfake))
-
-
-                atemp,atempVar = self.tb.GetAcc(trigger,tag,errSource+"Down")
-                nmcbgtemp,nmcbgtempVar = self.tb.GetNMcbg(trigger,tag,shiftJet=errSource+"Down")
-                bftemp = BFSolver3D( atemp )
-                BW2 = bftemp.solveQuadEqn(bftemp.setMeasuredX(nData=ndata, nMcbg=nmcbgtemp+nfake))
-
-                errs.append(np.abs(BW1-BW2)/2)
+            # up tuning
+            slv1 = BFSolver3D( counts1.acc[icata] )
+            BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata]+counts1.nfake[icata]))
+            # down tuning
+            slv2 = BFSolver3D( counts2.acc[icata] )
+            BW2  = slv2.solveQuadEqn(slv2.setMeasuredX(nData=counts2.ndata[icata], nMcbg=counts2.nmcbg[icata]+counts2.nfake[icata]))
+            # differentce between up and down tuning
+            errs.append((BW1-BW2)/2)
                 
-        errs = np.array(errs)
-        return errs#, 1/np.sum(1/errs**2,axis=0)**0.5
-
-
-    def errSystem_QCDPDF(self,errSource="Renorm"):
-        errs = []
-        for trigger in ["mu","e"]:
-            for tag in ["1b","2b"]:
-                
-                a,aVar  = self.tb.GetAcc(trigger,tag)
-                ndata,ndataVar = self.tb.GetNData(trigger,tag)
-                nmcbg,nmcbgVar = self.tb.GetNMcbg(trigger,tag)
-                nfake,nfakeVar = self.tb.GetNFake(trigger,tag)
-
-                atemp,atempVar = self.tb.GetAcc(trigger,tag,errSource+"Up")
-                bftemp = BFSolver3D( atemp )
-                BW1 = bftemp.solveQuadEqn(bftemp.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-
-
-                atemp,atempVar = self.tb.GetAcc(trigger,tag,errSource+"Down")
-                bftemp = BFSolver3D( atemp )
-                BW2 = bftemp.solveQuadEqn(bftemp.setMeasuredX(nData=ndata, nMcbg=nmcb+nfake))
-
-                errs.append(np.abs(BW1-BW2)/2)
-
         errs = np.array(errs)
         return errs
-    '''
+
+
+    def errSystem_lheWeight(self,errSource="Renorm"):
+
+        counts1 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"Up"))
+        counts2 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"Down"))
+
+        errs = []
+
+        for icata in range(4):
+                
+            # up tuning
+            slv1 = BFSolver3D( counts1.acc[icata] )
+            BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata]+counts1.nfake[icata]))
+            # down tuning
+            slv2 = BFSolver3D( counts2.acc[icata] )
+            BW2  = slv2.solveQuadEqn(slv2.setMeasuredX(nData=counts2.ndata[icata], nMcbg=counts2.nmcbg[icata]+counts2.nfake[icata]))
+            # differentce between up and down tuning
+            errs.append((BW1-BW2)/2)
+                
+        errs = np.array(errs)
+        return errs
+
 
     def io_printErrorForExcelFormat(self,error):
         error = np.abs(error/0.1086 * 100)
@@ -262,15 +245,3 @@ class BFSovler3D_Error:
                         if i != j :
                             smear[slt,j,i] = smear[slt,i,j]
         return smear
-
-    # def temp(self):
-    #     errs = []
-    #     for trigger in ["mu","e"]:
-    #         for tag in ["1b","2b"]:
-    #             a,aVar  = self.tb.GetAcc(trigger,tag)
-    #             ndata,ndataVar = self.tb.GetNData(trigger,tag)
-    #             nmcbg,nmcbgVar = self.tb.GetNMcbg(trigger,tag)
-    #             nfake,nfakeVar = self.tb.GetNFake(trigger,tag)   
-        
-    #     errs = np.array(errs)
-    #     return errs, 1/np.sum(1/errs**2,axis=0)**0.5
