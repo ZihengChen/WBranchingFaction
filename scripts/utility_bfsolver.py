@@ -171,7 +171,7 @@ class BFSolver:
 # 3D Inheritance of BFSolver
 class BFSolver3D (BFSolver):
 
-    def __init__(self, a, xs = 832+35.85*2, lumin=35847, bte=0.1785, btm=0.1736 ):
+    def __init__(self, a, xs = 832+35.85*2, lumin=35847, bte=0.1785, btm=0.1736  ):
         super().__init__(a, xs, lumin, bte, btm)
     
     def evaluateLeftSideOfQuadEqn(self,paraBW):
@@ -195,17 +195,18 @@ class BFSolver3D (BFSolver):
 
 # 1D Inheritance of BFSolver
 class BFSolver1D (BFSolver):
-    def __init__(self, a, xs = 832+35.85*2, lumin=35847, bte=0.1785, btm=0.1736 ):
+    def __init__(self, a, xs = 832+35.85*2, lumin=35847, bte=0.1785, btm=0.1736, bWe=0.1071, bWm=0.1063 ):
         super().__init__(a, xs, lumin, bte, btm)
+        self.bWe,self.bWm = bWe,bWm
 
     def evaluateLeftSideOfQuadEqn(self,paraBW):
         x,y,z = sym.symbols('x,y,z',real=True)
-        leftSide = [ float(eq.evalf(subs={x: BWPDG[0], y: BWPDG[1], z: paraBW[i]})) for i,eq in enumerate(self.quadEqn) ]
+        leftSide = [ float(eq.evalf(subs={x:self.bWe, y:self.bWm, z:paraBW[i]})) for i,eq in enumerate(self.quadEqn) ]
         return np.array(leftSide) # return 1x3 vector
 
     def solveQuadEqn(self, obsX):
         eqn = self.getQuadEqn(obsX)
-        paraBW0 = BWPDG[np.array([2,2,2])]
+        paraBW0 = np.array([0.11,0.11,0.11])
         solution  = root(self.evaluateLeftSideOfQuadEqn, paraBW0).x
         return solution
 
