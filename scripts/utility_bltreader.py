@@ -188,7 +188,7 @@ class BLTReader:
         out_dict['lepton1_mt']      = (2*lep1.Pt()*tree.met*(1-np.cos(lep1.Phi()-tree.metPhi )))**0.5
         out_dict['lepton1_energy']  = lep1.Energy()
             
-        if self.selection in ['e4j','mu4j','e4j_fake','mu4j_fake']:
+        if self.selection in ['e4j','mu4j','e4j_fakes','mu4j_fakes']:
             jet1, jet2, jet3, jet4 = tree.jetOneP4, tree.jetTwoP4, tree.jetThreeP4, tree.jetFourP4
             tag1, tag2, tag3 ,tag4 = tree.jetOneTag, tree.jetTwoTag, tree.jetThreeTag, tree.jetFourTag   
             
@@ -405,13 +405,13 @@ class BLTReader:
 
     def _setNameList(self):
         ## 1. define the datalist
-        if self.selection in ["mumu","mutau","mu4j","mu4j_fake"]:
+        if self.selection in ["mumu","mutau","mu4j","mu4j_fakes"]:
             self.datalist = [
                 'muon_2016B', 'muon_2016C','muon_2016D','muon_2016E',
                 'muon_2016F','muon_2016G','muon_2016H'
                 ]
 
-        elif self.selection in ["ee","etau","e4j","e4j_fake"]:
+        elif self.selection in ["ee","etau","e4j","e4j_fakes"]:
             self.datalist = [
                 'electron_2016B', 'electron_2016C','electron_2016D','electron_2016E',
                 'electron_2016F','electron_2016G','electron_2016H'
