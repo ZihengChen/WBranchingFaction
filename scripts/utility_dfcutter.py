@@ -15,7 +15,6 @@ class DFCutter:
         self.selection = selection
         self.nbjet = nbjet
         self.name = name
-        self.cut = self._cut()
 
         if self.selection == "emu2":
             self.pickleDirectry = common.dataDirectory() + "pickle/emu/{}/".format( self.name )
@@ -42,7 +41,7 @@ class DFCutter:
             dataFrame = self._variateDataFrame(dataFrame,variation)
 
         # MARK -- cut the dataframe
-        dataFrame = dataFrame.query(self.cut)
+        dataFrame = dataFrame.query(self._cut(variation))
 
         # MARK -- post processing
         # drop if data of emu,mue
@@ -52,11 +51,14 @@ class DFCutter:
         dataFrame = dataFrame.reset_index(drop=True)
         return dataFrame
 
-    def _cut(self):
+    def _cut(self,variation):
         zveto  = " & (dilepton_mass<80 | dilepton_mass>102) "
         lmveto = " & (dilepton_mass>12) "
-        ssveto = " & (lepton1_q != lepton2_q) "
-        osveto = " & (lepton1_q == lepton2_q) "
+
+        leptonSign = " & (lepton1_q != lepton2_q) "
+        if variation == 'ss':
+            leptonSign = " & (lepton1_q == lepton2_q) "
+
         
         nbveto = " & (nBJets{})".format(self.nbjet)
 
@@ -65,15 +67,15 @@ class DFCutter:
             njveto = " & (nJets >= 4)"
 
         sltcut = {
-                "mumu"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + ssveto + zveto,
-                "ee"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + ssveto + zveto,
-                "mutau" : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + ssveto,
-                "etau"  : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + ssveto,
+                "mumu"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + leptonSign + zveto,
+                "ee"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + leptonSign + zveto,
+                "mutau" : " (lepton1_pt > 25) & (lepton2_pt > 20) " + lmveto + leptonSign,
+                "etau"  : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
                 "mu4j"  : " (lepton1_pt > 30) ",
                 "e4j"   : " (lepton1_pt > 30) ",
 
-                "emu"   : " ((triggerLepton == 1) | (triggerLepton == 3 & lepton1_pt>lepton2_pt)) & (lepton1_pt > 25) & (lepton2_pt > 15) " + lmveto +  ssveto, 
-                "emu2"  : " ((triggerLepton == 2) | (triggerLepton == 3 & lepton1_pt<lepton2_pt)) & (lepton1_pt > 10) & (lepton2_pt > 30) " + lmveto +  ssveto, 
+                "emu"   : " ((triggerLepton == 1) | (triggerLepton == 3 & lepton1_pt>lepton2_pt)) & (lepton1_pt > 25) & (lepton2_pt > 15) " + lmveto +  leptonSign, 
+                "emu2"  : " ((triggerLepton == 2) | (triggerLepton == 3 & lepton1_pt<lepton2_pt)) & (lepton1_pt > 10) & (lepton2_pt > 30) " + lmveto +  leptonSign, 
                 }
 
         return sltcut[self.selection] + njveto + nbveto

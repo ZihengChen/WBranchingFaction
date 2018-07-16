@@ -282,6 +282,7 @@ class ASingleKinematicPlot:
                                  gridspec_kw={'height_ratios':[3,1]},
                                  figsize=self.figuresize)
         fig.subplots_adjust(hspace=0)
+        self.axes = axes
         ax = axes[0]
 
         ######################### 1. Main Plots #############################
