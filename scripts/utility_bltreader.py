@@ -5,6 +5,7 @@ import pandas as pd
 import ROOT as root
 
 import utility_common as common
+from utility_common import *
 
 
 class BLTReader:
@@ -468,7 +469,7 @@ class BLTReader:
             'ttbar_inclusive_fsrdown' : 'ttbar_inclusive_FSRDown',
             'ttbar_inclusive_fsrup'   : 'ttbar_inclusive_FSRUp',
             'ttbar_inclusive_isrdown' : 'ttbar_inclusive_ISRDown',
-            'ttbar_inclusive_isrup'   : 'ttbar_inclusive_ISRUp',,
+            'ttbar_inclusive_isrup'   : 'ttbar_inclusive_ISRUp',
             'ttbar_inclusive_hdampdown':'ttbar_inclusive_MEPSDown',
             'ttbar_inclusive_hdampup' : 'ttbar_inclusive_MEPSUp' ,
             'ttbar_inclusive_down'    : 'ttbar_inclusive_UEDown',

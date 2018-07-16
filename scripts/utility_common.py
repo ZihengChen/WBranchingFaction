@@ -17,7 +17,7 @@ def dataDirectory(isLocal=True):
         dataDir = "/Users/zihengchen/Documents/Analysis/workplace/data/"
     else: 
         # on bahumut
-        dataDir = "/home/zchen/Documents/Analysis/workplace/data/"
+        dataDir = "/mnt/data/zchen/Analysis/"
     return dataDir
 
 def fakeRate():
