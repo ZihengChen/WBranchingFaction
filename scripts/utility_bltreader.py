@@ -5,7 +5,7 @@ import pandas as pd
 import ROOT as root
 
 import utility_common as common
-from utlity_bltreaderDict improt *
+from utlity_bltreaderDict import *
 
 
 class BLTReader:
