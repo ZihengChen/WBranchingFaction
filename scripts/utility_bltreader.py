@@ -9,7 +9,7 @@ import utility_common as common
 
 class BLTReader:
 
-    def __init__(self, inputRootFileName, selection, includeTTTheory=False, readInverseMuISO=False):
+    def __init__(self, inputRootFileName, selection, includeTTTheory=False):
 
         self.dataDirectory = common.dataDirectory(isLocal=False) 
 
@@ -19,8 +19,6 @@ class BLTReader:
         self.selection = selection
         self.lumin = 35.864
         
-        
-        self.readInverseMuISO = readInverseMuISO
         self.includeTTTheory = includeTTTheory
         self._setCrossection()
         self._setNameList()
@@ -54,12 +52,8 @@ class BLTReader:
     
     def readBLT(self):
         # loop over all names
-        if self.readInverseMuISO:
-            for name in self.datalist:
-                self.makePickle(name)
-        else:
-            for name in self.datalist + self.mclist:
-                self.makePickle(name)
+        for name in self.datalist + self.mclist:
+            self.makePickle(name)
         print(self.selection + " finished!")
 
     # MARK-1 -- ntuple to pickle
@@ -194,7 +188,7 @@ class BLTReader:
         out_dict['lepton1_mt']      = (2*lep1.Pt()*tree.met*(1-np.cos(lep1.Phi()-tree.metPhi )))**0.5
         out_dict['lepton1_energy']  = lep1.Energy()
             
-        if self.selection in ['e4j','mu4j']:
+        if self.selection in ['e4j','mu4j','e4j_fake','mu4j_fake']:
             jet1, jet2, jet3, jet4 = tree.jetOneP4, tree.jetTwoP4, tree.jetThreeP4, tree.jetFourP4
             tag1, tag2, tag3 ,tag4 = tree.jetOneTag, tree.jetTwoTag, tree.jetThreeTag, tree.jetFourTag   
             
@@ -394,10 +388,7 @@ class BLTReader:
     def _getOutputPath(self,name):
         outputPath  = self.dataDirectory+"pickle/"+self.selection+"/"
         if name in self.datalist:
-            if self.readInverseMuISO:
-                outputPath += "data2016_inverseISO/"
-            else:
-                outputPath += "data2016/"
+            outputPath += "data2016/"
         elif name in self.mcdibosonlist:
             outputPath += "mcdiboson/"
         elif name in self.mcdylist:
@@ -414,13 +405,13 @@ class BLTReader:
 
     def _setNameList(self):
         ## 1. define the datalist
-        if self.selection in ["mumu","mutau","mu4j"]:
+        if self.selection in ["mumu","mutau","mu4j","mu4j_fake"]:
             self.datalist = [
                 'muon_2016B', 'muon_2016C','muon_2016D','muon_2016E',
                 'muon_2016F','muon_2016G','muon_2016H'
                 ]
 
-        elif self.selection in ["ee","etau","e4j"]:
+        elif self.selection in ["ee","etau","e4j","e4j_fake"]:
             self.datalist = [
                 'electron_2016B', 'electron_2016C','electron_2016D','electron_2016E',
                 'electron_2016F','electron_2016G','electron_2016H'
