@@ -5,11 +5,7 @@ import pandas as pd
 import ROOT as root
 
 import utility_common as common
-<<<<<<< HEAD
-from utility_common import *
-=======
-from utlity_bltreaderDict import *
->>>>>>> 4c973e3263a168fbf50edd0b7ab95c03911cb015
+from utility_bltreaderDict import *
 
 
 class BLTReader:
@@ -67,7 +63,7 @@ class BLTReader:
         scaleFactor = self._getScaleFactor(name)
         outputPath = self._getOutputPath(name)
 
-        makeDirectory(outputPath, clear=False)
+        common.makeDirectory(outputPath, clear=False)
 
         tree = self.inputRootFile.Get('{}/bltTree_{}'.format(self.selection,name))
 

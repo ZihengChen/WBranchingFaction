@@ -86,7 +86,7 @@ def fillAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     out_dict['lepton1_mt']      = (2*lep1.Pt()*tree.met*(1-np.cos(lep1.Phi()-tree.metPhi )))**0.5
     out_dict['lepton1_energy']  = lep1.Energy()
         
-    if self.selection in ['e4j','mu4j','e4j_fakes','mu4j_fakes']:
+    if selection in ['e4j','mu4j','e4j_fakes','mu4j_fakes']:
         jet1, jet2, jet3, jet4 = tree.jetOneP4, tree.jetTwoP4, tree.jetThreeP4, tree.jetFourP4
         tag1, tag2, tag3 ,tag4 = tree.jetOneTag, tree.jetTwoTag, tree.jetThreeTag, tree.jetFourTag   
         
@@ -221,7 +221,6 @@ def fillAllVariables_fakeSelection( tree, selection, name, scaleFactor):
     out_dict['nJets']        =  tree.nJets
     out_dict['nBJets']       =  tree.nBJets
     out_dict['nPV']          =  tree.nPV
-    out_dict['triggerLepton']=  tree.triggerLeptonStatus
 
     out_dict['eventWeight']  =  scaleFactor * tree.eventWeight
     out_dict['eventWeightSF']=  scaleFactor
@@ -237,15 +236,18 @@ def fillAllVariables_fakeSelection( tree, selection, name, scaleFactor):
     out_dict['lepton1_pt']  = lep1.Pt()
     out_dict['lepton1_eta'] = lep1.Eta()
     out_dict['lepton1_phi'] = lep1.Phi()
+    out_dict['lepton1_iso'] = tree.leptonOneIso
+    
 
     out_dict['lepton2_pt']  = lep2.Pt()
     out_dict['lepton2_eta'] = lep2.Eta()
     out_dict['lepton2_phi'] = lep2.Phi()
+    out_dict['lepton2_iso'] = tree.leptonTwoIso
 
     out_dict['dilepton_mass'] = dilepton.M()
     
     lep3 = tree.leptonThreeP4
-    out_dict['lepton3_iso']     = tree.leptonThreeISO
+    out_dict['lepton3_iso']     = tree.leptonThreeIso
     
     out_dict['lepton3_deltaPhi']= lep3.DeltaPhi(dilepton)
     out_dict['lepton3_pt']      = lep3.Pt()
