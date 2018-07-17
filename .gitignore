@@ -1,9 +1,10 @@
 
 data
 plot
-*/__pycache__
-*/.ipynb_checkpoints
-*png
+
+*.ipynb_checkpoints
+*__pycache__
+*.png
 *.DS_Store
 
 
