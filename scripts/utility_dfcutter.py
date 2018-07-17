@@ -17,9 +17,9 @@ class DFCutter:
         self.name = name
 
         if self.selection == "emu2":
-            self.pickleDirectry = common.dataDirectory() + "pickle/emu/{}/".format( self.name )
+            self.pickleDirectry = common.dataDirectory() + "pickles/emu/{}/".format( self.name )
         else:
-            self.pickleDirectry = common.dataDirectory() + "pickle/{}/{}/".format(self.selection, self.name )
+            self.pickleDirectry = common.dataDirectory() + "pickles/{}/{}/".format(self.selection, self.name )
 
     def getDataFrame(self,variation=""):
         '''
@@ -63,7 +63,7 @@ class DFCutter:
         nbveto = " & (nBJets{})".format(self.nbjet)
 
         njveto = " & (nJets >= 2)"
-        if self.selection in ["mu4j","e4j"]:
+        if '4j' in self.selection:
             njveto = " & (nJets >= 4)"
 
         sltcut = {
@@ -73,6 +73,9 @@ class DFCutter:
                 "etau"  : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
                 "mu4j"  : " (lepton1_pt > 30) ",
                 "e4j"   : " (lepton1_pt > 30) ",
+
+                "mu4j_fakes"  : " (lepton1_pt > 30) ",
+                "e4j_fakes"   : " (lepton1_pt > 30) ",
 
                 "emu"   : " ((triggerLepton == 1) | (triggerLepton == 3 & lepton1_pt>lepton2_pt)) & (lepton1_pt > 25) & (lepton2_pt > 15) " + lmveto +  leptonSign, 
                 "emu2"  : " ((triggerLepton == 2) | (triggerLepton == 3 & lepton1_pt<lepton2_pt)) & (lepton1_pt > 10) & (lepton2_pt > 30) " + lmveto +  leptonSign, 

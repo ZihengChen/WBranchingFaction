@@ -23,9 +23,9 @@ class DFPlotter:
 
         # combine all dataframes as a list
         dfList = [MCzz,MCdy] + MCsgList + [Data]
-        if self.hasFake:
-            Fake = DFCutter(self.selection, self.nbjet, "data2016_inverseISO").getDataFrame(variation)
-            dfList = [Fake] + dfList
+        # if self.hasFake:
+        # Fake = DFCutter(self.selection, self.nbjet, "data2016_inverseISO").getDataFrame(variation)
+        # dfList = [Fake] + dfList
         return dfList
 
     def plotKinematics(self):
@@ -47,9 +47,9 @@ class DFPlotter:
     def _setConfiguration(self):
         # MARK -- config output plot directory
         if self.nbjet == "==1":
-            self.outputPlotDir = common.dataDirectory()+"../plot/{}/1b/".format(self.selection)
+            self.outputPlotDir = common.dataDirectory()+"../plots/kinematics/{}/1b/".format(self.selection)
         elif self.nbjet == ">1":
-            self.outputPlotDir = common.dataDirectory()+"../plot/{}/2b/".format(self.selection)
+            self.outputPlotDir = common.dataDirectory()+"../plots/kinematics/{}/2b/".format(self.selection)
         
         common.makeDirectory(self.outputPlotDir)
 
@@ -70,7 +70,7 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020", "#e0301e", "#eb8c00", "#49feec", "deepskyblue", "mediumpurple", "k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"pp/plotparameters.csv")
+            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_ll.csv")
             self.adjust = [1,1,1,1,1,1]
             self.hasFake = False
         # ee
@@ -89,7 +89,7 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020", "#e0301e", "#eb8c00", "#49feec", "deepskyblue", "mediumpurple", "k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"pp/plotparameters.csv")
+            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_ll.csv")
             self.adjust = [1,1,1,1,1,1]
             self.hasFake = False
         
@@ -111,7 +111,7 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"pp/plotparameters.csv")
+            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_ll.csv")
             self.adjust = [1,1,1,1,1,1,1]
             self.hasFake = False
 
@@ -133,7 +133,7 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"pp/plotparameters.csv")
+            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_ll.csv")
             self.adjust = [1,1,1,1,1,1,1]
             self.hasFake = False
         
@@ -155,32 +155,32 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"pp/plotparameters.csv")
+            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_ll.csv")
             self.adjust = [1,1,1,1,1,1,1]
             self.hasFake = False
 
         # mu4j
-        elif self.selection == "mu4j":
+        elif "mu4j" in self.selection:
             self.mcsgQueryList = [
                 'genCategory in [16,18,19,20,21]',
                 'genCategory in [1,2,3,4,5,6,7,8,9,10,11,12]',
                 'genCategory in [17]',
                 'genCategory in [13,14,15]'
             ]
-            self.labelList = ['Fakes','Diboson','V+Jets',
+            self.labelList = ['Diboson','V+Jets',
                 r'$tt/tW \rightarrow lh$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow \mu + h$',
                 r'$tt/tW \rightarrow \mu+ \tau$',
                 'data'
             ]
-            self.colorList = ["gray","#a32020","#e0301e","#eb8c00","#49feec","deepskyblue","mediumpurple","k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"pp/plotparameters4j.csv")
-            self.adjust = [common.fakeRate(),1,1,1,1,1,1]
-            self.hasFake = True
+            self.colorList = ["#a32020","#e0301e","#eb8c00","#49feec","deepskyblue","mediumpurple","k"]
+            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_l4j.csv")
+            self.adjust = [1,1,1,1,1,1]
+            self.hasFake = False
 
         # e4j
-        elif self.selection == "e4j":
+        elif "e4j" in self.selection:
             self.mcsgQueryList = [
                 'genCategory in [17,18,19,20,21]',
                 'genCategory in [1,2,3,4,5,6,7,8,9,13,14,15]',
@@ -195,7 +195,7 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","#49feec","deepskyblue","mediumpurple","k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"pp/plotparameters4j.csv")
+            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_l4j.csv")
             self.adjust = [1,1,1,1,1,1]
             self.hasFake = False
 

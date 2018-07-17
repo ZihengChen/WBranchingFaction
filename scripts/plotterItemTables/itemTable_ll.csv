@@ -1,0 +1,34 @@
+index,var,lower,upper,step,xlabel
+0,jet1_eta,-5,5,0.2,jet1_eta
+2,jet1_pt,0,200,5,jet1_pt [GeV]
+3,jet2_eta,-5,5,0.2,jet2_eta
+5,jet2_pt,0,200,5,jet2_pt [GeV]
+6,jet_delta_eta,0,4.5,0.1,jet_delta_eta
+7,jet_delta_phi,0,3.2,0.1,jet_delta_phi
+8,jet_delta_r,0,6,0.2,jet_delta_r
+9,dijet_eta,-5,5,0.2,dijet_eta
+10,dijet_mass,0,400,10,dijet_mass [GeV]
+11,dijet_phi,-3,3,0.2,dijet_phi
+12,dijet_pt,0,200,5,dijet_pt [GeV]
+13,dijet_pt_over_m,0,5,0.2,dijet_pt_over_m
+14,dilepton_eta,-5,5,0.2,dilepton_eta
+15,dilepton_mass,0,200,5,dilepton_mass [GeV]
+16,dilepton_phi,-3,3,0.2,dilepton_phi
+17,dilepton_pt,0,200,5,dilepton_pt [GeV]
+18,dilepton_pt_over_m,0,5,0.2,dilepton_pt_over_m
+19,lepton1_eta,-5,5,0.2,lepton1_eta
+21,lepton1_pt,0,150,5,lepton1_pt [GeV]
+22,lepton2_eta,-5,5,0.2,lepton2_eta
+24,lepton2_pt,0,150,5,lepton2_pt [GeV]
+25,lepton_delta_eta,0,4.5,0.1,lepton_delta_eta
+26,lepton_delta_phi,0,3.2,0.1,lepton_delta_phi
+27,lepton_delta_r,0,6,0.2,lepton_delta_r
+28,nBJets,0,10,1,nBjets
+29,nElectrons,0,10,1,nElectrons
+30,nJets,0,10,1,nJets
+31,nMuons,0,10,1,nMuons
+32,nPV,0,40,1,nPV
+33,met,0,200,5,met [GeV]
+34,lepton1_mt,0,200,5, lepton1_mt [GeV]
+35,lepton2_mt,0,200,5, lepton2_mt [GeV]
+36,triggerLepton,0,8,1,triggerLepton

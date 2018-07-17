@@ -1,6 +1,6 @@
 
 data
-plot
+plots
 
 *.ipynb_checkpoints
 *__pycache__
@@ -8,17 +8,3 @@ plot
 *.DS_Store
 
 
-
-
-#!/plot/ee/*
-
-#!/plot/mm/*
-#!/plot/em/*
-#!/plot/em2/*
-#!/plot/et/*
-
-#!/plot/mt/*
-#!/plot/m4j/*
-
-#!/plot/e4j/*
-#!/plot/fake/*
