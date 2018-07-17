@@ -1,11 +1,12 @@
-/plot/*
-/data/*
+
 data
 plot
+*/__pycache__
+*/.ipynb_checkpoints
+*png
+*.DS_Store
 
-.DS_Store
-*/.DS_Store
-*/*/.DS_Store
+
 
 
 #!/plot/ee/*
