@@ -38,7 +38,7 @@ class BLTReader:
             nGens = nGens + [self.getNGen(name) for name in self.mcttTheorylist]
 
         df = pd.DataFrame({"name":names, "ngen":nGens })
-        df.to_pickle(self.dataDirectory+"pickle/ngen.pkl")
+        df.to_pickle(self.dataDirectory+"pickles/ngen.pkl")
         
     def getNGen(self,name):
         histogram = self.inputRootFile.Get('GenCategory_'+name)
@@ -182,7 +182,7 @@ class BLTReader:
     def _getOutputPath(self,name):
         folderNameForselection = self.selection
 
-        outputPath  = self.dataDirectory+"pickle/"+folderNameForselection+"/"
+        outputPath  = self.dataDirectory+"pickles/"+folderNameForselection+"/"
         if name in self.datalist:
             outputPath += "data2016/"
         elif name in self.mcdibosonlist:
