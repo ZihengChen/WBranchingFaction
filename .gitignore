@@ -1,9 +1,12 @@
 /plot/*
 /data/*
+data
+plot
 
-/.DS_Store
-/*/.DS_Store
-/*/*/.DS_Store
+.DS_Store
+*/.DS_Store
+*/*/.DS_Store
+
 
 #!/plot/ee/*
 
