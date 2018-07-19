@@ -30,8 +30,10 @@ class BLTReader:
     #############################
         
     def outputNGen(self):
-        names = ["t","tt"] 
-        nGens = [self.getNGen("t_tw")+self.getNGen("tbar_tw"),self.getNGen("ttbar_inclusive")] 
+        names = ["t","tt","tt_2l"] 
+        nGens = [self.getNGen("t_tw")+self.getNGen("tbar_tw"),
+                 self.getNGen("ttbar_inclusive"),
+                 self.getNGen("ttbar_2l2nu")] 
         
         if self.includeTTTheory:
             names = names + self.mcttTheorylist
@@ -54,7 +56,7 @@ class BLTReader:
     
     def readBLT(self):
         # loop over all names
-        for name in self.datalist + self.mclist:
+        for name in self.mclist + self.datalist:
             self.makePickle(name)
         print(self.selection + " finished!")
 
@@ -153,6 +155,7 @@ class BLTReader:
                     't_tw'            :  35850,
                     'tbar_tw'         :  35850,
                     'ttbar_inclusive' :  832000,
+                    'ttbar_2l2nu'     :  87340,
                     
                     'ttbar_inclusive_fsrdown'   :  832000,
                     'ttbar_inclusive_fsrup'     :  832000,
@@ -239,7 +242,7 @@ class BLTReader:
 
         self.mctlist        = [ 't_tw','tbar_tw']
 
-        self.mcttlist       = [ 'ttbar_inclusive']
+        self.mcttlist       = [ 'ttbar_inclusive','ttbar_2l2nu']
 
         self.mcttTheorylist = [ 'ttbar_inclusive_fsrdown','ttbar_inclusive_fsrup',
                                 'ttbar_inclusive_isrdown','ttbar_inclusive_isrup',
@@ -247,7 +250,7 @@ class BLTReader:
                                 'ttbar_inclusive_down','ttbar_inclusive_up']
 
         self.mclist = self.mcttbosonlist + self.mcdibosonlist + self.mcdylist + self.mctlist + self.mcttlist 
-        
+        #self.mclist = self.mcttlist
         if self.includeTTTheory:
             self.mclist = self.mclist + self.mcttTheorylist
 
