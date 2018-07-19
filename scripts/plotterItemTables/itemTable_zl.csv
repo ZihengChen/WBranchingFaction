@@ -1,27 +1,22 @@
 index,var,lower,upper,step,xlabel
-
 15,dilepton_mass,70,110,1,dilepton_mass [GeV]
 16,trilepton_pt,50,300,5,trilepton_pt [GeV]
 17,trilepton_eta,-5,5,0.2,trilepton_eta
 18,trilepton_mass,50,300,5,trilepton_mass [GeV]
-
 19,lepton1_eta,-5,5,0.2,lepton1_eta
 20,lepton1_phi,-3,3,0.2,lepton1_phi
 21,lepton1_pt,0,150,5,lepton1_pt [GeV]
 22,lepton2_eta,-5,5,0.2,lepton2_eta
 23,lepton2_phi,-3,3,0.2,lepton2_phi
 24,lepton2_pt,0,150,5,lepton2_pt [GeV]
-
-22,lepton3_eta,-5,5,0.2,lepton2_eta
-23,lepton3_phi,-3,3,0.2,lepton2_phi
+22,lepton3_eta,-5,5,0.2,lepton3_eta
+23,lepton3_phi,-3,3,0.2,lepton3_phi
 24,lepton3_pt,0,150,5,lepton3_pt [GeV]
-24,lepton3_iso,0,2,0.05,lepton3_iso
-
+24,lepton3_iso,-0.05,2,0.05,lepton3_iso
 28,nBJets,0,10,1,nBjets
 29,nElectrons,0,10,1,nElectrons
 30,nJets,0,10,1,nJets
 31,nMuons,0,10,1,nMuons
 32,nPV,0,40,1,nPV
-
 33,met,0,200,5,met [GeV]
 34,lepton3_deltaPhi,0,4.2,0.1,lepton3_deltaPhi 
