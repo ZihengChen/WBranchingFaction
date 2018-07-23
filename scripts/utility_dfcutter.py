@@ -17,9 +17,15 @@ class DFCutter:
         self.name = name
 
         if self.selection == "emu2":
-            self.pickleDirectry = common.dataDirectory() + "pickles/emu/{}/".format( self.name )
+            if 'mctt' in self.name:
+                self.pickleDirectry = common.dataDirectory() + "pickles/emu/mctt/"
+            else:
+                self.pickleDirectry = common.dataDirectory() + "pickles/emu/{}/".format( self.name )
         else:
-            self.pickleDirectry = common.dataDirectory() + "pickles/{}/{}/".format(self.selection, self.name )
+            if 'mctt' in self.name:
+                self.pickleDirectry = common.dataDirectory() + "pickles/{}/mctt/".format(self.selection)
+            else:
+                self.pickleDirectry = common.dataDirectory() + "pickles/{}/{}/".format(self.selection, self.name )
 
     def getDataFrame(self,variation=""):
         '''
@@ -31,6 +37,10 @@ class DFCutter:
         # for tt read dedicated pickle
         if self.name == "mctt":
             dataFrame = pd.read_pickle(self.pickleDirectry + "ntuple_ttbar_inclusive.pkl")
+            
+        elif self.name == "mctt_2l2nu":
+            dataFrame = pd.read_pickle(self.pickleDirectry + "ntuple_ttbar_2l2nu.pkl")
+        
         # for not tt, read all pickles in a directory
         else:
             pickles = glob.glob( self.pickleDirectry + "/*.pkl")
