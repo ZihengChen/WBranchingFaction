@@ -8,7 +8,7 @@ class BFSovler3D_Error:
         self.tb = BFSolver_Toolbox()
         self.dataDir = common.dataDirectory() 
 
-        counts = pd.read_pickle( self.dataDir + "count/count_.pkl")
+        counts = pd.read_pickle( self.dataDir + "counts/count_.pkl")
         
         self.a, self.aVar = counts.acc, counts.accVar
         self.ndata, self.ndataVar = counts.ndata, counts.ndataVar
@@ -16,57 +16,92 @@ class BFSovler3D_Error:
         self.nfake, self.nfakeVar = counts.nfake, counts.nfakeVar
         
     
-    def errStat(self, errSource, npoints=100):
+    def errStat(self, errSource):
     
         errs = []
         for icata in range(4):
-
             a,aVar  = self.a[icata], self.aVar[icata]
             ndata,ndataVar = self.ndata[icata],self.ndataVar[icata]
             nmcbg,nmcbgVar = self.nmcbg[icata],self.nmcbgVar[icata]
             nfake,nfakeVar = self.nfake[icata],self.nfakeVar[icata]
 
             slv = BFSolver3D(a)
+            BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
 
             ## data: by err propagation
             if errSource == "data":
-                BW = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-                # taking derivertive dBW/dnData
-                deltaNData = np.identity(4)
-                dBW_over_dnData = []
-                for i in range(4):
-                    BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata+deltaNData[i], nMcbg=nmcbg+nfake))
-                    dBW_over_dnData.append(BW1-BW)
-                dBW_over_dnData = np.array(dBW_over_dnData)
+
+                dBW = []
+                for c in range(4):
+                    # variate ndata to ndata1
+                    ndata1 = ndata.copy()
+                    ndata1[c] = ndata[c] + ndataVar[c]**0.5
+                    # get BW1 corresponding to ndata1
+                    BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata1, nMcbg=nmcbg+nfake))
+                    # push deriveratives
+                    dBW.append( BW1-BW )
+                dBW = np.array(dBW)
                 # propagating error
-                errFromSource = np.matmul(ndataVar, dBW_over_dnData**2)**0.5
+                errFromSource = np.sum(dBW**2,axis=0)**0.5
             
             ## mcbg: by std of toys which variate mcbg
             elif errSource == "mcbg":
-                temp = []
-                for i in trange( npoints, desc = errSource+'-'+str(icata)):
-                    smear = np.random.normal(0, nmcbgVar**0.5)
-                    BW1   = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake+smear))
-                    temp.append(BW1)
-                errFromSource = np.array(temp).std(axis=0)
+            
+                dBW = []
+                for c in range(4):
+                    # variate nmcbg to nmcbg1
+                    nmcbg1 = nmcbg.copy()
+                    nmcbg1[c] = nmcbg[c]+nmcbgVar[c]**0.5
+                    # get BW1 corresponding to nmcbg1
+                    BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg1+nfake))
+                    # push deriveratives
+                    dBW.append( BW1-BW )
+                dBW = np.array(dBW)
+                # propagating error
+                errFromSource = np.sum(dBW**2,axis=0)**0.5
 
             ## mcbg: by std of toys which variate mcbg
             elif errSource == "fake":
-                temp = []
-                for i in trange( npoints, desc=errSource+'-'+str(icata)):
-                    smear = np.random.normal(0, nfakeVar**0.5)
-                    BW1   = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake+smear))
-                    temp.append(BW1)
-                errFromSource = np.array(temp).std(axis=0)
+                dBW = []
+                for c in range(4):
+                    # variate nfake to nfake1
+                    nfake1 = nfake.copy()
+                    nfake1[c] = nfake[c]+nfakeVar[c]**0.5
+                    # get BW1 corresponding to nfake1
+                    BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake1))
+                    # push deriveratives
+                    dBW.append( BW1-BW )
+                dBW = np.array(dBW)
+                # propagating error
+                errFromSource = np.sum(dBW**2,axis=0)**0.5
 
             elif errSource == "mcsg":
-                temp = []
-                for i in trange( npoints, desc=errSource+'-'+str(icata)):
-                    smear = self.smearAcc(a,aVar)
-                    slv1  = BFSolver3D( a + smear)
-                    BW1   = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))    
-                    temp.append(BW1)  
-                errFromSource = np.array(temp).std(axis=0)
+                dBW = []
+                for c in range(4):
+                    for i in range(6):
+                        for j in range(6):
+                            # variate a to a1
+                            if i == j and a[c,i,j]>0.001: 
+                                # variate a to a1
+                                a1 = a.copy()
+                                a1[c,i,j] = a[c,i,j] + aVar[c,i,j]**0.5
+                                # get BW1 corresponding to a1ß
+                                slv1 = BFSolver3D(a1)
+                                BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                                dBW.append( BW1-BW )
+                
+                            if i < j and a[c,i,j]>0.001:
+                                # variate a to a1
+                                a1 = a.copy()
+                                a1[c,i,j] = a[c,i,j] + aVar[c,i,j]**0.5
+                                a1[c,j,i] = a[c,j,i] + aVar[c,j,i]**0.5
+                                # get BW1 corresponding to a1
+                                slv1 = BFSolver3D(a1)
+                                BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                                dBW.append( BW1-BW )
+                dBW = np.array(dBW)
+                # propagating error
+                errFromSource = np.sum(dBW**2,axis=0)**0.5
 
             else:
                 print("invalid stat err source")
