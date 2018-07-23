@@ -30,7 +30,7 @@ class BLTReader:
     #############################
         
     def outputNGen(self):
-        names = ["t","tt","tt_2l"] 
+        names = ["t","tt0","tt2"] 
         nGens = [self.getNGen("t_tw")+self.getNGen("tbar_tw"),
                  self.getNGen("ttbar_inclusive"),
                  self.getNGen("ttbar_2l2nu")] 
@@ -56,7 +56,7 @@ class BLTReader:
     
     def readBLT(self):
         # loop over all names
-        for name in self.mclist + self.datalist:
+        for name in self.mclist:# + self.datalist:
             self.makePickle(name)
         print(self.selection + " finished!")
 
