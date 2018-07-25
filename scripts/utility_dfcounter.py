@@ -2,33 +2,14 @@ import utility_common as common
 from utility_dfcutter import *
 
 
-def countDataFrames(variation=""):
-    labels  = ["trigger","usetag","acc","accVar","accs","accsVar","nmcbg","nmcbgVar","nfake","nfakeVar","ndata","ndataVar"]
-    records = []
-    for trigger in ["mu","e"]:
-        for usetag in ["1b","2b"]:
-            print( "counting "+trigger+usetag + " ...")
-
-            counter = DFCounter(trigger,usetag)
-            counter.setVariation(variation)
-
-            acc,accVar,accs,accsVar = counter.returnAcc()
-            nmcbg,nmcbgVar = counter.returnNMCbg()
-            nfake,nfakeVar = counter.returnNFake()
-            ndata,ndataVar = counter.returnNData()
- 
-            records.append( (trigger,usetag,acc,accVar,accs,accsVar,nmcbg,nmcbgVar,nfake,nfakeVar,ndata,ndataVar) )
-
-    df = pd.DataFrame.from_records(records, columns=labels)
-    df.to_pickle( common.dataDirectory() + "counts/count_{}.pkl".format(variation))
-    print( "counting finished!")
-    
 class DFCounter():
     def __init__(self,trigger,usetag):
 
         self.trigger = trigger
         self.usetag  = usetag
+
         self._setConfiguration(trigger,usetag)
+
 
     def setVariation(self,variation):
         self.variation = variation
@@ -69,19 +50,13 @@ class DFCounter():
 
     def returnAcc(self):
         acc,accVar = [],[] 
-        accs,accsVar = [],[] # breakdown acc to tt,tw, tt_includsive, tt_2l2nu
         for slt in self.selections:
-            temp,tempVar,temps,tempsVar = self.getAcc(slt,self.nbjet)
+            temp,tempVar = self.getAcc(slt,self.nbjet)
             acc.append(temp)
             accVar.append(tempVar)
-
-            accs.append(temps)
-            accsVar.append(tempsVar)
         acc = np.array(acc)
         accVar = np.array(accVar)
-        accs = np.array(accs)
-        accsVar = np.array(accsVar)
-        return acc,accVar,accs,accsVar # 4x6x6,4x6x6
+        return acc,accVar# 4x6x6,4x6x6
 
 
     #############################
@@ -97,7 +72,7 @@ class DFCounter():
     def getNFake(self,selection,nbjet):
 
         if selection == "mu4j":
-            fakeSF = common.muonFakeSF()
+            fakeSF = common.getFakeSF('mu')
 
             temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame()
             n    = np.sum(temp.eventWeight)
@@ -111,7 +86,7 @@ class DFCounter():
             nVar *= fakeSF**2
         
         elif selection == "e4j":
-            fakeSF = common.electronFakeSF()
+            fakeSF = common.getFakeSF('e')
 
             temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame()
             n    = np.sum(temp.eventWeight)
@@ -138,75 +113,46 @@ class DFCounter():
 
     def getAcc(self,selection,nbjet):
 
-
         # tW
+        nGenMCt = self.dfNGen.query("name=='t'" ).ngen.values[0]
         df = DFCutter(selection,nbjet,"mct").getDataFrame(self.variation)
-        nMCt  = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
-        accMCt  = nMCt /self.nGenMCt
-        accMCtVar = accMCt  * (1-accMCt ) / self.nGenMCt 
+        nMCt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
 
+        accMCt, accMCtVar = common.getEfficiency(nMCt, nGenMCt)
+
+
+        # tt
+        # variated tt
         if self.variation in ['FSRUp','FSRDown','ISRUp','ISRDown','UEUp','UEDown','MEPSUp','MEPSDown']:
             nGenMCtt = self.dfNGen[self.dfNGen.name=='ttbar_inclusive_'+self.variation].ngen.values[0]
-
             df = DFCutter(selection,nbjet,"mctt").getDataFrame(self.variation)
-            nMCtt  = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
-            accMCtt = nMCtt/self.nGenMCtt
-            accMCttVar = accMCtt * (1-accMCtt) / nGenMCtt
+            nMCtt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
+        # nominal tt
+        else:   
+            # inclusive tt
+            nGenMCtt = self.dfNGen[self.dfNGen.name=='tt'].ngen.values[0]
+            df = DFCutter(selection,nbjet,'mctt').getDataFrame(self.variation)
+            nMCtt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
+            # include semilepton and lepton tt
+            # for mcttName in ['_2l2nu','_semilepton']:
+            #     nGenMCtt += self.dfNGen[self.dfNGen.name=='tt'+mcttName].ngen.values[0]
+            #     df = DFCutter(selection,nbjet,'mctt'+mcttName).getDataFrame(self.variation)
+            #     nMCtt += self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
+        accMCtt, accMCttVar = common.getEfficiency(nMCtt, nGenMCtt)
 
-            accs = np.array([   accMCtt[self.arrayToMatrix], 
-                                accMCt[self.arrayToMatrix]])
-
-            accsVar = np.array([    accMCttVar[self.arrayToMatrix], 
-                                    accMCtVar[self.arrayToMatrix]])
-            
-        else:
-
-            # tt_inclusive
-            df = DFCutter(selection,nbjet,"mctt").getDataFrame(self.variation)
-            _nMCtt  = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
-            _accMCtt = _nMCtt/self.nGenMCtt
-            _accMCttVar = _accMCtt * (1-_accMCtt) / self.nGenMCtt
-
-            # tt_2l2nu
-            df = DFCutter(selection,nbjet,"mctt_2l2nu").getDataFrame(self.variation)
-            _nMCtt_2l2nu = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
-            _accMCtt_2l2nu = _nMCtt_2l2nu/self.nGenMCtt_2l2nu
-            _accMCttVar_2l2nu = _accMCtt_2l2nu * (1-_accMCtt_2l2nu) / self.nGenMCtt_2l2nu
-
-            # tt
-            accMCtt = (_nMCtt + _nMCtt_2l2nu)/ ( self.nGenMCtt + self.nGenMCtt_2l2nu )
-            accMCttVar = accMCtt * (1-accMCtt) / ( self.nGenMCtt + self.nGenMCtt_2l2nu )
-
-
-            accs = np.array([   accMCtt[self.arrayToMatrix], 
-                                accMCt[self.arrayToMatrix], 
-                                _accMCtt[self.arrayToMatrix], 
-                                _accMCtt_2l2nu[self.arrayToMatrix]])
-
-            accsVar = np.array([    accMCttVar[self.arrayToMatrix], 
-                                    accMCtVar[self.arrayToMatrix],
-                                     _accMCttVar[self.arrayToMatrix], 
-                                    _accMCttVar_2l2nu[self.arrayToMatrix]])
-            
-
-            
-
+        # combine tt and tW
         acc = self.c_ttxs * accMCtt + self.c_txs * accMCt
         accVar = self.c_ttxs**2 * accMCttVar + self.c_txs**2 * accMCtVar
 
-        #if matrixFormat:
         acc = acc[self.arrayToMatrix]
         accVar = accVar[self.arrayToMatrix]
 
+        return acc,accVar
 
-
-        return acc,accVar,accs,accsVar
-
-
+    
     #############################
     ## private helper functions
     #############################
-
 
     def _countDataFrameByTauDecay(self, df, normToLumin=True, withWeights=True):
 
@@ -232,14 +178,14 @@ class DFCounter():
         return np.array(yields)
     
     def _setConfiguration(self,trigger,usetag):
-        self.dataDirectry = common.dataDirectory()
+        self.baseDir = common.getBaseDirectory() 
         self.variation = ""
 
         # config nbjet and selections
         if trigger == "mu":
             self.selections = ["emu","mumu","mutau","mu4j"]
         elif trigger == "e":
-            self.selections = ["ee","emu2","etau","e4j"]
+            self.selections = ["ee" ,"emu2","etau" , "e4j"]
         
         if usetag == "1b":
             self.nbjet = "==1"
@@ -247,11 +193,8 @@ class DFCounter():
             self.nbjet = ">1"
 
         # read nGen from file
-        dfNGen = pd.read_pickle(self.dataDirectry + "pickles/ngen.pkl")
-        self.dfNGen = dfNGen
-        self.nGenMCt  = dfNGen.query("name=='t'" ).ngen.values[0]
-        self.nGenMCtt = dfNGen.query("name=='tt'").ngen.values[0]
-        self.nGenMCtt_2l2nu = dfNGen.query("name=='tt_2l2nu'").ngen.values[0] + 1e-9
+        dfNGen = pd.read_pickle(self.baseDir + "data/pickles/ngen.pkl")
+        self.dfNGen   = dfNGen
 
 
         self.ttxs,self.txs = 832,35.85*2

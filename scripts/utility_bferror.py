@@ -6,9 +6,9 @@ from tqdm import tqdm, trange
 class BFSovler3D_Error:
     def __init__(self):
         self.tb = BFSolver_Toolbox()
-        self.dataDir = common.dataDirectory() 
+        self.baseDir = common.getBaseDirectory() 
 
-        counts = pd.read_pickle( self.dataDir + "counts/count_.pkl")
+        counts = pd.read_pickle( self.baseDir + "data/counts/count_inc.pkl")
         
         self.a, self.aVar = counts.acc, counts.accVar
         self.ndata, self.ndataVar = counts.ndata, counts.ndataVar
@@ -85,12 +85,12 @@ class BFSovler3D_Error:
                                 # variate a to a1
                                 a1 = a.copy()
                                 a1[c,i,j] = a[c,i,j] + aVar[c,i,j]**0.5
-                                # get BW1 corresponding to a1ß
+                                # get BW1 corresponding to a1
                                 slv1 = BFSolver3D(a1)
                                 BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
                                 dBW.append( BW1-BW )
                 
-                            if i < j and a[c,i,j]>0.001:
+                            if i < j :#and a[c,i,j]>0.001:
                                 # variate a to a1
                                 a1 = a.copy()
                                 a1[c,i,j] = a[c,i,j] + aVar[c,i,j]**0.5
@@ -171,7 +171,7 @@ class BFSovler3D_Error:
     def errSystem_energyScale(self,errSource="e"):
         errs = []
 
-        counts1 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"PtDown"))
+        counts1 = pd.read_pickle(self.baseDir + "data/countss/count_{}.pkl".format(errSource+"PtDown"))
 
         for icata in range(4):
             
@@ -194,8 +194,8 @@ class BFSovler3D_Error:
         '''
 
 
-        counts1 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"Up"))
-        counts2 = pd.read_pickle(self.dataDir + "count/count_{}.pkl".format(errSource+"Down"))
+        counts1 = pd.read_pickle(self.baseDir + "data/counts/count_{}.pkl".format(errSource+"Up"))
+        counts2 = pd.read_pickle(self.baseDir + "data/counts/count_{}.pkl".format(errSource+"Down"))
 
 
         errs = []

@@ -5,7 +5,7 @@ from IPython.display import clear_output
 
 
 class DFPlotter:
-    def __init__(self,selection,nbjet):
+    def __init__(self,selection,nbjet,):
         self.selection = selection
         self.nbjet = nbjet
         self._setConfiguration() 
@@ -29,6 +29,8 @@ class DFPlotter:
         return dfList
 
     def plotKinematics(self):
+        if self.outputPlotDir != None:
+            common.makeDirectory(self.outputPlotDir)
 
         dfList = self.getDataFrameList()
         for index, row in self.pp.iterrows():
@@ -45,13 +47,20 @@ class DFPlotter:
 
 
     def _setConfiguration(self):
+        self.outputPlotDir = None
+        
+        baseDirectory = common.getBaseDirectory()
+
         # MARK -- config output plot directory
         if self.nbjet == "==1":
-            self.outputPlotDir = common.dataDirectory()+"../plots/kinematics/{}/1b/".format(self.selection)
+            self.outputPlotDir = baseDirectory+"plots/kinematics/{}/1b/".format(self.selection)
+            
         elif self.nbjet == ">1":
-            self.outputPlotDir = common.dataDirectory()+"../plots/kinematics/{}/2b/".format(self.selection)
+            self.outputPlotDir = baseDirectory+"plots/kinematics/{}/2b/".format(self.selection)
+
+
         
-        common.makeDirectory(self.outputPlotDir)
+
 
         # MARK -- config plotting parameters for each selection
         # mumu
@@ -70,7 +79,7 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020", "#e0301e", "#eb8c00", "#49feec", "deepskyblue", "mediumpurple", "k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_ll.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ll.csv")
             self.adjust = [1,1,1,1,1,1]
             self.hasFake = False
         # ee
@@ -89,7 +98,7 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020", "#e0301e", "#eb8c00", "#49feec", "deepskyblue", "mediumpurple", "k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_ll.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ll.csv")
             self.adjust = [1,1,1,1,1,1]
             self.hasFake = False
         
@@ -111,7 +120,7 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_ll.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ll.csv")
             self.adjust = [1,1,1,1,1,1,1]
             self.hasFake = False
 
@@ -133,7 +142,7 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_ll.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ll.csv")
             self.adjust = [1,1,1,1,1,1,1]
             self.hasFake = False
         
@@ -155,7 +164,7 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_ll.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ll.csv")
             self.adjust = [1,1,1,1,1,1,1]
             self.hasFake = False
 
@@ -175,7 +184,7 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","#49feec","deepskyblue","mediumpurple","k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_l4j.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_l4j.csv")
             self.adjust = [1,1,1,1,1,1]
             self.hasFake = False
 
@@ -195,7 +204,7 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","#49feec","deepskyblue","mediumpurple","k"]
-            self.pp = pd.read_csv(common.dataDirectory()+"../scripts/plotterItemTables/itemTable_l4j.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_l4j.csv")
             self.adjust = [1,1,1,1,1,1]
             self.hasFake = False
 
