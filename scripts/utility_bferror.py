@@ -8,7 +8,7 @@ class BFSovler3D_Error:
         self.tb = BFSolver_Toolbox()
         self.baseDir = common.getBaseDirectory() 
 
-        counts = pd.read_pickle( self.baseDir + "data/counts/count_inc.pkl")
+        counts = pd.read_pickle( self.baseDir + "data/counts/count_.pkl")
         
         self.a, self.aVar = counts.acc, counts.accVar
         self.ndata, self.ndataVar = counts.ndata, counts.ndataVar
