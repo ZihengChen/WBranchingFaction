@@ -37,7 +37,7 @@ class BLTReader:
                  ] 
         
         if self.includeTTTheory:
-            names = names + self.mcttTheorylist
+            names = names + [self.mcttTheorylistFileNames[name] for name in self.mcttTheorylist]
             nGens = nGens + [self.getNGen(name) for name in self.mcttTheorylist]
 
         df = pd.DataFrame({"name":names, "ngen":nGens })
