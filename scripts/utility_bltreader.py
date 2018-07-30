@@ -30,10 +30,11 @@ class BLTReader:
     #############################
         
     def outputNGen(self):
-        names = ["t","tt0","tt2"] 
+        names = ["t","tt","tt_2l2nu","tt_semilepton"] 
         nGens = [self.getNGen("t_tw")+self.getNGen("tbar_tw"),
                  self.getNGen("ttbar_inclusive"),
-                 self.getNGen("ttbar_2l2nu")] 
+                 self.getNGen("ttbar_2l2nu"),
+                 self.getNGen("ttbar_semilepton")] 
         
         if self.includeTTTheory:
             names = names + self.mcttTheorylist
@@ -156,6 +157,7 @@ class BLTReader:
                     'tbar_tw'         :  35850,
                     'ttbar_inclusive' :  832000,
                     'ttbar_2l2nu'     :  87340,
+                    'ttbar_semilepton':  364456,
                     
                     'ttbar_inclusive_fsrdown'   :  832000,
                     'ttbar_inclusive_fsrup'     :  832000,
@@ -242,15 +244,16 @@ class BLTReader:
 
         self.mctlist        = [ 't_tw','tbar_tw']
 
-        self.mcttlist       = [ 'ttbar_inclusive','ttbar_2l2nu']
+        #self.mcttlist       = [ 'ttbar_inclusive','ttbar_2l2nu','ttbar_semilepton']
+        self.mcttlist       = [ 'ttbar_semilepton']
 
         self.mcttTheorylist = [ 'ttbar_inclusive_fsrdown','ttbar_inclusive_fsrup',
                                 'ttbar_inclusive_isrdown','ttbar_inclusive_isrup',
                                 'ttbar_inclusive_hdampdown','ttbar_inclusive_hdampup',
                                 'ttbar_inclusive_down','ttbar_inclusive_up']
 
-        self.mclist = self.mcttbosonlist + self.mcdibosonlist + self.mcdylist + self.mctlist + self.mcttlist 
-        #self.mclist = self.mcttlist
+        #self.mclist = self.mcttbosonlist + self.mcdibosonlist + self.mcdylist + self.mctlist + self.mcttlist 
+        self.mclist = self.mcttlist
         if self.includeTTTheory:
             self.mclist = self.mclist + self.mcttTheorylist
 
