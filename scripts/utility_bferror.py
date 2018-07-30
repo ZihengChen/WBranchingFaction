@@ -171,7 +171,7 @@ class BFSovler3D_Error:
     def errSystem_energyScale(self,errSource="e"):
         errs = []
 
-        counts1 = pd.read_pickle(self.baseDir + "data/countss/count_{}.pkl".format(errSource+"PtDown"))
+        counts1 = pd.read_pickle(self.baseDir + "data/counts/count_{}.pkl".format(errSource+"PtDown"))
 
         for icata in range(4):
             
