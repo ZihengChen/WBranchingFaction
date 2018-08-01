@@ -134,7 +134,7 @@ class DFPlotter:
                 'genCategory in [13,14,15]'
             ]
             self.labelList = ['Diboson','V+Jets',
-                r'$tt/tW \rightarrow l + h$ (other)',
+                r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow l + l$ (other) ',
                 r'$tt/tW \rightarrow \mu + h$', 
                 r'$tt/tW \rightarrow \tau + h$',
@@ -156,7 +156,7 @@ class DFPlotter:
                 'genCategory in [10,11,12]'
             ]
             self.labelList = ['Diboson','V+Jets',
-                r'$tt/tW \rightarrow l + h$ (other)',
+                r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow l + l$ (other) ',
                 r'$tt/tW \rightarrow e + h$', 
                 r'$tt/tW \rightarrow \tau + h$',

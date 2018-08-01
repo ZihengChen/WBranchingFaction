@@ -131,22 +131,33 @@ class DFCounter():
             num = nMCtt 
             den = nGenMCtt
         # nominal tt
-        else:   
+
+        elif self.variation == '': 
+            # inclusive tt
+            nGenMCtt = self.dfNGen[self.dfNGen.name=='tt'].ngen.values[0]
+            df = DFCutter(selection,nbjet,'mctt').getDataFrame()
+            nMCtt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
+
+            nGenMCtt_2l2nu = self.dfNGen[self.dfNGen.name=='tt_2l2nu'].ngen.values[0]
+            df = DFCutter(selection,nbjet,'mctt_2l2nu').getDataFrame()
+            nMCtt_2l2nu = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
+
+            nGenMCtt_semilepton = self.dfNGen[self.dfNGen.name=='tt_semilepton'].ngen.values[0]
+            df = DFCutter(selection,nbjet,'mctt_semilepton').getDataFrame()
+            nMCtt_semilepton = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
+
+            num = nMCtt + nMCtt_2l2nu + nMCtt_semilepton
+            den = nGenMCtt + nGenMCtt_2l2nu + nGenMCtt_semilepton
+        
+        else:
             # inclusive tt
             nGenMCtt = self.dfNGen[self.dfNGen.name=='tt'].ngen.values[0]
             df = DFCutter(selection,nbjet,'mctt').getDataFrame(self.variation)
             nMCtt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
 
-            nGenMCtt_2l2nu = self.dfNGen[self.dfNGen.name=='tt_2l2nu'].ngen.values[0]
-            df = DFCutter(selection,nbjet,'mctt_2l2nu').getDataFrame(self.variation)
-            nMCtt_2l2nu = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
+            num = nMCtt 
+            den = nGenMCtt
 
-            nGenMCtt_semilepton = self.dfNGen[self.dfNGen.name=='tt_semilepton'].ngen.values[0]
-            df = DFCutter(selection,nbjet,'mctt_semilepton').getDataFrame(self.variation)
-            nMCtt_semilepton = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
-
-            num = nMCtt + nMCtt_2l2nu + nMCtt_semilepton
-            den = nGenMCtt + nGenMCtt_2l2nu + nGenMCtt_semilepton
 
         accMCtt, accMCttVar = common.getEfficiency(num, den)
 
