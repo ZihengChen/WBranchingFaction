@@ -9,6 +9,12 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
         out_dict['runNumber']    =  tree.runNumber
         out_dict['evtNumber']    =  tree.evtNumber
 
+     # 0. Filling Event Info
+    if selection in ['etau','mutau']:
+        out_dict['tauMVA']    =  tree.tauMVA
+        out_dict['tauDecayMode']    =  tree.tauDecayMode
+
+
     out_dict['nMuons']       =  tree.nMuons
     out_dict['nElectrons']   =  tree.nElectrons
     out_dict['nJets']        =  tree.nJets
