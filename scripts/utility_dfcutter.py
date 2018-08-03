@@ -53,7 +53,7 @@ class DFCutter:
             dataFrame = self._variateDataFrame(dataFrame,variation)
 
         # MARK -- cut the dataframe
-        dataFrame = dataFrame.query(self._cut())
+        dataFrame = dataFrame.query(self._cut(variation))
 
         # MARK -- post processing
         # drop if data of emu,mue
@@ -63,7 +63,7 @@ class DFCutter:
         dataFrame = dataFrame.reset_index(drop=True)
         return dataFrame
 
-    def _cut(self):
+    def _cut(self, variation):
         zveto  = " & (dilepton_mass<80 | dilepton_mass>102) "
         lmveto = " & (dilepton_mass>12) "
 
@@ -78,7 +78,7 @@ class DFCutter:
         sltcut = {
                 "mumu"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + leptonSign + zveto,
                 "ee"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + leptonSign + zveto,
-                "mutau" : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
+                "mutau" : " (lepton1_pt > 25) & (lepton2_pt > 20) " + lmveto + leptonSign,
                 "etau"  : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
                 "mu4j"  : " (lepton1_pt > 30) ",
                 "e4j"   : " (lepton1_pt > 30) ",
@@ -89,8 +89,19 @@ class DFCutter:
                 "emu"   : " ((triggerLepton == 1) | (triggerLepton == 3 & lepton1_pt>lepton2_pt)) & (lepton1_pt > 25) & (lepton2_pt > 15) " + lmveto +  leptonSign, 
                 "emu2"  : " ((triggerLepton == 2) | (triggerLepton == 3 & lepton1_pt<lepton2_pt)) & (lepton1_pt > 10) & (lepton2_pt > 30) " + lmveto +  leptonSign, 
                 }
+        
+        totalcut = sltcut[self.selection] + njveto + nbveto
 
-        return sltcut[self.selection] + njveto + nbveto
+        threshold = ''
+        if self.selection in ["mutau","etau"]:
+
+            if 'pta' in variation:
+                threshold = " & (lepton1_pt > {}) ".format( variation[-2:] )
+            if 'ptb' in variation:
+                threshold = " & (lepton2_pt > {}) ".format( variation[-2:] )
+            
+        return totalcut + threshold
+
 
     def _variateDataFrame(self, df, variation):
         # variate the sign of lepton2 to same sign for tau fakes
