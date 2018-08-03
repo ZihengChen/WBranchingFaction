@@ -16,16 +16,18 @@ class DFCutter:
         self.nbjet = nbjet
         self.name = name
 
+        self.baseDir = common.getBaseDirectory() 
+
         if self.selection == "emu2":
             if 'mctt' in self.name:
-                self.pickleDirectry = common.dataDirectory() + "pickles/emu/mctt/"
+                self.pickleDirectry = self.baseDir + "data/pickles/emu/mctt/"
             else:
-                self.pickleDirectry = common.dataDirectory() + "pickles/emu/{}/".format( self.name )
+                self.pickleDirectry = self.baseDir + "data/pickles/emu/{}/".format( self.name )
         else:
             if 'mctt' in self.name:
-                self.pickleDirectry = common.dataDirectory() + "pickles/{}/mctt/".format(self.selection)
+                self.pickleDirectry = self.baseDir + "data/pickles/{}/mctt/".format(self.selection)
             else:
-                self.pickleDirectry = common.dataDirectory() + "pickles/{}/{}/".format(self.selection, self.name )
+                self.pickleDirectry = self.baseDir + "data/pickles/{}/{}/".format(self.selection, self.name )
 
     def getDataFrame(self,variation=""):
         '''
@@ -37,21 +39,21 @@ class DFCutter:
         # for tt read dedicated pickle
         if self.name == "mctt":
             dataFrame = pd.read_pickle(self.pickleDirectry + "ntuple_ttbar_inclusive.pkl")
-            
         elif self.name == "mctt_2l2nu":
             dataFrame = pd.read_pickle(self.pickleDirectry + "ntuple_ttbar_2l2nu.pkl")
-        
+        elif self.name == "mctt_semilepton":
+            dataFrame = pd.read_pickle(self.pickleDirectry + "ntuple_ttbar_semilepton.pkl")
         # for not tt, read all pickles in a directory
         else:
             pickles = glob.glob( self.pickleDirectry + "/*.pkl")
             dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True)
         
         # MARK -- variate the dataframe for MC
-        if not "data2016" in self.name:
+        if not "data2016" in self.name or variation == 'ss':
             dataFrame = self._variateDataFrame(dataFrame,variation)
 
         # MARK -- cut the dataframe
-        dataFrame = dataFrame.query(self._cut(variation))
+        dataFrame = dataFrame.query(self._cut())
 
         # MARK -- post processing
         # drop if data of emu,mue
@@ -61,15 +63,12 @@ class DFCutter:
         dataFrame = dataFrame.reset_index(drop=True)
         return dataFrame
 
-    def _cut(self,variation):
+    def _cut(self):
         zveto  = " & (dilepton_mass<80 | dilepton_mass>102) "
         lmveto = " & (dilepton_mass>12) "
 
         leptonSign = " & (lepton1_q != lepton2_q) "
-        if variation == 'ss':
-            leptonSign = " & (lepton1_q == lepton2_q) "
 
-        
         nbveto = " & (nBJets{})".format(self.nbjet)
 
         njveto = " & (nJets >= 2)"
@@ -94,6 +93,10 @@ class DFCutter:
         return sltcut[self.selection] + njveto + nbveto
 
     def _variateDataFrame(self, df, variation):
+        # variate the sign of lepton2 to same sign for tau fakes
+        if variation == 'ss':
+            df.lepton2_q = - df.lepton2_q
+
         # variate e,m,t energy correction
         if variation == 'EPtDown':
             if self.selection in ['ee','etau','e4j']:
@@ -122,8 +125,9 @@ class DFCutter:
         if variation in ["BTagUp","BTagDown","MistagUp","MistagDown"]:
             df.nBJets = df["nBJets"+variation]
 
-        # variate tt theoretical LHE weights
+        # variate tt theoretical weight and LHE weights
         if (self.name== "mctt"):
+            # for lhe weight variation
             if (variation in ["RenormUp","RenormDown","FactorUp","FactorDown","PDFUp","PDFDown"]):
 
                 variableNames = {
@@ -135,7 +139,7 @@ class DFCutter:
                     "PDFDown"   : "pdf_weight_down"
                     }
                 variableName = variableNames[variation]
-                df.eventWeight = df.eventWeight * df[variableName]
+                df.eventWeight = df.eveßntWeight * df[variableName]
             
             # for tt theoretical variation
             if variation in [ 'FSRUp','FSRDown','ISRUp','ISRDown','UEUp','UEDown','MEPSUp','MEPSDown']:

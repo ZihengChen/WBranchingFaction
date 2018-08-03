@@ -1,6 +1,6 @@
 import numpy as np
 
-def fillAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
+def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
 
     out_dict = {}
     
@@ -36,7 +36,7 @@ def fillAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
         out_dict['qcd_weight_down_down'] = tree.qcdWeights[8]
 
         pdf_var = tree.pdfWeight
-        out_dict['pdf_var']              = pdf_var #+ (tree.qcdWeights[0] - tree.qcdWeights[9])**2
+        out_dict['pdf_var']              = pdf_var
         out_dict['pdf_weight_up']        = 1+np.sqrt(pdf_var/99)
         out_dict['pdf_weight_down']      = 1-np.sqrt(pdf_var/99)
         out_dict['alpha_s_err']          = tree.alphaS
@@ -212,7 +212,7 @@ def fillAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
 
     return out_dict
 
-def fillAllVariables_fakeSelection( tree, selection, name, scaleFactor):
+def getAllVariables_fakeSelection( tree, selection, name, scaleFactor):
 
     out_dict = {}
 

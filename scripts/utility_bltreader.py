@@ -12,29 +12,37 @@ class BLTReader:
 
     def __init__(self, inputRootFileName, selection, includeTTTheory=False):
 
-        self.dataDirectory = common.dataDirectory(isLocal=False) 
+        self.baseDir = common.getBaseDirectory(isLocal=False) 
 
-        self.inputRootFileName = inputRootFileName
-        self.inputRootFile = root.TFile(self.dataDirectory+"root/"+inputRootFileName)
+        self.inputRootFile = root.TFile(self.baseDir+"root/"+inputRootFileName)
 
         self.selection = selection
         self.lumin = 35.864
         
         self.includeTTTheory = includeTTTheory
 
-        self._setCrossection()
-        self._setNameList()
+        self._getCrossection()
+        self._getNameList()
         
     #############################
     ## Save number of Gen 
     #############################
         
     def outputNGen(self):
+<<<<<<< HEAD
         names = ["t","tt","tt_2l2nu","tt_semilepton"] 
         nGens = [self.getNGen("t_tw")+self.getNGen("tbar_tw"),
                  self.getNGen("ttbar_inclusive"),
                  self.getNGen("ttbar_2l2nu"),
                  self.getNGen("ttbar_semilepton")] 
+=======
+        names = ["t","tt","tt_2l","tt_semilepton"] 
+        nGens = [self.getNGen("t_tw")+self.getNGen("tbar_tw"),
+                 self.getNGen("ttbar_inclusive"),
+                 self.getNGen("ttbar_2l2nu"),
+                 self.getNGen("ttbar_semilepton")
+                 ] 
+>>>>>>> 68f658a17efa97207603bd195ee1ad0da9c64a1d
         
         if self.includeTTTheory:
             
@@ -42,7 +50,7 @@ class BLTReader:
             nGens = nGens + [self.getNGen(name) for name in self.mcttTheorylist]
 
         df = pd.DataFrame({"name":names, "ngen":nGens })
-        df.to_pickle(self.dataDirectory+"pickles/ngen.pkl")
+        df.to_pickle(self.baseDir+"data/pickles/ngen.pkl")
         
     def getNGen(self,name):
         histogram = self.inputRootFile.Get('GenCategory_'+name)
@@ -97,7 +105,7 @@ class BLTReader:
                 continue
 
             # and this event to the ntuple
-            entry.update(self._fillAllVariables(tree, self.selection, name, scaleFactor))
+            entry.update(self._getAllVariables(tree, self.selection, name, scaleFactor))
             n -= 1
             yield entry
 
@@ -105,12 +113,12 @@ class BLTReader:
     #############################
     ## private helper functions
     #############################
-    def _fillAllVariables(self, tree, selection, name, scaleFactor):
+    def _getAllVariables(self, tree, selection, name, scaleFactor):
         if selection in ["ee","mumu","emu","mutau","etau","mu4j","e4j","mu4j_fakes","e4j_fakes"]:
-            dictionary = fillAllVariables_multileptonSelection(tree, selection, name, scaleFactor)
+            dictionary = getAllVariables_multileptonSelection(tree, selection, name, scaleFactor)
         else: 
             #selection in ["ee_e","mumu_e","mumu_mu","ee_mu"]:
-            dictionary = fillAllVariables_fakeSelection(tree, selection, name, scaleFactor)
+            dictionary = getAllVariables_fakeSelection(tree, selection, name, scaleFactor)
         return dictionary
         
     def _getScaleFactor(self,name):
@@ -127,7 +135,7 @@ class BLTReader:
         return scaleFactor
         
     
-    def _setCrossection(self):
+    def _getCrossection(self):
         self.xsTable = { 
 
                     'ww'              : 12178,
@@ -186,9 +194,9 @@ class BLTReader:
                 }
 
     def _getOutputPath(self,name):
-        folderNameForselection = self.selection
 
-        outputPath  = self.dataDirectory+"pickles/"+folderNameForselection+"/"
+        outputPath  = self.baseDir+"data/pickles/"+self.selection+"/"
+
         if name in self.datalist:
             outputPath += "data2016/"
         elif name in self.mcdibosonlist:
@@ -205,7 +213,7 @@ class BLTReader:
             outputPath += "mctt/"
         return outputPath
 
-    def _setNameList(self):
+    def _getNameList(self):
         ## 1. define the datalist
         if self.selection in ["mumu","mutau","mu4j","mu4j_fakes","mumu_mu","mumu_e"]:
             self.datalist = [
