@@ -81,7 +81,7 @@ class BFSovler3D_Error:
                     for i in range(6):
                         for j in range(6):
                             # variate a to a1
-                            if i == j and a[c,i,j]>0.001: 
+                            if i == j and a[c,i,j]>0: 
                                 # variate a to a1
                                 a1 = a.copy()
                                 a1[c,i,j] = a[c,i,j] + aVar[c,i,j]**0.5
@@ -90,7 +90,7 @@ class BFSovler3D_Error:
                                 BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
                                 dBW.append( BW1-BW )
                 
-                            if i < j :#and a[c,i,j]>0.001:
+                            if i < j and a[c,i,j]>0:
                                 # variate a to a1
                                 a1 = a.copy()
                                 a1[c,i,j] = a[c,i,j] + aVar[c,i,j]**0.5
@@ -137,9 +137,17 @@ class BFSovler3D_Error:
         errs = np.array(errs)
         return errs
 
+
+
     def errSystem_objectEff(self,errSource):
+        # measured based on 20% per MisID from jet per 100GeV
+        # df = DFCutter('etau','>1',"mctt").getDataFrame()
+        # np.sum( df.eventWeight*(1+0.002*df.lepton2_pt) )/ np.sum(df.eventWeight)
+
+        jetMisTauIDErrList = [1.07958,1.07994,1.07973, 1.07965]
         errs = []
         for icata in range(4):
+            
 
             a     = self.a[icata]
             ndata = self.ndata[icata]
@@ -147,22 +155,68 @@ class BFSovler3D_Error:
             nfake = self.nfake[icata]
 
             slv = BFSolver3D(a)
+            BW = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+
+            
                 
             if errSource == "e":
+
                 effUp = np.array([0.01,0,0,0]) + 1
+                ## tuning up a
+                slv1 = BFSolver3D( effUp[:,None,None]*a )
+                ## tuning up nmcbg
+                BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=effUp*nmcbg+nfake))
+                
+                errs.append(BW1-BW)  
+
             elif errSource == "mu":
+
                 effUp = np.array([0,0.01,0,0]) + 1
-            elif errSource == "tau":
-                effUp = np.array([0,0,0.05,0]) + 1
+                ## tuning up a
+                slv1 = BFSolver3D( effUp[:,None,None]*a )
+                ## tuning up nmcbg
+                BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=effUp*nmcbg+nfake))
+                
+                errs.append(BW1-BW)
+
+
+            elif errSource == "tauID":
+                a1 = a.copy()
+
+                if icata in [0,1]:
+                    trigger = 1
+                if icata in [2,3]:
+                    trigger = 0
+
+                a1[2,trigger,4] = a[2,trigger,4]*1.05
+                a1[2,4,trigger] = a[2,4,trigger]*1.05
+
+                slv1 = BFSolver3D(a1)
+                BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                errs.append(BW1-BW)
+
+
+            elif errSource == "jetMisTauID":
+                jetMisTauIDErr = jetMisTauIDErrList[icata]
+                if icata in [0,1]:
+                    trigger = 1
+                if icata in [2,3]:
+                    trigger = 0
+
+                a1 = a.copy()
+                a1[2,trigger,5] = a[2,trigger,5]*jetMisTauIDErr
+                a1[2,5,trigger] = a[2,5,trigger]*jetMisTauIDErr
+
+                slv1 = BFSolver3D(a1)
+                BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                errs.append(BW1-BW)
+
+
             else:
                 print("invalid stat err source")
 
-            BW = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-            ## tuning up a
-            slv1 = BFSolver3D( effUp[:,None,None]*a )
-            ## tuning up nmcbg
-            BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=effUp*nmcbg+nfake))
-            errs.append(BW1-BW)                
+            
+              
         
         errs = np.array(errs)
         return errs

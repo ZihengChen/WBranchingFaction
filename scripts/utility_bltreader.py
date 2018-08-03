@@ -29,23 +29,14 @@ class BLTReader:
     #############################
         
     def outputNGen(self):
-<<<<<<< HEAD
-        names = ["t","tt","tt_2l2nu","tt_semilepton"] 
-        nGens = [self.getNGen("t_tw")+self.getNGen("tbar_tw"),
-                 self.getNGen("ttbar_inclusive"),
-                 self.getNGen("ttbar_2l2nu"),
-                 self.getNGen("ttbar_semilepton")] 
-=======
         names = ["t","tt","tt_2l","tt_semilepton"] 
         nGens = [self.getNGen("t_tw")+self.getNGen("tbar_tw"),
                  self.getNGen("ttbar_inclusive"),
                  self.getNGen("ttbar_2l2nu"),
                  self.getNGen("ttbar_semilepton")
                  ] 
->>>>>>> 68f658a17efa97207603bd195ee1ad0da9c64a1d
         
         if self.includeTTTheory:
-            
             names = names + [self.mcttTheorylistFileNames[name] for name in self.mcttTheorylist]
             nGens = nGens + [self.getNGen(name) for name in self.mcttTheorylist]
 

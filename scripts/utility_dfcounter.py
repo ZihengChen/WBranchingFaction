@@ -131,7 +131,8 @@ class DFCounter():
             num = nMCtt 
             den = nGenMCtt
         # nominal tt
-        else:   
+
+        else: #self.variation == '' or ('pta' in self.variation) or ('pta' in self.variation) : 
             # inclusive tt
             nGenMCtt = self.dfNGen[self.dfNGen.name=='tt'].ngen.values[0]
             df = DFCutter(selection,nbjet,'mctt').getDataFrame(self.variation)
@@ -147,6 +148,16 @@ class DFCounter():
 
             num = nMCtt + nMCtt_2l2nu + nMCtt_semilepton
             den = nGenMCtt + nGenMCtt_2l2nu + nGenMCtt_semilepton
+        
+        # else:
+        #     # inclusive tt
+        #     nGenMCtt = self.dfNGen[self.dfNGen.name=='tt'].ngen.values[0]
+        #     df = DFCutter(selection,nbjet,'mctt').getDataFrame(self.variation)
+        #     nMCtt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
+
+        #     num = nMCtt 
+        #     den = nGenMCtt
+
 
         accMCtt, accMCttVar = common.getEfficiency(num, den)
 
