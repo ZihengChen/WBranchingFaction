@@ -127,10 +127,19 @@ class BFSovler3D_Error:
             elif errSource == "fake":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
                 BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*1.15))
-            elif errSource == "mcsg":
+            elif errSource == "mctt":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-                slv1 = BFSolver3D(1.05*a)
+                
+                counts1 = pd.read_pickle(self.baseDir + "data/counts/count_{}.pkl".format("TTXSUp"))
+                slv1 = BFSolver3D(counts1.acc[icata])
                 BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+            elif errSource == "mctw":
+                BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                
+                counts1 = pd.read_pickle(self.baseDir + "data/counts/count_{}.pkl".format("TWXSUp"))
+                slv1 = BFSolver3D(counts1.acc[icata])
+                BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+
             else:
                 print("invalid stat err source")
             errs.append(BW1-BW)                
@@ -222,7 +231,7 @@ class BFSovler3D_Error:
         return errs
 
 
-    def errSystem_energyScale(self,errSource="e"):
+    def errSystem_energyScale(self,errSource="E"):
         errs = []
 
         counts1 = pd.read_pickle(self.baseDir + "data/counts/count_{}.pkl".format(errSource+"PtDown"))

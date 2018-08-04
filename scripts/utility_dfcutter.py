@@ -78,7 +78,7 @@ class DFCutter:
         sltcut = {
                 "mumu"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + leptonSign + zveto,
                 "ee"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + leptonSign + zveto,
-                "mutau" : " (lepton1_pt > 25) & (lepton2_pt > 20) " + lmveto + leptonSign,
+                "mutau" : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
                 "etau"  : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
                 "mu4j"  : " (lepton1_pt > 30) ",
                 "e4j"   : " (lepton1_pt > 30) ",

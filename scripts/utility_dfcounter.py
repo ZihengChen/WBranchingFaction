@@ -4,6 +4,7 @@ from utility_dfcutter import *
 
 class DFCounter():
     def __init__(self,trigger,usetag):
+        self.variation = ""
 
         self.trigger = trigger
         self.usetag  = usetag
@@ -13,6 +14,7 @@ class DFCounter():
 
     def setVariation(self,variation):
         self.variation = variation
+        self._setConfiguration(self.trigger,self.usetag)
 
     #############################
     ## Given trigger,usetag
@@ -201,7 +203,6 @@ class DFCounter():
     
     def _setConfiguration(self,trigger,usetag):
         self.baseDir = common.getBaseDirectory() 
-        self.variation = ""
 
         # config nbjet and selections
         if trigger == "mu":
@@ -220,6 +221,12 @@ class DFCounter():
 
 
         self.ttxs,self.txs = 832,35.85*2
+        if self.variation == 'TTXSUp':
+            self.ttxs = self.ttxs * 1.05
+        if self.variation == 'TWXSUp':
+            self.txs = self.txs * 1.05
+
+
         self.c_ttxs = self.ttxs/(self.ttxs+self.txs)
         self.c_txs  = self.txs /(self.ttxs+self.txs)
 
