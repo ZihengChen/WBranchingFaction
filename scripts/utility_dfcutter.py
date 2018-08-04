@@ -113,14 +113,14 @@ class DFCutter:
             if self.selection in ['ee','etau','e4j']:
                 df.lepton1_pt = df.lepton1_pt * 0.995
 
-            if self.selection == ['ee','emu']:
+            if self.selection in ['ee','emu','emu2']:
                 df.lepton2_pt = df.lepton2_pt * 0.995
         
         if variation == 'MuPtDown':
-            if self.selection in ['mumu','emu','mutau','mu4j']:
+            if self.selection in ['mumu','emu','emu2','mutau','mu4j']:
                 df.lepton1_pt = df.lepton1_pt * 0.995
 
-            if self.selection == ['mumu']:
+            if self.selection in ['mumu']:
                 df.lepton2_pt = df.lepton2_pt * 0.995
             
         if variation == 'TauPtDown':
