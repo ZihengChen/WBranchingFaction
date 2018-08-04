@@ -18,8 +18,8 @@ def makeDirectory(filePath, clear=True):
 def getBaseDirectory(isLocal=True):
     if isLocal:
         # on my local macbook
-        # baseDir = "/Users/zihengchen/Documents/Analysis/workplace/"
-        baseDir = "/home/zchen/Documents/Analysis/workplace/"
+        baseDir = "/Users/zihengchen/Documents/Analysis/workplace/"
+        #baseDir = "/home/zchen/Documents/Analysis/workplace/"
     else: 
         # on bahumut
         baseDir = "/home/zchen/Documents/Analysis/workplace/"

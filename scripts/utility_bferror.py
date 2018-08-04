@@ -110,6 +110,38 @@ class BFSovler3D_Error:
 
         errs = np.array(errs)
         return errs
+
+    def errConstent(self, errSource):
+
+        errs = []
+        for icata in range(4):
+            a,aVar  = self.a[icata], self.aVar[icata]
+            ndata,ndataVar = self.ndata[icata],self.ndataVar[icata]
+            nmcbg,nmcbgVar = self.nmcbg[icata],self.nmcbgVar[icata]
+            nfake,nfakeVar = self.nfake[icata],self.nfakeVar[icata]
+
+            slv = BFSolver3D(a)
+            BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+
+            if errSource =='BtmUp':
+                slv1 = BFSolver3D(a,btm=0.1736+0.0005)
+            if errSource =='BteUp':
+                slv1 = BFSolver3D(a,bte=0.1785+0.0004)
+
+
+            BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+
+            errs.append(BW1-BW)
+                 
+        errs = np.array(errs)
+        return errs
+
+            
+
+
+        
+
+
     
     def errSystem_crossSection(self, errSource):
         errs = []
