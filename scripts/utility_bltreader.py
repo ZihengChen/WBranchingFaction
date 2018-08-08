@@ -14,7 +14,7 @@ class BLTReader:
 
         self.baseDir = common.getBaseDirectory(isLocal=False) 
 
-        self.inputRootFile = root.TFile(self.baseDir+"root/"+inputRootFileName)
+        self.inputRootFile = root.TFile(self.baseDir+"data/root/"+inputRootFileName)
 
         self.selection = selection
         self.lumin = 35.864
@@ -69,6 +69,7 @@ class BLTReader:
         common.makeDirectory(outputPath, clear=False)
 
         tree = self.inputRootFile.Get('{}/bltTree_{}'.format(self.selection,name))
+        print(name)
 
         if tree.GetEntriesFast() > 0:
             ntuple = self.fillNtuple(tree, name, scaleFactor)
@@ -206,7 +207,7 @@ class BLTReader:
 
     def _getNameList(self):
         ## 1. define the datalist
-        if self.selection in ["mumu","mutau","mu4j","mu4j_fakes","mumu_mu","mumu_e"]:
+        if self.selection in ["mumu","mutau","mu4j","mu4j_fakes","mumu_mu","mumu_e","emu_tau"]:
             self.datalist = [
                 'muon_2016B', 'muon_2016C','muon_2016D','muon_2016E',
                 'muon_2016F','muon_2016G','muon_2016H'
@@ -243,8 +244,11 @@ class BLTReader:
                                 'w1jets','w2jets','w3jets','w4jets']
 
         self.mctlist        = [ 't_tw','tbar_tw']
-
-        self.mcttlist       = [ 'ttbar_inclusive','ttbar_2l2nu','ttbar_semilepton']
+        
+        if self.selection in ["ee_mu","ee_e","mumu_mu","mumu_e","emu_tau"]:
+            self.mcttlist       = [ 'ttbar_inclusive']
+        else:
+            self.mcttlist       = [ 'ttbar_inclusive','ttbar_2l2nu','ttbar_semilepton']
         #self.mcttlist       = [ 'ttbar_semilepton']
 
         self.mcttTheorylist = [ 'ttbar_inclusive_fsrdown','ttbar_inclusive_fsrup',
