@@ -28,9 +28,9 @@ def getBaseDirectory(isLocal=True):
 def getFakeSF(obj):
     sf = 0
     if obj == "e":
-        sf = 0.116
+        sf = 0.12
     elif obj == 'mu':
-        sf = 0.081
+        sf = 0.09
     elif obj == 'tau':
         sf = 0.87
     return sf

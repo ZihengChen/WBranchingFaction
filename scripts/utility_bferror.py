@@ -158,7 +158,11 @@ class BFSovler3D_Error:
                 BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=1.05*nmcbg+nfake))
             elif errSource == "fake":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*1.15))
+                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*1.30))
+            elif errSource == "lumin":
+                BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=(nmcbg+nfake)*1.025))
+
             elif errSource == "mctt":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
                 
@@ -257,8 +261,6 @@ class BFSovler3D_Error:
                 print("invalid stat err source")
 
             
-              
-        
         errs = np.array(errs)
         return errs
 

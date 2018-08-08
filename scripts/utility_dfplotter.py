@@ -299,7 +299,9 @@ class DFPlotter:
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
             self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ll.csv")
-            self.adjust = [1,1,1,1,1,1,.89/.95]
+            self.adjust = [1,1,1,1,1,1,1]
+            #self.adjust = [1/.95,1/.95,1/.95,1/.95,1/.95,1/.95,.89/.95]
+            
             self.hasFake = False
         
         # etau
@@ -321,7 +323,8 @@ class DFPlotter:
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
             self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ll.csv")
-            self.adjust = [1,1,1,1,1,1,.89/.95]
+            self.adjust = [1,1,1,1,1,1,1]
+            #self.adjust = [1/.95,1/.95,1/.95,1/.95,1/.95,1/.95,.89/.95]
             self.hasFake = False
 
         # mu4j
