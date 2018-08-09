@@ -115,6 +115,52 @@ class NSignal:
         bMatrix = np.outer(bVector,bVector)
         return np.sum( self.a * bMatrix )
 
+class rSovler:
+    def __init__(self, a, xs = 832+35.85*2, lumin=35847, bwl = 0.1080, bte=0.1785, btm=0.1736 ):
+        
+        self.xs = xs
+        self.lumin = lumin
+        self.bwl = bwl
+
+        self.nSignal_den =  NSignal(a[0], xs,lumin,bte,btm)
+        self.nSignal_num =  NSignal(a[1], xs,lumin,bte,btm)
+
+        self.measuredX = self.predictX(self.bwl,)
+
+    
+    def predictX(self, r=1):
+        BW = self.bwl * np.array([1,1,r])
+        self.nSignal_den.predictNSignal()
+        n = np.array( [ it.predictNSignal(BW) for it in self.nSignal] )
+        return n[0:3]/np.sum(n)
+
+
+    
+    def getQuadEqn(self, obsX):
+
+        quadEqn = []
+
+        x,y,z = sym.symbols('x,y,z',real=True)
+        terms = [x*x,y*y,z*z,x*y,x*z,y*z,x,y,z,1]
+
+        # for each channel get quadCoeff
+        coeff = np.array( [ it.quadCoeff for it in self.nSignal] )
+        coeffNorm = np.sum(coeff,axis=0)
+
+        for i in range(3):
+
+            coeffQuadEqn = obsX[i]*coeffNorm - coeff[i]
+            
+            temp = 0
+            for k,term in enumerate(terms):
+                temp += coeffQuadEqn[k] * term
+            quadEqn.append(temp)
+
+        self.quadEqn = quadEqn
+
+        return quadEqn
+
+
 # super class
 class BFSolver:
 

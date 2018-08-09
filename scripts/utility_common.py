@@ -18,8 +18,8 @@ def makeDirectory(filePath, clear=True):
 def getBaseDirectory(isLocal=True):
     if isLocal:
         # on my local macbook
-        #baseDir = "/Users/zihengchen/Documents/Analysis/workplace/"
-        baseDir = "/home/zchen/Documents/Analysis/workplace/"
+        baseDir = "/Users/zihengchen/Documents/Analysis/workplace/"
+        #baseDir = "/home/zchen/Documents/Analysis/workplace/"
     else: 
         # on bahumut
         baseDir = "/home/zchen/Documents/Analysis/workplace/"
@@ -60,6 +60,18 @@ def getEfficiency(k,n,alpha=0.317):
     var = err**2
 
     return center,var
+
+def featureList():
+    ls=['dijet_eta', 'dijet_mass', 'dijet_phi', 'dijet_pt', 'dijet_pt_over_m',
+        'dilepton_eta', 'dilepton_mass', 'dilepton_phi', 'dilepton_pt','dilepton_pt_over_m',
+        'jet1_energy', 'jet1_eta', 'jet1_phi', 'jet1_pt', 'jet1_tag',
+        'jet2_energy', 'jet2_eta', 'jet2_phi', 'jet2_pt', 'jet2_tag',
+        'jet_delta_eta', 'jet_delta_phi', 'jet_delta_r', 
+        'lepton1_energy', 'lepton1_eta','lepton1_reliso', 'lepton1_phi','lepton1_pt',
+        'lepton2_energy', 'lepton2_eta','lepton2_reliso', 'lepton2_phi','lepton2_pt',
+        'lepton_delta_eta', 'lepton_delta_phi','lepton_delta_r'
+        ]
+    return ls
 
 
 

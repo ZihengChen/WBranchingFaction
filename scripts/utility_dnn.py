@@ -12,8 +12,78 @@ import torch.optim as optim
 from   torch.utils.data import Dataset, DataLoader
 
 
+import utility_common as common
 
-    
+
+
+class TrainingDataLoader():
+    def __init__(self,selection,nbjet):
+        self.selection = selection
+        self.nbjet = nbjet
+        
+        self.var_list = common.featureList()
+
+        self.nvar = len(self.var_list)
+
+        if nbjet == '==1':
+            self.bname = '1b'
+        if nbjet == '>1':
+            self.bname = '2b'
+
+        
+    def loadData(self):          
+        MCzz = DFCutter(self.selection, self.nbjet, "mcdiboson").getDataFrame()
+        MCdy = DFCutter(self.selection, self.nbjet, "mcdy").getDataFrame()
+        MCt  = DFCutter(self.selection, self.nbjet, "mct").getDataFrame()
+        MCtt = DFCutter(self.selection, self.nbjet, "mctt").getDataFrame()
+        
+        MCsg  = pd.concat([MCt,MCtt],ignore_index=True)
+        if self.selection == 'mumu':
+            MCsg0 = MCsg.query('genCategory != 14')
+            MCsg1 = MCsg.query('genCategory == 14')
+        if self.selection == 'ee':
+            MCsg0 = MCsg.query('genCategory != 10')
+            MCsg1 = MCsg.query('genCategory == 10')
+        
+        
+        MClist = [MCzz,MCdy,MCsg0,MCsg1]
+        
+        self.df_list, self.N_list, self.NRaw_list = [],[],[]
+        for i in range(len(MClist)):
+            #MClist[i] = MClist[i].reset_index(drop=True)
+            
+            n    = int(np.sum(MClist[i].eventWeight))
+            nRaw = int(np.sum(MClist[i].eventWeight/MClist[i].eventWeightSF))
+            df   = MClist[i].sample(int(n),replace=False)
+            
+            self.N_list.append(n)
+            self.NRaw_list.append(nRaw)
+            self.df_list.append(df)
+        
+        
+        MCbkg   = pd.concat(self.df_list[0:3],ignore_index=True)
+        MCsig   = self.df_list[3]
+        
+        drop_list = [v for v in MCsig.columns if not v in self.var_list]
+        MCbkg.drop( drop_list, axis=1, inplace=True)
+        MCsig.drop( drop_list, axis=1, inplace=True)
+        
+        MCbkg['label'] = 0
+        MCsig['label'] = 1
+        
+        df_train = pd.concat([MCbkg,MCsig],ignore_index=True)
+        df_train = df_train.reset_index(drop=True)
+        self.norm = {}
+        for v in df_train.columns:
+            if v != 'label':
+                mu = df_train[v].mean()
+                sigma = df_train[v].std()
+                df_train[v] = (df_train[v] - mu)/sigma
+                self.norm[v] = (mu,sigma)
+        np.save( common.getBaseDirectory()+"data/networks/{}{}_norm.npy".format(self.selection,self.bname), self.norm)
+        self.df_train = df_train
+
+
 class MyDataset(Dataset):
     def __init__(self, datatable,n, transform=None):
         self.data  = np.reshape(datatable[:,0:-1],(-1,n)).astype('float32')
@@ -28,6 +98,7 @@ class MyDataset(Dataset):
         if self.transform:
             sample = self.transform(sample)
         return sample
+
 
 class Net(nn.Module):
     def __init__(self,n,m1,m2,m3,c):
@@ -96,70 +167,55 @@ def CutScoreEff(mc,a,b,step):
     ax.grid()
 
 
-class trainingDataLoader():
-    def __init__(self,selection,nbjet):
+class DNNGrader():
+    def __init__(self, selection, nbjet):
         self.selection = selection
         self.nbjet = nbjet
         
-        self.var_list = ['dijet_eta', 'dijet_mass', 'dijet_phi', 'dijet_pt', 'dijet_pt_over_m',
-                         'dilepton_eta', 'dilepton_mass', 'dilepton_phi', 'dilepton_pt','dilepton_pt_over_m',
-                         'jet1_energy', 'jet1_eta', 'jet1_phi', 'jet1_pt', 'jet1_tag',
-                         'jet2_energy', 'jet2_eta', 'jet2_phi', 'jet2_pt', 'jet2_tag',
-                         'jet_delta_eta', 'jet_delta_phi', 'jet_delta_r', 
-                         'lepton1_energy', 'lepton1_eta','lepton1_reliso', 'lepton1_phi','lepton1_pt',
-                         'lepton2_energy', 'lepton2_eta','lepton2_reliso', 'lepton2_phi','lepton2_pt',
-                         'lepton_delta_eta', 'lepton_delta_phi','lepton_delta_r'
-                        ]
+        self.var_list = common.featureList()
         self.nvar = len(self.var_list)
-        
-    def loadData(self):          
-        MCzz = DFCutter(self.selection, self.nbjet, "mcdiboson").getDataFrame()
-        MCdy = DFCutter(self.selection, self.nbjet, "mcdy").getDataFrame()
-        MCt  = DFCutter(self.selection, self.nbjet, "mct").getDataFrame()
-        MCtt = DFCutter(self.selection, self.nbjet, "mctt").getDataFrame()
-        
-        MCsg  = pd.concat([MCt,MCtt],ignore_index=True)
-        if self.selection == 'mumu':
-            MCsg0 = MCsg.query('genCategory != 14')
-            MCsg1 = MCsg.query('genCategory == 14')
-        if self.selection == 'ee':
-            MCsg0 = MCsg.query('genCategory != 10')
-            MCsg1 = MCsg.query('genCategory == 10')
-        
-        
-        MClist = [MCzz,MCdy,MCsg0,MCsg1]
-        
-        self.df_list, self.N_list, self.NRaw_list = [],[],[]
-        for i in range(len(MClist)):
-            #MClist[i] = MClist[i].reset_index(drop=True)
-            
-            n    = int(np.sum(MClist[i].eventWeight))
-            nRaw = int(np.sum(MClist[i].eventWeight/MClist[i].eventWeightSF))
-            df   = MClist[i].sample(int(n),replace=False)
-            
-            self.N_list.append(n)
-            self.NRaw_list.append(nRaw)
-            self.df_list.append(df)
-        
-        
-        MCbkg   = pd.concat(self.df_list[0:3],ignore_index=True)
-        MCsig   = self.df_list[3]
-        
-        drop_list = [v for v in MCsig.columns if not v in self.var_list]
-        MCbkg.drop( drop_list, axis=1, inplace=True)
-        MCsig.drop( drop_list, axis=1, inplace=True)
-        
-        MCbkg['label'] = 0
-        MCsig['label'] = 1
-        
-        df_train = pd.concat([MCbkg,MCsig],ignore_index=True)
-        df_train = df_train.reset_index(drop=True)
-        self.norm = {}
-        for v in df_train.columns:
+
+        if nbjet == '==1':
+            self.bname = '1b'
+        if nbjet == '>1':
+            self.bname = '2b'
+
+
+        self.norm = np.load( common.getBaseDirectory()+"data/networks/{}{}_norm.npy".format(self.selection,self.bname) ).item()
+        self.net  = torch.load(common.getBaseDirectory()+"data/networks/{}{}.pt".format(self.selection,self.bname))
+
+    def gradeDF(self, df):
+        # remove other column if not in feature list
+        drop_list = [ v for v in df.columns if not v in self.var_list ]
+        temp = df.drop(drop_list, axis=1)
+
+        # normalize features
+        for v in temp.columns:
             if v != 'label':
-                mu = df_train[v].mean()
-                sigma = df_train[v].std()
-                df_train[v] = (df_train[v] - mu)/sigma
-                self.norm[v] = (mu,sigma)
-        self.df_train = df_train
+                mu,sigma = self.norm[v]
+                temp[v] = (temp[v]-mu)/sigma
         
+        # calculate MVA
+        temp['softmax'] = np.ones(len(temp)).astype(int)
+
+        tempset = MyDataset(temp.as_matrix(),self.nvar)
+        
+        temploader = DataLoader(tempset, batch_size=tempset.__len__(), shuffle=False, num_workers=1)
+        tempiter = iter(temploader).next()
+        tempoutputs  = self.net(Variable(tempiter["feature"]))
+        
+        tempsoftmax  = F.softmax(tempoutputs,dim=1).data.numpy()
+        tempSignalP  = tempsoftmax[:,1]
+        #temppredicts = isSignal.astype(int)
+        #torch.max(tempoutputs.data, 1)[1] # return likelihood, predict
+        df["softmax"] = tempSignalP
+        
+        return df
+
+    
+    def gradeDFList(self,dfList):
+        for idf in dfList:
+            idf = self.gradeDF(idf)
+        return dfList
+
+    
