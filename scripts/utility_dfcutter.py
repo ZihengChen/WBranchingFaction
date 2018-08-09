@@ -1,6 +1,7 @@
 import utility_common as common
 import pandas as pd
 from pylab import *
+from utility_dnn import *
 
 import glob
 import os, sys
@@ -29,7 +30,7 @@ class DFCutter:
             else:
                 self.pickleDirectry = self.baseDir + "data/pickles/{}/{}/".format(self.selection, self.name )
 
-    def getDataFrame(self,variation=""):
+    def getDataFrame(self,variation="", querySoftmax=None):
         '''
         para:   variation==""
         return: dataframe, given selection, nbjet, name
@@ -59,8 +60,14 @@ class DFCutter:
         # drop if data of emu,mue
         if (self.selection in ["emu","emu2"]) and ("data2016" in self.name):
             dataFrame = dataFrame.drop_duplicates(subset=['runNumber', 'evtNumber'])
+
+        # query sortmax if needed
+        if not querySoftmax is None:
+            dataFrame = DNNGrader(self.selection,self.nbjet).gradeDF(dataFrame,querySoftmax=0.05)
+
         # reindex the dataframe
-        dataFrame = dataFrame.reset_index(drop=True)
+        dataFrame.reset_index(drop=True, inplace=True)
+
         return dataFrame
 
     def _cut(self, variation):

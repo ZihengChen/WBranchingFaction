@@ -494,9 +494,15 @@ class ASingleKinematicPlot:
             ax.legend(fontsize=10,loc="upper left")
         else:
             ax.legend(fontsize=10,loc="upper right")
-            ax.text(0.04*self.b+0.96*self.a, 1.35*h.max(), 
-                    r'CMS $preliminary$',
-                    style="italic",fontsize="15",fontweight='bold')
+            if self.logscale:
+                ax.text(0.04*self.b+0.96*self.a, 4*h.max(), 
+                        r'CMS $preliminary$',
+                        style="italic",fontsize="15",fontweight='bold')
+            else:
+                ax.text(0.04*self.b+0.96*self.a, 1.35*h.max(), 
+                        r'CMS $preliminary$',
+                        style="italic",fontsize="15",fontweight='bold')
+
             
         ax.grid(True,linestyle="--",alpha=0.5)
         ax.set_xlim(self.a, self.b)

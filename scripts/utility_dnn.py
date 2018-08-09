@@ -39,11 +39,11 @@ class TrainingDataLoader():
         
         MCsg  = pd.concat([MCt,MCtt],ignore_index=True)
         if self.selection == 'mumu':
-            MCsg0 = MCsg.query('genCategory != 14')
-            MCsg1 = MCsg.query('genCategory == 14')
+            MCsg0 = MCsg.query('(genCategory != 14) & (genCategory != 5)')
+            MCsg1 = MCsg.query('(genCategory == 14) | (genCategory == 5)')
         if self.selection == 'ee':
-            MCsg0 = MCsg.query('genCategory != 10')
-            MCsg1 = MCsg.query('genCategory == 10')
+            MCsg0 = MCsg.query('(genCategory != 10) & (genCategory != 4)')
+            MCsg1 = MCsg.query('(genCategory == 10) | (genCategory == 4)')
         
         
         MClist = [MCzz,MCdy,MCsg0,MCsg1]
@@ -184,7 +184,8 @@ class DNNGrader():
         self.norm = np.load( common.getBaseDirectory()+"data/networks/{}{}_norm.npy".format(self.selection,self.bname) ).item()
         self.net  = torch.load(common.getBaseDirectory()+"data/networks/{}{}.pt".format(self.selection,self.bname))
 
-    def gradeDF(self, df):
+    def gradeDF(self, df, querySoftmax=None ):
+        
         # remove other column if not in feature list
         drop_list = [ v for v in df.columns if not v in self.var_list ]
         temp = df.drop(drop_list, axis=1)
@@ -198,6 +199,7 @@ class DNNGrader():
         # calculate MVA
         temp['softmax'] = np.ones(len(temp)).astype(int)
 
+
         tempset = MyDataset(temp.as_matrix(),self.nvar)
         
         temploader = DataLoader(tempset, batch_size=tempset.__len__(), shuffle=False, num_workers=1)
@@ -208,14 +210,22 @@ class DNNGrader():
         tempSignalP  = tempsoftmax[:,1]
         #temppredicts = isSignal.astype(int)
         #torch.max(tempoutputs.data, 1)[1] # return likelihood, predict
+        df = df.reset_index(drop=True)
         df["softmax"] = tempSignalP
+
+        if (not querySoftmax is None) :
+            df = df.query("softmax>{}".format(querySoftmax))
+            df.reset_index(drop=True, inplace=True)
         
         return df
 
+
     
-    def gradeDFList(self,dfList):
+    def gradeDFList(self,dfList, querySoftmax=None):
         for idf in dfList:
-            idf = self.gradeDF(idf)
+            idf = self.gradeDF(idf, querySoftmax)
         return dfList
+
+
 
     
