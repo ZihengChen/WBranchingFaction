@@ -1,6 +1,6 @@
 index,var,lower,upper,step,xlabel
-0,jet1_eta,-5,5,0.2,jet1_eta
-2,jet1_pt,0,200,5,jet1_pt [GeV]
+0,jet1_eta,-5,5,0.2,r'$\eta_{jet1}$'
+2,jet1_pt,0,200,5,r'$\p^T_{jet1}$ [GeV]'
 3,jet2_eta,-5,5,0.2,jet2_eta
 5,jet2_pt,0,200,5,jet2_pt [GeV]
 6,jet_delta_eta,0,4.5,0.1,jet_delta_eta

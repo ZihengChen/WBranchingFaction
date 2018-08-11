@@ -12,7 +12,7 @@ index,var,lower,upper,step,xlabel
 22,lepton3_eta,-5,5,0.2,lepton3_eta
 23,lepton3_phi,-3,3,0.2,lepton3_phi
 24,lepton3_pt,0,150,5,lepton3_pt [GeV]
-24,lepton3_iso,-0.05,1.0,0.05,lepton3_iso
+24,lepton3_iso,-0.5,5,1,lepton3_iso
 28,nBJets,0,10,1,nBjets
 29,nElectrons,0,10,1,nElectrons
 30,nJets,0,10,1,nJets

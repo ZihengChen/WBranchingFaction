@@ -65,6 +65,8 @@ class DFCutter:
         if not querySoftmax is None:
             dataFrame = DNNGrader(self.selection,self.nbjet).gradeDF(dataFrame,querySoftmax=0.05)
 
+        #dataFrame = self._modifyTauIDCorrection(dataFrame)
+
         # reindex the dataframe
         dataFrame.reset_index(drop=True, inplace=True)
 
@@ -166,5 +168,17 @@ class DFCutter:
         
         return df
 
+    def _modifyTauIDCorrection(self, df):
+        if self.selection in ['mutau','etau']:
+            df.eventWeight = df.eventWeight/0.95
+
+            if ("mctt" in self.name) or ("mct" in self.name):
+                slt = df.genCategory==12
+                df[slt].eventWeight = df[slt].eventWeight*0.89
+
+                slt = df.genCategory==15
+                df[slt].eventWeight = df[slt].eventWeight*0.89
+
+        return df
 
 
