@@ -1,0 +1,34 @@
+index,var,lower,upper,step,xlabel
+1,jet1_eta,-5,5,0.2,$\eta_{j_1}$
+2,jet1_pt,0,200,5,$p^T_{j_1}$ [GeV]
+3,jet2_eta,-5,5,0.2,$\eta_{j_2}$
+4,jet2_pt,0,200,5,$p^T_{j_2}$ [GeV]
+5,jet_delta_eta,0,4.5,0.1,$\Delta \eta_{jj}$
+6,jet_delta_phi,0,3.2,0.1,$\Delta \phi_{jj}$
+7,jet_delta_r,0,6,0.2,$\Delta R_{jj}$
+8,dijet_eta,-5,5,0.2,$\eta_{jj}$
+9,dijet_mass,0,400,10,$m_{jj}$ [GeV]
+10,dijet_phi,-3,3,0.2,$\phi_{jj}$
+11,dijet_pt,0,200,5,$p^T_{jj}$ [GeV]
+12,dijet_pt_over_m,0,5,0.2,$ p^T_{jj} / m_{jj} $
+13,dilepton_eta,-5,5,0.2,$\eta_{\mu\mu}$
+14,dilepton_mass,0,200,5,$m_{\mu\mu}$ [GeV]
+15,dilepton_phi,-3,3,0.2,$\phi_{\mu\mu}$
+16,dilepton_pt,0,200,5,$p^T_{\mu\mu}$ [GeV]
+17,dilepton_pt_over_m,0,5,0.2,$p^T_{\mu\mu} / m_{\mu\mu} $
+18,lepton1_eta,-5,5,0.2,$\eta_{\mu_1}$
+19,lepton1_pt,0,150,5,$p^T_{\mu_1}$ [GeV]
+20,lepton2_eta,-5,5,0.2,$\eta_{\mu_2}$
+21,lepton2_pt,0,150,5,$p^T_{\mu_2}$ [GeV]
+22,lepton_delta_eta,0,4.5,0.1,$\Delta \eta_{\mu\mu}$
+23,lepton_delta_phi,0,3.2,0.1,$\Delta \phi_{\mu\mu}$
+24,lepton_delta_r,0,6,0.2,$\Delta R_{\mu\mu}$
+25,nBJets,0,10,1,$n_{b}$
+26,nElectrons,0,10,1,$n_{e}$
+27,nJets,0,10,1,$n_{j}$
+28,nMuons,0,10,1,$n_{\mu}$
+29,nPV,0,40,1,$n_{PV}$
+30,met,0,200,5,met [GeV]
+31,lepton1_mt,0,200,5,$m^T_{\mu_1}$ [GeV]
+32,lepton2_mt,0,200,5,$m^T_{\mu_2}$ [GeV]
+33,triggerLepton,0,8,1,triggerLepton

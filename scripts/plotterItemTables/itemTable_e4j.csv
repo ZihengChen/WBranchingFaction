@@ -1,0 +1,25 @@
+index,var,lower,upper,step,xlabel
+0,jet1_eta,-5,5,0.2,$\eta_{j_1}$
+1,jet1_pt,0,200,5,$p^T_{j_1}$ [GeV]
+2,jet2_eta,-5,5,0.2,$\eta_{j_2}$
+3,jet2_pt,0,200,5,$p^T_{j_2}$ [GeV]
+4,jet3_eta,-5,5,0.2,$\eta_{j_3}$
+5,jet3_pt,0,200,5,$p^T_{j_3}$ [GeV]
+6,jet4_eta,-5,5,0.2,$\eta_{j_4}$
+7,jet4_pt,0,200,5,$p^T_{j_4}$ [GeV]
+8,dijet_m,0,200,5,$m_{jj}$ [GeV]
+9,trijet_mass1,50,500,10,$m_{jjb_1}$ [GeV]
+10,trijet_mass2,50,500,10,$m_{jjb_2}$ [GeV]
+11,lepton1_mt,0,150,5,$m^T_{e}$
+12,lepton1_eta,-5,5,0.2,$\eta_{e}$
+13,lepton1_phi,-3,3,0.2,$p^T_{e}$ [GeV]
+14,lepton1_pt,0,150,5,$\eta_{e}$
+15,nBJets,0,10,1,$n_{b}$
+16,nElectrons,0,10,1,$n_{e}$
+17,nJets,0,10,1,$n_{j}$
+18,nMuons,0,10,1,$n_{\mu}$
+19,nPV,0,40,1,$n_{PV}$
+20,deltaphi_jet_b1,0,4,0.1,$\Delta \phi_{jjb_1}$
+21,deltaphi_jet_b2,0,4,0.1,$\Delta \phi_{jjb_2}$
+22,deltar_jet_b1,0,5,0.1,$\Delta R_{jjb_1}$
+23,deltar_jet_b2,0,5,0.1,$\Delta R_{jjb_2}$

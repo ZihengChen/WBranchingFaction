@@ -70,7 +70,6 @@ class SystematicPlotter:
 
     
     def plotKinematics(self):
-        
 
         for index, row in self.pp.iterrows():
 
@@ -107,7 +106,7 @@ class SystematicPlotter:
                     )
 
 
-            ax.errorbar(centers,h,yerr=[np.abs(h1-h),np.abs(h2-h)], fmt='.',color='C0',markersize=0,linewidth=1,alpha=1)
+            ax.errorbar(centers,h,  yerr=[np.abs(h1-h),np.abs(h2-h)], fmt='.',color='C0',markersize=0,linewidth=1,alpha=1)
             ax.errorbar(centers,h+H,yerr=[np.abs(H1-H),np.abs(H2-H)], fmt='.',color='C1',markersize=0,linewidth=1,alpha=1)
             ax.legend()
 
@@ -179,9 +178,21 @@ class DFPlotter:
 
         # combine all dataframes as a list
         dfList = [MCzz,MCdy] + MCsgList + [Data]
-        # if self.hasFake:
-        # Fake = DFCutter(self.selection, self.nbjet, "data2016_inverseISO").getDataFrame(variation)
-        # dfList = [Fake] + dfList
+        
+        # add fakes if in mu4j and e4j
+        if self.selection in ['mu4j','e4j']:
+
+            names = ["data2016","mcdiboson","mcdy","mct","mctt"]
+
+            Fake = pd.DataFrame()
+            for name in names:
+                temp =  DFCutter(self.selection+'_fakes', self.nbjet, name).getDataFrame(variation)
+                if not name == 'data2016':
+                    temp.eventWeight = -1*temp.eventWeight
+                Fake = Fake.append(temp,ignore_index=True)
+
+            dfList = [Fake] + dfList
+            
         return dfList
 
     def plotKinematics(self):
@@ -193,7 +204,7 @@ class DFPlotter:
 
             v,a,b,step,xl = row["var"],row["lower"],row["upper"],row["step"],row["xlabel"]
 
-            sk = ASingleKinematicPlot(v,a,b,step,dfList,adjust=self.adjust,hasFake=self.hasFake)
+            sk = ASingleKinematicPlot(v,a,b,step,dfList,adjust=self.adjust)
             sk.settingPlot(xl,self.labelList, self.colorList)
             sk.makePlot(self.outputPlotDir)
 
@@ -215,8 +226,7 @@ class DFPlotter:
             self.outputPlotDir = baseDirectory+"plots/kinematics/{}/2b/".format(self.selection)
 
 
-        
-
+    
 
         # MARK -- config plotting parameters for each selection
         # mumu
@@ -228,16 +238,16 @@ class DFPlotter:
                 'genCategory in [13,14,15]'
             ]
             self.labelList = ['Diboson','V+Jets',
-                r'$tt/tW \rightarrow l + had$',
+                r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow \mu + \mu$',
                 r'$tt/tW \rightarrow \mu+ \tau$',
                 'data'
             ]
             self.colorList = ["#a32020", "#e0301e", "#eb8c00", "#49feec", "deepskyblue", "mediumpurple", "k"]
-            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ll.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_mumu.csv")
             self.adjust = [1,1,1,1,1,1]
-            self.hasFake = False
+            #self.hasFake = False
         # ee
         elif self.selection == "ee":
             self.mcsgQueryList = [
@@ -247,16 +257,16 @@ class DFPlotter:
                 'genCategory in [10,11,12]'
             ]
             self.labelList = ['Diboson','V+Jets',
-                r'$tt/tW \rightarrow l + had$',
+                r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow e + e$',
                 r'$tt/tW \rightarrow e \tau$',
                 'data'
             ]
             self.colorList = ["#a32020", "#e0301e", "#eb8c00", "#49feec", "deepskyblue", "mediumpurple", "k"]
-            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ll.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ee.csv")
             self.adjust = [1,1,1,1,1,1]
-            self.hasFake = False
+            #self.hasFake = False
         
         # mue and emu
         elif self.selection in ["emu","emu2"]:
@@ -268,7 +278,7 @@ class DFPlotter:
                 'genCategory in [13,14,15]'
             ]
             self.labelList = ['Diboson','V+Jets',
-                r'$tt/tW \rightarrow l + h$ (other)',
+                r'$tt/tW \rightarrow$ (other)',
                 r'$tt/tW \rightarrow l + l$ (other)',
                 r'$tt/tW \rightarrow e + \mu$', 
                 r'$tt/tW \rightarrow e + \tau$',
@@ -276,9 +286,9 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
-            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ll.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_emu.csv")
             self.adjust = [1,1,1,1,1,1,1]
-            self.hasFake = False
+            #self.hasFake = False
 
         # mutau
         elif self.selection == "mutau":
@@ -298,11 +308,12 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
-            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ll.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_mutau.csv")
             self.adjust = [1,1,1,1,1,1,1]
             #self.adjust = [1/.95,1/.95,1/.95,1/.95,1/.95,1/.95,.89/.95]
             
-            self.hasFake = False
+            #self.hasFake = False
+            
         
         # etau
         elif self.selection == "etau":
@@ -322,10 +333,10 @@ class DFPlotter:
                 'data'
             ]
             self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
-            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ll.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_etau.csv")
             self.adjust = [1,1,1,1,1,1,1]
             #self.adjust = [1/.95,1/.95,1/.95,1/.95,1/.95,1/.95,.89/.95]
-            self.hasFake = False
+            #self.hasFake = False
 
         # mu4j
         elif "mu4j" in self.selection:
@@ -336,16 +347,22 @@ class DFPlotter:
                 'genCategory in [13,14,15]'
             ]
             self.labelList = ['Diboson','V+Jets',
-                r'$tt/tW \rightarrow lh$ other',
+                r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow \mu + h$',
                 r'$tt/tW \rightarrow \mu+ \tau$',
                 'data'
             ]
-            self.colorList = ["#a32020","#e0301e","#eb8c00","#49feec","deepskyblue","mediumpurple","k"]
             self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_l4j.csv")
+            self.colorList = ["#a32020","#e0301e","#eb8c00","#49feec","deepskyblue","mediumpurple","k"]
             self.adjust = [1,1,1,1,1,1]
-            self.hasFake = False
+
+            if self.selection == 'mu4j':
+                self.fakeSF = common.getFakeSF('mu')
+
+                self.colorList = ['grey'] + self.colorList
+                self.adjust    = [self.fakeSF] + self.adjust
+                self.labelList = ['Fakes']+self.labelList
 
         # e4j
         elif "e4j" in self.selection:
@@ -356,20 +373,26 @@ class DFPlotter:
                 'genCategory in [10,11,12]'
             ]
             self.labelList = ['Diboson','V+Jets',
-                r'$tt/tW \rightarrow lh$ other',
+                r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow e + h$',
                 r'$tt/tW \rightarrow e + \tau$',
                 'data'
             ]
-            self.colorList = ["#a32020","#e0301e","#eb8c00","#49feec","deepskyblue","mediumpurple","k"]
             self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_l4j.csv")
+            self.colorList = ["#a32020","#e0301e","#eb8c00","#49feec","deepskyblue","mediumpurple","k"]
             self.adjust = [1,1,1,1,1,1]
-            self.hasFake = False
+
+            if self.selection == 'e4j':
+                self.fakeSF = common.getFakeSF('e')
+
+                self.colorList = ['grey'] + self.colorList
+                self.adjust    = [self.fakeSF] + self.adjust
+                self.labelList = ['Fakes']+self.labelList
 
 
 class ASingleKinematicPlot:
-    def __init__(self, v, a,b,step, df_list, adjust=None, hasFake=False):
+    def __init__(self, v, a,b,step, df_list, adjust=None):
         self.v = v
         self.a = a
         self.b = b
@@ -384,7 +407,7 @@ class ASingleKinematicPlot:
         else:
             self.adjust = adjust
         
-        self.hasFake = hasFake
+        #self.hasFake = hasFake
 
         self.variable_list  = [mc[v].values for mc in df_list[0:-1]]
         self.weight_list    = [mc['eventWeight'].values * self.adjust[i] for i,mc in enumerate(df_list[0:-1])]
@@ -417,26 +440,26 @@ class ASingleKinematicPlot:
         return err
     
     def getHistogramErrorDueToBgCrossSection(self):
-        if self.hasFake:
-            variable = np.concatenate(self.variable_list[1:3])
-            weight   = np.concatenate(self.weight_list[1:3])
-            yieldBg,_    = np.histogram(variable, self.mybin, weights=weight)
-            errBg = 0.05 * yieldBg
+        # if self.hasFake:
+        #     variable = np.concatenate(self.variable_list[1:3])
+        #     weight   = np.concatenate(self.weight_list[1:3])
+        #     yieldBg,_    = np.histogram(variable, self.mybin, weights=weight)
+        #     errBg = 0.05 * yieldBg
 
-            variable = self.variable_list[0]
-            weight   = self.weight_list[0]
-            yieldFake,_    = np.histogram(variable, self.mybin, weights=weight)
-            errFake = 0.011/0.070 * yieldFake
+        #     variable = self.variable_list[0]
+        #     weight   = self.weight_list[0]
+        #     yieldFake,_    = np.histogram(variable, self.mybin, weights=weight)
+        #     errFake = 0.011/0.070 * yieldFake
 
-            err = ( errBg**2 + errFake**2)**0.5
-            return err
-        else:
-            variable = np.concatenate(self.variable_list[0:2])
-            weight   = np.concatenate(self.weight_list[0:2])
-            yieldBg,_    = np.histogram(variable, self.mybin, weights=weight)
-            err = 0.05 * yieldBg
-            return err
-        
+        #     err = ( errBg**2 + errFake**2)**0.5
+        #     return err
+        # else:
+        variable = np.concatenate(self.variable_list[0:2])
+        weight   = np.concatenate(self.weight_list[0:2])
+        yieldBg,_    = np.histogram(variable, self.mybin, weights=weight)
+        err = 0.05 * yieldBg
+        return err
+    
 
     def convertZeroInto(self,arr,into=1):
         for i in range(arr.size):
