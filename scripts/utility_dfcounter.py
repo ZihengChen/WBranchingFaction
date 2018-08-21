@@ -73,14 +73,15 @@ class DFCounter():
     
     def getNFake(self,selection,nbjet, querySoftmax=None):
 
+
         if selection == "mu4j":
             fakeSF = common.getFakeSF('mu')
 
-            temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame()
+            temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame(self.variation)
             n    = np.sum(temp.eventWeight)
             nVar = np.sum(temp.eventWeight**2)
             for name in ['mcdiboson','mcdy','mct','mctt']:
-                temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame()
+                temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame(self.variation)
                 n    -= np.sum(temp.eventWeight)
                 nVar += np.sum(temp.eventWeight**2)
 
@@ -90,16 +91,45 @@ class DFCounter():
         elif selection == "e4j":
             fakeSF = common.getFakeSF('e')
 
-            temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame()
+            temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame(self.variation)
             n    = np.sum(temp.eventWeight)
             nVar = np.sum(temp.eventWeight**2)
             for name in ['mcdiboson','mcdy','mct','mctt']:
-                temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame()
+                temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame(self.variation)
                 n    -= np.sum(temp.eventWeight)
                 nVar += np.sum(temp.eventWeight**2)
 
             n *= fakeSF
             nVar *= fakeSF**2
+
+        elif selection == "mutau":
+            fakeSF = 1.0
+
+            temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame(self.variation)
+            n    = np.sum(temp.eventWeight)
+            nVar = np.sum(temp.eventWeight**2)
+            for name in ['mcdiboson','mcdy','mct','mctt']:
+                temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame(self.variation)
+                n    -= np.sum(temp.eventWeight)
+                nVar += np.sum(temp.eventWeight**2)
+
+            n *= fakeSF
+            nVar *= fakeSF**2
+
+        elif selection == "etau":
+            fakeSF = 1.0
+
+            temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame(self.variation)
+            n    = np.sum(temp.eventWeight)
+            nVar = np.sum(temp.eventWeight**2)
+            for name in ['mcdiboson','mcdy','mct','mctt']:
+                temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame(self.variation)
+                n    -= np.sum(temp.eventWeight)
+                nVar += np.sum(temp.eventWeight**2)
+
+            n *= fakeSF
+            nVar *= fakeSF**2
+
 
         else:
             n,nVar = 0,0
