@@ -12,8 +12,8 @@ index,var,lower,upper,step,xlabel
 10,trijet_mass2,50,500,10,$m_{jjb_2}$ [GeV]
 11,lepton1_mt,0,150,5,$m^T_{e}$
 12,lepton1_eta,-5,5,0.2,$\eta_{e}$
-13,lepton1_phi,-3,3,0.2,$p^T_{e}$ [GeV]
-14,lepton1_pt,0,150,5,$\eta_{e}$
+13,lepton1_phi,-3,3,0.2,$\phi_{e}$ [GeV]
+14,lepton1_pt,0,150,5,$p^T_{e}$
 15,nBJets,0,10,1,$n_{b}$
 16,nElectrons,0,10,1,$n_{e}$
 17,nJets,0,10,1,$n_{j}$

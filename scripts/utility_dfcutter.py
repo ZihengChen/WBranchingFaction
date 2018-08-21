@@ -74,6 +74,8 @@ class DFCutter:
 
     def _cut(self, variation):
         zveto  = " & (dilepton_mass<80 | dilepton_mass>102) "
+        wmass = " & (dijet_m<95 & dijet_m>65) "
+        topmass = " & (trijet_mass1<200 & trijet_mass1>140) "
         lmveto = " & (dilepton_mass>12) "
 
         leptonSign = " & (lepton1_q != lepton2_q) "
@@ -89,11 +91,11 @@ class DFCutter:
                 "ee"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + leptonSign + zveto,
                 "mutau" : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
                 "etau"  : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
-                "mu4j"  : " (lepton1_pt > 30) ",
-                "e4j"   : " (lepton1_pt > 30) ",
 
-                "mu4j_fakes"  : " (lepton1_pt > 30) ",
-                "e4j_fakes"   : " (lepton1_pt > 30) ",
+                "mu4j"  : " (lepton1_pt > 25) & (lepton1_mt<60)"+ wmass + topmass,
+                "e4j"   : " (lepton1_pt > 25) & (lepton1_mt<60)"+ wmass + topmass,
+                "mu4j_fakes"  : " (lepton1_pt > 25) & (lepton1_mt<60)" + wmass + topmass,
+                "e4j_fakes"   : " (lepton1_pt > 25) & (lepton1_mt<60)" + wmass + topmass,
 
                 "emu"   : " ((triggerLepton == 1) | (triggerLepton == 3 & lepton1_pt>lepton2_pt)) & (lepton1_pt > 25) & (lepton2_pt > 15) " + lmveto +  leptonSign, 
                 "emu2"  : " ((triggerLepton == 2) | (triggerLepton == 3 & lepton1_pt<lepton2_pt)) & (lepton1_pt > 10) & (lepton2_pt > 30) " + lmveto +  leptonSign, 

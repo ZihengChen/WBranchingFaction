@@ -353,7 +353,7 @@ class DFPlotter:
                 r'$tt/tW \rightarrow \mu+ \tau$',
                 'data'
             ]
-            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_l4j.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_mu4j.csv")
             self.colorList = ["#a32020","#e0301e","#eb8c00","#49feec","deepskyblue","mediumpurple","k"]
             self.adjust = [1,1,1,1,1,1]
 
@@ -379,12 +379,12 @@ class DFPlotter:
                 r'$tt/tW \rightarrow e + \tau$',
                 'data'
             ]
-            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_l4j.csv")
+            self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_e4j.csv")
             self.colorList = ["#a32020","#e0301e","#eb8c00","#49feec","deepskyblue","mediumpurple","k"]
             self.adjust = [1,1,1,1,1,1]
 
             if self.selection == 'e4j':
-                self.fakeSF = common.getFakeSF('e')
+                self.fakeSF = 0#common.getFakeSF('e')
 
                 self.colorList = ['grey'] + self.colorList
                 self.adjust    = [self.fakeSF] + self.adjust
