@@ -136,11 +136,6 @@ class BFSovler3D_Error:
         errs = np.array(errs)
         return errs
 
-            
-
-
-        
-
 
     
     def errSystem_crossSection(self, errSource):
@@ -156,12 +151,28 @@ class BFSovler3D_Error:
             if errSource == "mcbg":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
                 BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=1.05*nmcbg+nfake))
-            elif errSource == "fake":
+            elif errSource == "fakemu":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*1.30))
+                variateScale = np.array([1.,1.,1.,1.])
+                if icata in [0,1]:
+                    variateScale = np.array([1,1,1,1.30])
+                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*variateScale))
+            
+            elif errSource == "fakee":
+                BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                variateScale = np.array([1.,1.,1.,1.])
+                if icata in [2,3]:
+                    variateScale = np.array([1,1,1,1.30])
+                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*variateScale))
+
+            elif errSource == "faketau":
+                BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                variateScale = np.array([1.,1.,1.30,1.])
+                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*variateScale))
+
             elif errSource == "lumin":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=(nmcbg+nfake)*1.025))
+                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg*1.025+nfake))
 
             elif errSource == "mctt":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))

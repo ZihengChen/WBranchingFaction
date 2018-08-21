@@ -32,7 +32,7 @@ def getFakeSF(obj):
     elif obj == 'mu':
         sf = 0.09
     elif obj == 'tau':
-        sf = 0.87
+        sf = 1.0
     return sf
 
 def matrixToArray(mtx):

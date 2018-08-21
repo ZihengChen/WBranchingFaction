@@ -328,7 +328,7 @@ class DFPlotter:
             #self.adjust = [1/.95,1/.95,1/.95,1/.95,1/.95,1/.95,.89/.95]
             #self.hasFake = False
             if self.selection == 'mutau':
-                self.fakeSF = 1.0
+                self.fakeSF = common.getFakeSF('tau')
                 self.colorList = ['grey'] + self.colorList
                 self.adjust    = [self.fakeSF] + self.adjust
                 self.labelList = ['Fakes']+self.labelList
@@ -357,7 +357,7 @@ class DFPlotter:
             #self.adjust = [1/.95,1/.95,1/.95,1/.95,1/.95,1/.95,.89/.95]
             #self.hasFake = False
             if self.selection == 'etau':
-                self.fakeSF = 1.0
+                self.fakeSF = common.getFakeSF('tau')
                 self.colorList = ['grey'] + self.colorList
                 self.adjust    = [self.fakeSF] + self.adjust
                 self.labelList = ['Fakes']+self.labelList

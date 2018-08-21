@@ -103,7 +103,7 @@ class DFCounter():
             nVar *= fakeSF**2
 
         elif selection == "mutau":
-            fakeSF = 1.0
+            fakeSF = common.getFakeSF('tau')
 
             temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame(self.variation)
             n    = np.sum(temp.eventWeight)
@@ -117,7 +117,7 @@ class DFCounter():
             nVar *= fakeSF**2
 
         elif selection == "etau":
-            fakeSF = 1.0
+            fakeSF = common.getFakeSF('tau')
 
             temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame(self.variation)
             n    = np.sum(temp.eventWeight)
