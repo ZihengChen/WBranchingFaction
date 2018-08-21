@@ -19,16 +19,21 @@ class DFCutter:
 
         self.baseDir = common.getBaseDirectory() 
 
+        folderOfSelection = self.selection
         if self.selection == "emu2":
-            if 'mctt' in self.name:
-                self.pickleDirectry = self.baseDir + "data/pickles/emu/mctt/"
-            else:
-                self.pickleDirectry = self.baseDir + "data/pickles/emu/{}/".format( self.name )
+            folderOfSelection = 'emu'
+        
+        if self.selection == "mutau_fakes":
+            folderOfSelection = 'mutau'
+            
+        if self.selection == "etau_fakes":
+            folderOfSelection = 'etau'
+        
+
+        if 'mctt' in self.name:
+            self.pickleDirectry = self.baseDir + "data/pickles/{}/mctt/".format(folderOfSelection)
         else:
-            if 'mctt' in self.name:
-                self.pickleDirectry = self.baseDir + "data/pickles/{}/mctt/".format(self.selection)
-            else:
-                self.pickleDirectry = self.baseDir + "data/pickles/{}/{}/".format(self.selection, self.name )
+            self.pickleDirectry = self.baseDir + "data/pickles/{}/{}/".format(folderOfSelection, self.name )
 
     def getDataFrame(self,variation="", querySoftmax=None):
         '''
@@ -46,15 +51,15 @@ class DFCutter:
             dataFrame = pd.read_pickle(self.pickleDirectry + "ntuple_ttbar_semilepton.pkl")
         # for not tt, read all pickles in a directory
         else:
-            pickles = glob.glob( self.pickleDirectry + "/*.pkl")
+            pickles = glob.glob( self.pickleDirectry + "*.pkl")
             dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True)
         
         # MARK -- variate the dataframe for MC
-        if not "data2016" in self.name or variation == 'ss':
+        if not "data2016" in self.name:
             dataFrame = self._variateDataFrame(dataFrame,variation)
-
+        
         # MARK -- cut the dataframe
-        dataFrame = dataFrame.query(self._cut(variation))
+        dataFrame.query(self._cut(), inplace = True)
 
         # MARK -- post processing
         # drop if data of emu,mue
@@ -65,20 +70,24 @@ class DFCutter:
         if not querySoftmax is None:
             dataFrame = DNNGrader(self.selection,self.nbjet).gradeDF(dataFrame,querySoftmax=0.05)
 
-        #dataFrame = self._modifyTauIDCorrection(dataFrame)
+        # 0.95 is the default normalization in BLT, change it for 0.92 for Vtight working points
+        #dataFrame = self._modifyTauIDCorrection(dataFrame)     
+        if (self.selection in ["mutau","etau"]) and (not "data2016" in self.name):
+            dataFrame.eventWeight = dataFrame.eventWeight*(0.92/0.95)
 
         # reindex the dataframe
         dataFrame.reset_index(drop=True, inplace=True)
 
         return dataFrame
 
-    def _cut(self, variation):
+    def _cut(self):
         zveto  = " & (dilepton_mass<80 | dilepton_mass>102) "
         wmass = " & (dijet_m<95 & dijet_m>65) "
         topmass = " & (trijet_mass1<200 & trijet_mass1>140) "
         lmveto = " & (dilepton_mass>12) "
 
         leptonSign = " & (lepton1_q != lepton2_q) "
+        sameSign = " & (lepton1_q == lepton2_q) "
 
         nbveto = " & (nBJets{})".format(self.nbjet)
 
@@ -89,13 +98,16 @@ class DFCutter:
         sltcut = {
                 "mumu"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + leptonSign + zveto,
                 "ee"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + leptonSign + zveto,
+
                 "mutau" : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
                 "etau"  : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
+                "mutau_fakes": " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + sameSign,
+                "etau_fakes" : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + sameSign,
 
-                "mu4j"  : " (lepton1_pt > 25) & (lepton1_mt<60)"+ wmass + topmass,
-                "e4j"   : " (lepton1_pt > 25) & (lepton1_mt<60)"+ wmass + topmass,
-                "mu4j_fakes"  : " (lepton1_pt > 25) & (lepton1_mt<60)" + wmass + topmass,
-                "e4j_fakes"   : " (lepton1_pt > 25) & (lepton1_mt<60)" + wmass + topmass,
+                "mu4j"  : " (lepton1_pt > 30) ",# & (lepton1_mt<60)"+ wmass + topmass,
+                "e4j"   : " (lepton1_pt > 30) ",# & (lepton1_mt<60)"+ wmass + topmass,
+                "mu4j_fakes"  : " (lepton1_pt > 30) ",# & (lepton1_mt<60)" + wmass + topmass,
+                "e4j_fakes"   : " (lepton1_pt > 30) ",# & (lepton1_mt<60)" + wmass + topmass,
 
                 "emu"   : " ((triggerLepton == 1) | (triggerLepton == 3 & lepton1_pt>lepton2_pt)) & (lepton1_pt > 25) & (lepton2_pt > 15) " + lmveto +  leptonSign, 
                 "emu2"  : " ((triggerLepton == 2) | (triggerLepton == 3 & lepton1_pt<lepton2_pt)) & (lepton1_pt > 10) & (lepton2_pt > 30) " + lmveto +  leptonSign, 
@@ -103,21 +115,21 @@ class DFCutter:
         
         totalcut = sltcut[self.selection] + njveto + nbveto
 
-        threshold = ''
-        if self.selection in ["mutau","etau"]:
+        # threshold = ''
+        # if self.selection in ["mutau","etau"]:
 
-            if 'pta' in variation:
-                threshold = " & (lepton1_pt > {}) ".format( variation[-2:] )
-            if 'ptb' in variation:
-                threshold = " & (lepton2_pt > {}) ".format( variation[-2:] )
+        #     if 'pta' in variation:
+        #         threshold = " & (lepton1_pt > {}) ".format( variation[-2:] )
+        #     if 'ptb' in variation:
+        #         threshold = " & (lepton2_pt > {}) ".format( variation[-2:] )
             
-        return totalcut + threshold
+        return totalcut #+ threshold
 
 
     def _variateDataFrame(self, df, variation):
-        # variate the sign of lepton2 to same sign for tau fakes
-        if variation == 'ss':
-            df.lepton2_q = - df.lepton2_q
+        # # variate the sign of lepton2 to same sign for tau fakes
+        # if variation == 'ss':
+        #     df.lepton2_q = - df.lepton2_q
 
         # variate e,m,t energy correction
         if variation == 'EPtDown':

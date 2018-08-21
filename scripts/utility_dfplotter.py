@@ -192,6 +192,21 @@ class DFPlotter:
                 Fake = Fake.append(temp,ignore_index=True)
 
             dfList = [Fake] + dfList
+
+
+        # add fakes if in mutau and etau
+        if self.selection in ['mutau','etau']:
+
+            names = ["data2016","mcdiboson","mcdy","mct","mctt"]
+
+            Fake = pd.DataFrame()
+            for name in names:
+                temp =  DFCutter(self.selection+'_fakes', self.nbjet, name).getDataFrame(variation)
+                if not name == 'data2016':
+                    temp.eventWeight = -1*temp.eventWeight
+                Fake = Fake.append(temp,ignore_index=True)
+
+            dfList = [Fake] + dfList
             
         return dfList
 
@@ -291,7 +306,7 @@ class DFPlotter:
             #self.hasFake = False
 
         # mutau
-        elif self.selection == "mutau":
+        elif "mutau" in self.selection:
             self.mcsgQueryList = [
                 'genCategory in [16,21]',
                 'genCategory in [1,2,3, 4,5,6,7,8,9, 10,11,12]',
@@ -311,12 +326,16 @@ class DFPlotter:
             self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_mutau.csv")
             self.adjust = [1,1,1,1,1,1,1]
             #self.adjust = [1/.95,1/.95,1/.95,1/.95,1/.95,1/.95,.89/.95]
-            
             #self.hasFake = False
+            if self.selection == 'mutau':
+                self.fakeSF = 1.0
+                self.colorList = ['grey'] + self.colorList
+                self.adjust    = [self.fakeSF] + self.adjust
+                self.labelList = ['Fakes']+self.labelList
             
         
         # etau
-        elif self.selection == "etau":
+        elif "etau" in self.selection:
             self.mcsgQueryList = [
                 'genCategory in [17,21]',
                 'genCategory in [1,2,3, 4,5,6,7,8,9, 13,14,15]',
@@ -337,6 +356,11 @@ class DFPlotter:
             self.adjust = [1,1,1,1,1,1,1]
             #self.adjust = [1/.95,1/.95,1/.95,1/.95,1/.95,1/.95,.89/.95]
             #self.hasFake = False
+            if self.selection == 'etau':
+                self.fakeSF = 1.0
+                self.colorList = ['grey'] + self.colorList
+                self.adjust    = [self.fakeSF] + self.adjust
+                self.labelList = ['Fakes']+self.labelList
 
         # mu4j
         elif "mu4j" in self.selection:
