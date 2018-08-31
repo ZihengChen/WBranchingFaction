@@ -29,6 +29,11 @@ class DFCutter:
         if self.selection == "etau_fakes":
             folderOfSelection = 'etau'
         
+        if self.selection == "eep":
+            folderOfSelection = 'ee'
+
+        if self.selection == "mumup":
+            folderOfSelection = 'mumu'
 
         if 'mctt' in self.name:
             self.pickleDirectry = self.baseDir + "data/pickles/{}/mctt/".format(folderOfSelection)
@@ -57,6 +62,11 @@ class DFCutter:
         # MARK -- variate the dataframe for MC
         if not "data2016" in self.name:
             dataFrame = self._variateDataFrame(dataFrame,variation)
+
+        # MARK -- grade mumu and ee
+        if self.selection in ["mumup","eep"]:
+            dataFrame = DNNGrader(self.selection,self.nbjet).gradeDF(dataFrame)
+
         
         # MARK -- cut the dataframe
         dataFrame.query(self._cut(), inplace = True)
@@ -65,10 +75,6 @@ class DFCutter:
         # drop if data of emu,mue
         if (self.selection in ["emu","emu2"]) and ("data2016" in self.name):
             dataFrame = dataFrame.drop_duplicates(subset=['runNumber', 'evtNumber'])
-
-        # query sortmax if needed
-        if not querySoftmax is None:
-            dataFrame = DNNGrader(self.selection,self.nbjet).gradeDF(dataFrame,querySoftmax=0.05)
 
         # 0.95 is the default normalization in BLT, change it for 0.92 for Vtight working points
         #dataFrame = self._modifyTauIDCorrection(dataFrame)     
@@ -95,10 +101,31 @@ class DFCutter:
         if '4j' in self.selection:
             njveto = " & (nJets >= 4)"
 
+
+
+        prime = ''
+        if self.selection == "mumup":
+            if self.nbjet == '==1':
+                prime = '& (softmax>0.25)'
+            else:
+                prime = '& (softmax>0.0002)'
+            #prime = '& (lepton2_pt < 25)'
+
+        if self.selection == "eep":
+            if self.nbjet == '==1':
+                prime = '& (softmax>0.0005)'
+            else:
+                prime = '& (softmax>0.0001)'
+            #prime = '& (lepton2_pt < 30)'
+
+
         sltcut = {
                 "mumu"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + leptonSign + zveto,
                 "ee"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + leptonSign + zveto,
 
+                "mumup"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + leptonSign + zveto + prime,
+                "eep"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + leptonSign + zveto + prime,
+                
                 "mutau" : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
                 "etau"  : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
                 "mutau_fakes": " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + sameSign,
@@ -114,6 +141,10 @@ class DFCutter:
                 }
         
         totalcut = sltcut[self.selection] + njveto + nbveto
+
+        
+
+
 
         # threshold = ''
         # if self.selection in ["mutau","etau"]:

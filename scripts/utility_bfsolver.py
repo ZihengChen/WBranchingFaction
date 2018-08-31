@@ -4,6 +4,7 @@ import sympy as sym
 from scipy.optimize import root
 
 BWPDG = np.array([0.1071,0.1063,0.1138])
+BWLPDG = 0.1080
 
 class NSignal:
 
@@ -20,11 +21,22 @@ class NSignal:
         self.quadCoeff = self._quadCoeffFromAnalytics()
         self.quadCoeffFromBMatrix = self._quadCoeffFromBMatrix()
         self.measuredNSignal = self.predictNSignal() # for initialize, further setup may needed
+
+        self.quadCoeffR = self.quadCoeffOfRFromAnalytics(BWLPDG)
     
     # 1. Predict N signal
     def predictNSignal(self, BW=BWPDG):
         terms = np.array([BW[0]**2,BW[1]**2,BW[2]**2, BW[0]*BW[1],BW[0]*BW[2],BW[1]*BW[2], BW[0],BW[1],BW[2],1])
         n = np.dot(self.quadCoeff,terms) * (self.xs*self.lumin)
+        return n
+
+    # 1. Predict N signal with r
+    def predictNSignalR(self, r=1, bwl=BWLPDG):
+
+        R = np.array([r**2,r,1])
+        coeffR = self.quadCoeffOfRFromAnalytics(bwl)
+
+        n = np.dot(coeffR,R) * (self.xs*self.lumin)
         return n
 
     # 2. Calculate Measured N signal
@@ -38,6 +50,17 @@ class NSignal:
     ##########################################
     # Private helper functions about BMatrix #
     ##########################################
+    def quadCoeffOfRFromAnalytics(self,bwl):
+        coeff = self.quadCoeff
+        ibwl = 1/bwl
+
+        coeffa = coeff[2]
+        coeffb = coeff[4] + coeff[5] + ibwl*coeff[8]
+        coeffc = coeff[0] + coeff[1] + coeff[3] + ibwl*(coeff[6]+coeff[7]) + ibwl*ibwl*(coeff[9])
+
+        return np.array([coeffa,coeffb,coeffc]) 
+
+
     def _quadCoeffFromAnalytics(self):
 
         '''
@@ -134,56 +157,67 @@ class RSovler:
         return self.measuredX
 
     def predictX(self, r=1):
-        BW = self.bwl * np.array([1,1,r])
 
-        den = self.nSignal_den.predictNSignal(BW)
+        den = self.nSignal_den.predictNSignalR(r, self.bwl)
 
-        num = self.nSignal_num.predictNSignal(BW)
+        num = self.nSignal_num.predictNSignalR(r, self.bwl)
 
         return num/den
-
-    def getQuadEqn(self, obsX):
-
-
-        x,y,z = sym.symbols('x,y,z',real=True)
-        terms = [x*x,y*y,z*z,x*y,x*z,y*z,x,y,z,1]
-
-        # for each channel get quadCoeff
-        coeff_den = self.nSignal_den.quadCoeff
-        coeff_num = self.nSignal_num.quadCoeff
-
-
-        coeffQuadEqn = obsX*coeff_den - coeff_num
-
-
-        for k,term in enumerate(terms):
-            temp += coeffQuadEqn[k] * term
-
-        for i in range(3):
-
-            coeffQuadEqn = obsX[i]*coeffNorm - coeff[i]
-            
-            quadEqn = 0
-            for k,term in enumerate(terms):
-                quadEqn += coeffQuadEqn[k] * term
-
-        self.quadEqn = quadEqn
-
-        return quadEqn
     
-    def evaluateLeftSideOfQuadEqn(self,paraR):
-        x,y,z = sym.symbols('x,y,z',real=True)
-
-        paraBW = self.bwl * np.array([1,1,paraR])
-
-        leftSide = float( self.quadEqn.evalf(subs={x: paraBW[0], y: paraBW[1], z: paraBW[2]}) )
-        return leftSide # return 1 scalar
-
     def solveQuadEqn(self, obsX):
-        eqn = self.getQuadEqn(obsX)
-        paraR0 = 1.0   
-        solution  = root(self.evaluateLeftSideOfQuadEqn, paraR0).x
+        coeffden = self.nSignal_den.quadCoeffOfRFromAnalytics(self.bwl)
+        coeffnum = self.nSignal_num.quadCoeffOfRFromAnalytics(self.bwl)
+        coeff    = obsX*coeffden-coeffnum
+
+
+        delta = coeff[1]**2-4*coeff[0]*coeff[2]
+        solution = (-coeff[1]-np.sqrt(delta)) / (2*coeff[0])
         return solution
+
+    
+
+    # def getQuadEqn(self, obsX):
+
+
+    #     x,y,z = sym.symbols('x,y,z',real=True)
+    #     terms = [x*x,y*y,z*z,x*y,x*z,y*z,x,y,z,1]
+
+    #     # for each channel get quadCoeff
+    #     coeff_den = self.nSignal_den.quadCoeff
+    #     coeff_num = self.nSignal_num.quadCoeff
+
+
+    #     coeffQuadEqn = obsX*coeff_den - coeff_num
+
+
+    #     for k,term in enumerate(terms):
+    #         temp += coeffQuadEqn[k] * term
+
+    #     for i in range(3):
+
+    #         coeffQuadEqn = obsX[i]*coeffNorm - coeff[i]
+            
+    #         quadEqn = 0
+    #         for k,term in enumerate(terms):
+    #             quadEqn += coeffQuadEqn[k] * term
+
+    #     self.quadEqn = quadEqn
+
+    #     return quadEqn
+    
+    # def evaluateLeftSideOfQuadEqn(self,paraR):
+    #     x,y,z = sym.symbols('x,y,z',real=True)
+
+    #     paraBW = self.bwl * np.array([1,1,paraR])
+
+    #     leftSide = float( self.quadEqn.evalf(subs={x: paraBW[0], y: paraBW[1], z: paraBW[2]}) )
+    #     return leftSide # return 1 scalar
+
+    # def solveQuadEqn(self, obsX):
+    #     eqn = self.getQuadEqn(obsX)
+    #     paraR0 = 1.0   
+    #     solution  = root(self.evaluateLeftSideOfQuadEqn, paraR0).x
+    #     return solution
 
 
 

@@ -180,6 +180,8 @@ class DNNGrader():
         if nbjet == '>1':
             self.bname = '2b'
 
+        if self.selection[-1] == 'p':
+            self.selection = self.selection[0:-1]
 
         self.norm = np.load( common.getBaseDirectory()+"data/networks/{}{}_norm.npy".format(self.selection,self.bname) ).item()
         self.net  = torch.load(common.getBaseDirectory()+"data/networks/{}{}.pt".format(self.selection,self.bname))
@@ -222,9 +224,8 @@ class DNNGrader():
 
     
     def gradeDFList(self,dfList, querySoftmax=None):
-        for idf in dfList:
-            idf = self.gradeDF(idf, querySoftmax)
-        return dfList
+        return [self.gradeDF(idf,querySoftmax) for idf in dfList]
+
 
 
 

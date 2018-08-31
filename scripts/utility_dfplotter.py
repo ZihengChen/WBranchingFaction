@@ -221,7 +221,7 @@ class DFPlotter:
 
             sk = ASingleKinematicPlot(v,a,b,step,dfList,adjust=self.adjust)
             sk.settingPlot(xl,self.labelList, self.colorList)
-            sk.makePlot(self.outputPlotDir)
+            sk.makePlot(self.outputPlotDir, self.selection)
 
             print("making plots -- {} nbjet{}: {}/{}".format(self.selection, self.nbjet, index+1, len(self.pp)) )
             clear_output(wait=True)
@@ -408,7 +408,7 @@ class DFPlotter:
             self.adjust = [1,1,1,1,1,1]
 
             if self.selection == 'e4j':
-                self.fakeSF = 0#common.getFakeSF('e')
+                self.fakeSF = common.getFakeSF('e')
 
                 self.colorList = ['grey'] + self.colorList
                 self.adjust    = [self.fakeSF] + self.adjust
@@ -491,7 +491,7 @@ class ASingleKinematicPlot:
                 arr[i]=into
         return arr
 
-    def makePlot(self, plotoutdir=None):
+    def makePlot(self, plotoutdir=None, selection=None):
         plt.rc("figure",facecolor="w")
         fig, axes = plt.subplots(2, 1, sharex=True, 
                                  gridspec_kw={'height_ratios':[3,1]},
@@ -579,4 +579,15 @@ class ASingleKinematicPlot:
         ######################## 3. End and Save ############################### 
         ax.set_xlabel(self.xl,fontsize=13)
         if plotoutdir is not None:
-            fig.savefig(plotoutdir+"{}.png".format(self.v),dpi=300)
+
+            if selection is not None:
+                if '1b' in plotoutdir:
+                    fig.savefig(plotoutdir+"{}_1b_{}.pdf".format(selection,self.v))
+                if '2b' in plotoutdir:
+                    fig.savefig(plotoutdir+"{}_2b_{}.pdf".format(selection,self.v))
+
+            else:
+                fig.savefig(plotoutdir+"{}.png".format(self.v),dpi=300)
+
+            #
+
