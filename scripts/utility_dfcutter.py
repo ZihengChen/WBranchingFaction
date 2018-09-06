@@ -35,10 +35,9 @@ class DFCutter:
         if self.selection == "mumup":
             folderOfSelection = 'mumu'
 
-        if 'mctt' in self.name:
-            self.pickleDirectry = self.baseDir + "data/pickles/{}/mctt/".format(folderOfSelection)
-        else:
-            self.pickleDirectry = self.baseDir + "data/pickles/{}/{}/".format(folderOfSelection, self.name )
+
+        self.pickleDirectry = self.baseDir + "data/pickles/{}/".format(folderOfSelection)
+
 
     def getDataFrame(self,variation="", querySoftmax=None):
         '''
@@ -49,14 +48,23 @@ class DFCutter:
         # MARK -- read pickles given selection and name
         # for tt read dedicated pickle
         if self.name == "mctt":
-            dataFrame = pd.read_pickle(self.pickleDirectry + "ntuple_ttbar_inclusive.pkl")
+            dataFrame = pd.read_pickle(self.pickleDirectry + "mctt/ntuple_ttbar_inclusive.pkl")
         elif self.name == "mctt_2l2nu":
-            dataFrame = pd.read_pickle(self.pickleDirectry + "ntuple_ttbar_2l2nu.pkl")
+            dataFrame = pd.read_pickle(self.pickleDirectry + "mctt/ntuple_ttbar_2l2nu.pkl")
         elif self.name == "mctt_semilepton":
-            dataFrame = pd.read_pickle(self.pickleDirectry + "ntuple_ttbar_semilepton.pkl")
-        # for not tt, read all pickles in a directory
+            dataFrame = pd.read_pickle(self.pickleDirectry + "mctt/ntuple_ttbar_semilepton.pkl")
+        
+        # for dy
+        elif self.name == "mcdy":
+            pickles = glob.glob( self.pickleDirectry + "mcz/*.pkl")
+            pickles = pickles + glob.glob( self.pickleDirectry + "mcw/*.pkl")
+
+            pickles=[i for i in pickles if ( (not 'ntuple_zjets_m-10to50_amcatnlo' in i) & (not 'ntuple_zjets_m-50_amcatnlo' in i)) ]
+
+            dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True)
+        # for not tt or DY, read all pickles in a directory
         else:
-            pickles = glob.glob( self.pickleDirectry + "*.pkl")
+            pickles = glob.glob( self.pickleDirectry + "{}/*.pkl".format(self.name) )
             dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True)
         
         # MARK -- variate the dataframe for MC
@@ -208,7 +216,7 @@ class DFCutter:
             
             # for tt theoretical variation
             if variation in [ 'FSRUp','FSRDown','ISRUp','ISRDown','UEUp','UEDown','MEPSUp','MEPSDown']:
-                pickName = self.pickleDirectry + "ntuple_ttbar_inclusive_{}.pkl".format(variation)
+                pickName = self.pickleDirectry + "mctt/ntuple_ttbar_inclusive_{}.pkl".format(variation)
                 df = pd.read_pickle(pickName)
         
         return df

@@ -12,7 +12,7 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
      # 0. Filling Event Info
     if selection in ['etau','mutau']:
         out_dict['tauMVA']    =  tree.tauMVA
-        out_dict['tauDecayMode']    =  tree.tauDecayMode
+        out_dict['tauDecayMode'] =  tree.tauDecayMode
 
 
     out_dict['nMuons']       =  tree.nMuons
@@ -22,7 +22,7 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     out_dict['nPV']          =  tree.nPV
     out_dict['triggerLepton']=  tree.triggerLeptonStatus
 
-    out_dict['eventWeight']  =  scaleFactor * tree.eventWeight
+    out_dict['eventWeight']  =  scaleFactor * tree.eventWeight * tree.genWeight
     out_dict['eventWeightSF']=  scaleFactor
 
     out_dict['met']          =  tree.met
@@ -203,13 +203,13 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
         out_dict['jet2_eta']     = jet2.Eta()
         out_dict['jet2_phi']     = jet2.Phi()
         out_dict['jet2_energy']  = jet2.Energy()
-        out_dict['jet2_tag']    = tree.jetTwoTag
+        out_dict['jet2_tag']     = tree.jetTwoTag
         
         out_dict['jet_delta_eta']   = abs(jet1.Eta() - jet2.Eta())
         out_dict['jet_delta_phi']   = abs(jet1.DeltaPhi(jet2))
         out_dict['jet_delta_r']     = jet1.DeltaR(jet2)
         # dijet
-        dijet      = jet1 + jet2
+        dijet = jet1 + jet2
         out_dict['dijet_mass']      = dijet.M()
         out_dict['dijet_pt']        = dijet.Pt()
         out_dict['dijet_eta']       = dijet.Eta()
@@ -254,7 +254,16 @@ def getAllVariables_fakeSelection( tree, selection, name, scaleFactor):
     
     lep3 = tree.leptonThreeP4
     out_dict['lepton3_iso']     = tree.leptonThreeIso
-    
+    if selection in ['ee_e','mumu_e']:
+        out_dict['lepton3_isopass'] = tree.leptonThreeIsoPass
+    if selection in ['emu_tau']:
+        out_dict['tauDecayMode'] = tree.tauDecayMode
+        out_dict['tauMVA']       = tree.tauMVA
+        #out_dict['tauMVAOld']    = tree.tauMVAOld
+        out_dict['tauChHadIso']  = tree.taupuppiChHadIso
+        out_dict['tauNeuNeuIso'] = tree.taupuppiNeuHadIso
+        out_dict['tauGammaISO']  = tree.taupuppiGammaIso
+        
     out_dict['lepton3_deltaPhi']= lep3.DeltaPhi(dilepton)
     out_dict['lepton3_pt']      = lep3.Pt()
     out_dict['lepton3_eta']     = lep3.Eta()

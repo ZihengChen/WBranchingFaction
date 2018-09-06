@@ -69,7 +69,6 @@ class BLTReader:
         common.makeDirectory(outputPath, clear=False)
 
         tree = self.inputRootFile.Get('{}/bltTree_{}'.format(self.selection,name))
-        print(name)
 
         if tree.GetEntriesFast() > 0:
             ntuple = self.fillNtuple(tree, name, scaleFactor)
@@ -91,8 +90,11 @@ class BLTReader:
             entry = {}
 
             # do not double count DY1234Jet in inclusive DY samples
-            avoidDY1234Jet = (name in ['zjets_m-50','zjets_m-10to50']) & (0 < tree.nPartons < 5)
-            if ( avoidDY1234Jet ):
+            ignoreEvent = ((name in ['zjets_m-50','zjets_m-10to50']) & (0 < tree.nPartons < 5))
+            
+            # do not double count DY1234Jet in inclusive DY samples amcatnlo
+            ignoreEvent = ignoreEvent | ( (name in ['zjets_m-50_amcatnlo','zjets_m-10to50_amcatnlo']) & (0 <= tree.nPartons <=2 ) )
+            if ( ignoreEvent ):
                 n -= 1
                 continue
 
@@ -121,7 +123,8 @@ class BLTReader:
             xs = self.xsTable[name]
             # get nGenTotal for the name
             histogram = self.inputRootFile.Get("TotalEvents_"+name)
-            nGenTotal = histogram.GetBinContent(1)
+            #print("TotalEvents_"+name)
+            nGenTotal = histogram.GetBinContent(9) - histogram.GetBinContent(10)
             # calculate SF to lumin
             scaleFactor = self.lumin * xs/nGenTotal
         return scaleFactor
@@ -148,6 +151,14 @@ class BLTReader:
                     'z2jets_m-50'     :  1.18*334700,
                     'z3jets_m-50'     :  1.18*102300,
                     'z4jets_m-50'     :  1.18*54520,
+            
+            
+                    'zjets_m-10to50_amcatnlo'  : 18610000,
+                    'zjets_m-50_amcatnlo'      :  5765400,
+                    'z0jets_m-50_amcatnlo'     :  4757000,
+                    'z1jets_m-50_amcatnlo'     :  884400,
+                    'z2jets_m-50_amcatnlo'     :  338900,
+
 
                     'w1jets'          :  9493000,
                     'w2jets'          :  3120000,
@@ -193,8 +204,12 @@ class BLTReader:
             outputPath += "data2016/"
         elif name in self.mcdibosonlist:
             outputPath += "mcdiboson/"
-        elif name in self.mcdylist:
-            outputPath += "mcdy/"
+        elif name in self.mcwlist:
+            outputPath += "mcw/"
+        elif name in self.mczlist:
+            outputPath += "mcz/"
+        elif name in self.mczlolist:
+            outputPath += "mczlo/"
         elif name in self.mctlist:
             outputPath += "mct/"
         elif name in self.mcttlist:
@@ -232,31 +247,39 @@ class BLTReader:
         self.mcqcdlist = ['qcd_ht100to200','qcd_ht200to300','qcd_ht300to500','qcd_ht500to700',
                           'qcd_ht700to1000','qcd_ht1000to1500','qcd_ht1500to2000','qcd_ht2000']
 
-        self.mcttbosonlist  = [ 'TTZToLLNuNu']
+        
 
         self.mcdibosonlist  = [ 'ww','wz_2l2q','wz_3lnu','zz_2l2nu','zz_2l2q','zz_4l']
+        
+        self.mcwlist        = [ 'w1jets','w2jets','w3jets','w4jets' ]
 
-        self.mcdylist       = [ 'zjets_m-10to50','zjets_m-50',
+        self.mczlist        = [ 'zjets_m-10to50_amcatnlo','zjets_m-50_amcatnlo','z0jets_m-50_amcatnlo','z1jets_m-50_amcatnlo','z2jets_m-50_amcatnlo' ]
+        
+        self.mczlolist      = [ 'zjets_m-10to50', 'zjets_m-50',
                                 'z1jets_m-10to50','z1jets_m-50',
                                 'z2jets_m-10to50','z2jets_m-50',
                                 'z3jets_m-10to50','z3jets_m-50',
-                                'z4jets_m-10to50','z4jets_m-50',
-                                'w1jets','w2jets','w3jets','w4jets']
+                                'z4jets_m-10to50','z4jets_m-50']
+        
+        self.mcdylist       = self.mcwlist + self.mczlist + self.mczlolist
+        
+        
 
         self.mctlist        = [ 't_tw','tbar_tw']
         
         if self.selection in ["ee_mu","ee_e","mumu_mu","mumu_e","emu_tau"]:
             self.mcttlist       = [ 'ttbar_inclusive']
+            self.mcttbosonlist  = [ ]
         else:
             self.mcttlist       = [ 'ttbar_inclusive','ttbar_2l2nu','ttbar_semilepton']
-        #self.mcttlist       = [ 'ttbar_semilepton']
+            self.mcttbosonlist  = [ 'TTZToLLNuNu']
 
         self.mcttTheorylist = [ 'ttbar_inclusive_fsrdown','ttbar_inclusive_fsrup',
                                 'ttbar_inclusive_isrdown','ttbar_inclusive_isrup',
                                 'ttbar_inclusive_hdampdown','ttbar_inclusive_hdampup',
                                 'ttbar_inclusive_down','ttbar_inclusive_up']
 
-        self.mclist = self.mcttbosonlist + self.mcdibosonlist + self.mcdylist + self.mctlist + self.mcttlist 
+        self.mclist = self.mcdibosonlist + self.mcdylist + self.mctlist + self.mcttlist 
         #self.mclist = self.mcttlist
         if self.includeTTTheory:
             self.mclist = self.mclist + self.mcttTheorylist
