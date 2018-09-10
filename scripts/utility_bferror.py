@@ -38,7 +38,7 @@ class BFSovler3D_Error:
             w  = self.cWeight[icata]
 
             slv = BFSolver3D(a)
-            BW  += slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake)) * w
+            BW  += slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg.dot(np.ones(3))+nfake)) * w
         self.BW = BW
 
         print("{:6.4f}+/-{:6.4f}, {:6.4f}+/-{:6.4f}, {:6.4f}+/-{:6.4f}".format( self.BW[0], self.statErr[0],
@@ -54,7 +54,7 @@ class BFSovler3D_Error:
         for icata in range(4):
             a,aVar  = self.a[icata], self.aVar[icata]
             ndata,ndataVar = self.ndata[icata],self.ndataVar[icata]
-            nmcbg,nmcbgVar = self.nmcbg[icata],self.nmcbgVar[icata]
+            nmcbg,nmcbgVar = self.nmcbg[icata].dot(np.ones(3)), self.nmcbgVar[icata].dot(np.ones(3))
             nfake,nfakeVar = self.nfake[icata],self.nfakeVar[icata]
 
             slv = BFSolver3D(a)
@@ -149,7 +149,7 @@ class BFSovler3D_Error:
         for icata in range(4):
             a,aVar  = self.a[icata], self.aVar[icata]
             ndata,ndataVar = self.ndata[icata],self.ndataVar[icata]
-            nmcbg,nmcbgVar = self.nmcbg[icata],self.nmcbgVar[icata]
+            nmcbg,nmcbgVar = self.nmcbg[icata].dot(np.ones(3)), self.nmcbgVar[icata].dot(np.ones(3))
             nfake,nfakeVar = self.nfake[icata],self.nfakeVar[icata]
 
             slv = BFSolver3D(a)
@@ -178,30 +178,38 @@ class BFSovler3D_Error:
 
             a     = self.a[icata]
             ndata = self.ndata[icata]
-            nmcbg = self.nmcbg[icata]
+            nmcbg = self.nmcbg[icata].dot(np.array([1,1,1]))
             nfake = self.nfake[icata]
 
             slv = BFSolver3D(a)
-            if errSource == "mcbg":
+            if errSource == "mcvv":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=1.05*nmcbg+nfake))
+                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=self.nmcbg[icata].dot(np.array([1.1, 1, 1])) + nfake))
+            elif errSource == "mcz":
+                BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=self.nmcbg[icata].dot(np.array([1, 1.05, 1])) + nfake))
+            
+            elif errSource == "mcw":
+                BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=self.nmcbg[icata].dot(np.array([1, 1, 1.05])) + nfake))
+
             elif errSource == "fakemu":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
                 variateScale = np.array([1.,1.,1.,1.])
                 if icata in [0,1]:
-                    variateScale = np.array([1,1,1,1.30])
+                    variateScale = np.array([1,1,1,1.25])
                 BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*variateScale))
             
             elif errSource == "fakee":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
                 variateScale = np.array([1.,1.,1.,1.])
                 if icata in [2,3]:
-                    variateScale = np.array([1,1,1,1.30])
+                    variateScale = np.array([1,1,1,1.25])
                 BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*variateScale))
 
             elif errSource == "faketau":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-                variateScale = np.array([1.,1.,1.30,1.])
+                variateScale = np.array([1.,1.,1.25,1.])
                 BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*variateScale))
 
             elif errSource == "lumin":
@@ -244,7 +252,7 @@ class BFSovler3D_Error:
 
             a     = self.a[icata]
             ndata = self.ndata[icata]
-            nmcbg = self.nmcbg[icata]
+            nmcbg = self.nmcbg[icata].dot(np.ones(3))
             nfake = self.nfake[icata]
 
             slv = BFSolver3D(a)
@@ -301,7 +309,7 @@ class BFSovler3D_Error:
                 a1[2,5,trigger] = a[2,5,trigger]*jetMisTauIDErr
 
                 slv1 = BFSolver3D(a1)
-                BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg + nfake))
                 errs.append(BW1-BW)
 
 
@@ -324,10 +332,10 @@ class BFSovler3D_Error:
             
             # nominal tuning
             slv  = BFSolver3D(self.a[icata])
-            BW   = slv.solveQuadEqn(slv.setMeasuredX(nData=self.ndata[icata], nMcbg=self.nmcbg[icata]+self.nfake[icata]))
+            BW   = slv.solveQuadEqn(slv.setMeasuredX(nData=self.ndata[icata], nMcbg=self.nmcbg[icata].dot(np.ones(3))+self.nfake[icata]))
             # down tuning
             slv1 = BFSolver3D( counts1.acc[icata] )
-            BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata]+counts1.nfake[icata]))
+            BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata].dot(np.ones(3))+counts1.nfake[icata]))
             # difference between down and nominal
             errs.append(BW1-BW) 
 
@@ -351,10 +359,10 @@ class BFSovler3D_Error:
                 
             # up tuning
             slv1 = BFSolver3D( counts1.acc[icata] )
-            BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata]+counts1.nfake[icata]))
+            BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata].dot(np.ones(3))+counts1.nfake[icata]))
             # down tuning
             slv2 = BFSolver3D( counts2.acc[icata] )
-            BW2  = slv2.solveQuadEqn(slv2.setMeasuredX(nData=counts2.ndata[icata], nMcbg=counts2.nmcbg[icata]+counts2.nfake[icata]))
+            BW2  = slv2.solveQuadEqn(slv2.setMeasuredX(nData=counts2.ndata[icata], nMcbg=counts2.nmcbg[icata].dot(np.ones(3))+counts2.nfake[icata]))
             # differentce between up and down tuning
             errs.append((BW1-BW2)/2)
                 

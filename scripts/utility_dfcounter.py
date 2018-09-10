@@ -147,12 +147,13 @@ class DFCounter():
         return n, nVar
 
     def getNMCbg(self,selection,nbjet):
-        n, nVar = 0.0, 0.0
-        for name in ["mcdiboson","mcdy"]:
+        n, nVar = [], []
+        for name in ["mcdiboson","mcz","mcw"]:
             df = DFCutter(selection,nbjet,name).getDataFrame(self.variation) # get MC dataframe with variation
-            n    = n + np.sum(df.eventWeight)
-            nVar = nVar + np.sum(df.eventWeight**2)
-        return n, nVar
+            n.append( np.sum(df.eventWeight) )
+            nVar.append( np.sum(df.eventWeight**2) )
+
+        return np.array(n), np.array(nVar)
 
     def getAcc(self,selection,nbjet, enhanceStat=True):
 

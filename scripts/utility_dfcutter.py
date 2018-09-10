@@ -56,15 +56,32 @@ class DFCutter:
         
         # for dy
         elif self.name == "mcdy":
-            pickles = glob.glob( self.pickleDirectry + "mcz/*.pkl")
-            pickles = pickles + glob.glob( self.pickleDirectry + "mcw/*.pkl")
+            highmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
+            highmass = [i for i in highmass if ('m-50' in i) and ('raw' in i) ]
+            
+            lowmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
+            lowmass = [i for i in lowmass if 'm-10to50' in i]
 
-            pickles=[i for i in pickles if ( (not 'ntuple_zjets_m-10to50_amcatnlo' in i) & (not 'ntuple_zjets_m-50_amcatnlo' in i)) ]
+            pickles = lowmass+highmass + glob.glob( self.pickleDirectry + "mcw/*.pkl")
 
             dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True)
+
+
+        elif self.name == "mcz":
+            highmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
+            highmass = [i for i in highmass if ('m-50' in i) and ('raw' in i) ]
+            
+            lowmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
+            lowmass = [i for i in lowmass if 'm-10to50' in i]
+
+            pickles = lowmass+highmass
+            dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True)
+
+
         # for not tt or DY, read all pickles in a directory
         else:
             pickles = glob.glob( self.pickleDirectry + "{}/*.pkl".format(self.name) )
+            #print(pickles)
             dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True)
         
         # MARK -- variate the dataframe for MC
@@ -96,7 +113,8 @@ class DFCutter:
 
     def _cut(self):
         zveto  = " & (dilepton_mass<80 | dilepton_mass>102) "
-        wmass = " & (dijet_m<95 & dijet_m>65) "
+        zmass  = " & (dilepton_mass>85 & dilepton_mass<97) "
+        wmass  = " & (dijet_m<95 & dijet_m>65) "
         topmass = " & (trijet_mass1<200 & trijet_mass1>140) "
         lmveto = " & (dilepton_mass>12) "
 
@@ -108,8 +126,6 @@ class DFCutter:
         njveto = " & (nJets >= 2)"
         if '4j' in self.selection:
             njveto = " & (nJets >= 4)"
-
-
 
         prime = ''
         if self.selection == "mumup":
@@ -128,29 +144,31 @@ class DFCutter:
 
 
         sltcut = {
-                "mumu"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + leptonSign + zveto,
-                "ee"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + leptonSign + zveto,
+                "mumu"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + leptonSign + zveto + njveto + nbveto,
+                "ee"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + leptonSign + zveto + njveto + nbveto,
+                "emu"   : " ((triggerLepton == 1) | (triggerLepton == 3 & lepton1_pt>lepton2_pt)) & (lepton1_pt > 25) & (lepton2_pt > 15) " + lmveto +  leptonSign + njveto + nbveto, 
+                "emu2"  : " ((triggerLepton == 2) | (triggerLepton == 3 & lepton1_pt<lepton2_pt)) & (lepton1_pt > 10) & (lepton2_pt > 30) " + lmveto +  leptonSign + njveto + nbveto, 
+  
+                "mutau" : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign + njveto + nbveto,
+                "etau"  : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign + njveto + nbveto,
+                "mutau_fakes": " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + sameSign + njveto + nbveto,
+                "etau_fakes" : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + sameSign + njveto + nbveto,
 
-                "mumup"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + leptonSign + zveto + prime,
-                "eep"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + leptonSign + zveto + prime,
-                
-                "mutau" : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
-                "etau"  : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + leptonSign,
-                "mutau_fakes": " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + sameSign,
-                "etau_fakes" : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + sameSign,
+                "mu4j"  : " (lepton1_pt > 30) " + njveto + nbveto,
+                "e4j"   : " (lepton1_pt > 30) " + njveto + nbveto,
+                "mu4j_fakes"  : " (lepton1_pt > 30) " + njveto + nbveto,
+                "e4j_fakes"   : " (lepton1_pt > 30) " + njveto + nbveto,
 
-                "mu4j"  : " (lepton1_pt > 30) ",# & (lepton1_mt<60)"+ wmass + topmass,
-                "e4j"   : " (lepton1_pt > 30) ",# & (lepton1_mt<60)"+ wmass + topmass,
-                "mu4j_fakes"  : " (lepton1_pt > 30) ",# & (lepton1_mt<60)" + wmass + topmass,
-                "e4j_fakes"   : " (lepton1_pt > 30) ",# & (lepton1_mt<60)" + wmass + topmass,
+                "mumup"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + leptonSign + zveto + prime + njveto + nbveto,
+                "eep"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + leptonSign + zveto + prime + njveto + nbveto,
 
-                "emu"   : " ((triggerLepton == 1) | (triggerLepton == 3 & lepton1_pt>lepton2_pt)) & (lepton1_pt > 25) & (lepton2_pt > 15) " + lmveto +  leptonSign, 
-                "emu2"  : " ((triggerLepton == 2) | (triggerLepton == 3 & lepton1_pt<lepton2_pt)) & (lepton1_pt > 10) & (lepton2_pt > 30) " + lmveto +  leptonSign, 
+                "mumu0"  : " (lepton1_pt > 25) & (lepton2_pt > 10) & (nJets==0)" + lmveto + leptonSign + zmass ,
+                "ee0"    : " (lepton1_pt > 30) & (lepton2_pt > 15) & (nJets==0)" + lmveto + leptonSign + zmass ,
+                "mutau0" : " (lepton1_pt > 30) & (lepton2_pt > 20) & (nJets==0)" + lmveto + leptonSign + zmass ,
+                "etau0"  : " (lepton1_pt > 30) & (lepton2_pt > 20) & (nJets==0)" + lmveto + leptonSign + zmass ,
                 }
         
-        totalcut = sltcut[self.selection] + njveto + nbveto
-
-        
+        totalcut = sltcut[self.selection] 
 
 
 

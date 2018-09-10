@@ -226,6 +226,7 @@ class RSovler:
 class BFSolver:
 
     def __init__(self, a, xs = 832+35.85*2, lumin=35847, bte=0.1785, btm=0.1736 ):
+
             
         self.xs = xs
         self.lumin = lumin
@@ -233,6 +234,10 @@ class BFSolver:
         self.nSignal = [ NSignal(a[i], xs,lumin,bte,btm) for i in range(4) ]
 
         self.measuredX = self.predictX()
+
+
+
+
 
     # 1. Measured X
     def setMeasuredX(self,nData = np.zeros(4), nMcbg = np.zeros(4)):
