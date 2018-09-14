@@ -36,6 +36,15 @@ class DFCutter:
             folderOfSelection = 'mumu'
 
 
+        if self.selection == "mumu0_fakes":
+            folderOfSelection = 'mumu0'
+        if self.selection == "mutau0_fakes":
+            folderOfSelection = 'mutau0'
+        if self.selection == "ee0_fakes":
+            folderOfSelection = 'ee0'
+        if self.selection == "etau0_fakes":
+            folderOfSelection = 'etau0'
+
         self.pickleDirectry = self.baseDir + "data/pickles/{}/".format(folderOfSelection)
 
 
@@ -68,13 +77,17 @@ class DFCutter:
 
 
         elif self.name == "mcz":
-            highmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
-            highmass = [i for i in highmass if ('m-50' in i) and ('raw' in i) ]
+            if '0' in self.selection:
+                pickles = glob.glob( self.pickleDirectry + "mcz/*.pkl")
+            else:
+                highmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
+                highmass = [i for i in highmass if ('m-50' in i) and ('raw' in i) ]
             
-            lowmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
-            lowmass = [i for i in lowmass if 'm-10to50' in i]
+                lowmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
+                lowmass = [i for i in lowmass if 'm-10to50' in i]
 
-            pickles = lowmass+highmass
+                pickles = lowmass+highmass
+
             dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True)
 
 
@@ -166,6 +179,10 @@ class DFCutter:
                 "ee0"    : " (lepton1_pt > 30) & (lepton2_pt > 15) & (nJets==0)" + lmveto + leptonSign + zmass ,
                 "mutau0" : " (lepton1_pt > 30) & (lepton2_pt > 20) & (nJets==0)" + lmveto + leptonSign + zmass ,
                 "etau0"  : " (lepton1_pt > 30) & (lepton2_pt > 20) & (nJets==0)" + lmveto + leptonSign + zmass ,
+                "mumu0_fakes"  : " (lepton1_pt > 25) & (lepton2_pt > 10) & (nJets==0)" + lmveto + sameSign + zmass ,
+                "ee0_fakes"    : " (lepton1_pt > 30) & (lepton2_pt > 15) & (nJets==0)" + lmveto + sameSign + zmass ,
+                "mutau0_fakes" : " (lepton1_pt > 30) & (lepton2_pt > 20) & (nJets==0)" + lmveto + sameSign + zmass ,
+                "etau0_fakes"  : " (lepton1_pt > 30) & (lepton2_pt > 20) & (nJets==0)" + lmveto + sameSign + zmass ,
                 }
         
         totalcut = sltcut[self.selection] 

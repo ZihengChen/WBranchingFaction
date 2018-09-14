@@ -38,7 +38,9 @@ class BFSovler3D_Error:
             w  = self.cWeight[icata]
 
             slv = BFSolver3D(a)
-            BW  += slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg.dot(np.ones(3))+nfake)) * w
+            BW_icata = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg.dot(np.ones(3))+nfake))
+            BW  += BW_icata * w
+            print(BW_icata)
         self.BW = BW
 
         print("{:6.4f}+/-{:6.4f}, {:6.4f}+/-{:6.4f}, {:6.4f}+/-{:6.4f}".format( self.BW[0], self.statErr[0],
@@ -48,9 +50,10 @@ class BFSovler3D_Error:
 
         
         
-    def errStat(self, errSource):
+    def errStat(self, errSource, returnCovar=False):
     
         errs = []
+        covars = []
         for icata in range(4):
             a,aVar  = self.a[icata], self.aVar[icata]
             ndata,ndataVar = self.ndata[icata],self.ndataVar[icata]
@@ -64,6 +67,7 @@ class BFSovler3D_Error:
             if errSource == "data":
 
                 dBW = []
+                covar = np.zeros([3,3])
                 for c in range(4):
                     # variate ndata to ndata1
                     ndata1 = ndata.copy()
@@ -71,10 +75,18 @@ class BFSovler3D_Error:
                     # get BW1 corresponding to ndata1
                     BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata1, nMcbg=nmcbg+nfake))
                     # push deriveratives
-                    dBW.append( BW1-BW )
+                    deltaBW = BW1-BW
+                    dBW.append( deltaBW )
+
+                    covar += np.outer(deltaBW,deltaBW)
+                        
                 dBW = np.array(dBW)
                 # propagating error
                 errFromSource = np.sum(dBW**2,axis=0)**0.5
+                covars.append(covar)
+                
+
+
             
             ## mcbg: by std of toys which variate mcbg
             elif errSource == "mcbg":
@@ -141,7 +153,12 @@ class BFSovler3D_Error:
             errs.append(errFromSource)
 
         errs = np.array(errs)
-        return errs
+
+        if returnCovar:
+            covars = np.array(covars)
+            return errs , covars
+        else:
+            return errs
 
     def errConstent(self, errSource):
 
