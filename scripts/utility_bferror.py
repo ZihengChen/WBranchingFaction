@@ -299,15 +299,18 @@ class BFSovler3D_Error:
 
 
             elif errSource == "tauID":
-                a1 = a.copy()
+                
 
                 if icata in [0,1]:
                     trigger = 1
                 if icata in [2,3]:
                     trigger = 0
 
+                a1 = a.copy()
                 a1[2,trigger,4] = a[2,trigger,4]*1.05
                 a1[2,4,trigger] = a[2,4,trigger]*1.05
+                a1[2,trigger+2,4] = a[2,trigger+2,4]*1.05
+                a1[2,4,trigger+2] = a[2,4,trigger+2]*1.05
 
                 slv1 = BFSolver3D(a1)
                 BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
@@ -354,7 +357,7 @@ class BFSovler3D_Error:
             slv1 = BFSolver3D( counts1.acc[icata] )
             BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata].dot(np.ones(3))+counts1.nfake[icata]))
             # difference between down and nominal
-            errs.append(BW1-BW) 
+            errs.append(BW-BW1) 
 
         errs = np.array(errs) # 4x3 2D-array
         if self.statCombined:

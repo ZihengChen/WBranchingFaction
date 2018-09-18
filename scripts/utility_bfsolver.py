@@ -6,6 +6,33 @@ from scipy.optimize import root
 BWPDG = np.array([0.1071,0.1063,0.1138])
 BWLPDG = 0.1080
 
+
+class Yield:
+
+    def __init__(self, a, nmcbg, nfake, xs, lumin, bte, btm):
+
+        self.a     = a
+        self.nmcbg = nmcbg
+        self.nfake = nfake
+        
+        self.xs    = xs
+        self.lumin = lumin
+
+        self.bte = bte
+        self.btm = btm
+        self.bth = 1-bte-btm
+
+    def predict(self, BW=BWPDG):
+        
+        n  = self._accBMatrix(BW)*self.xs*self.lumin 
+        n += np.sum(self.nmcbg) + self.nfake
+        return n
+    
+    def _accBMatrix(self, BW):
+        bVector = np.array([ BW[0],BW[1], BW[2]*self.bte,  BW[2]*self.btm, BW[2]*self.bth, 1-np.sum(BW) ])
+        bMatrix = np.outer(bVector,bVector)
+        return np.sum( self.a * bMatrix )
+
 class NSignal:
 
     def __init__(self,a,xs,lumin, bte, btm):
@@ -219,9 +246,6 @@ class RSovler:
     #     solution  = root(self.evaluateLeftSideOfQuadEqn, paraR0).x
     #     return solution
 
-
-
-
 # super class
 class BFSolver:
 
@@ -234,9 +258,6 @@ class BFSolver:
         self.nSignal = [ NSignal(a[i], xs,lumin,bte,btm) for i in range(4) ]
 
         self.measuredX = self.predictX()
-
-
-
 
 
     # 1. Measured X

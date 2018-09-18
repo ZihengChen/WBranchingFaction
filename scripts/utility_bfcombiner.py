@@ -21,20 +21,29 @@ class bfCombiner():
         beta = np.r_[beta,beta,beta,beta]
         delta = beta-self.beta0
         chiquared = delta.dot( self.invVar.dot(delta) )
+        chiquared /= 2
         return chiquared
 
     def chisquared_r(self,param):
         # two paramters
-        # r, l
+        # r1,r2,l
+        r1,r2,l = param[0],param[1],param[2]
 
-        beta = np.array([   param[1]/(2+param[0]), 
-                            param[1]/(2+param[0]),
-                            param[1]/(2+param[0]) * param[0] ])
+        lep = 1./r1 + 1./r2 + 1.
+
+        bwe = l/(lep * r1)
+        bwm = l/(lep * r2)
+        bwt = l/(lep *  1)
+
+        beta = np.array([ bwe,bwm,bwt])
 
         beta = np.r_[beta,beta,beta,beta]
         delta = beta-self.beta0
-        chiquared = delta.dot( self.invVar.dot(delta) )
+        chiquared = delta.dot( self.invVar.dot(delta) ) 
+
+        chiquared /= 2
         return chiquared
+
 
 
     def lsEstimator(self):
@@ -42,9 +51,9 @@ class bfCombiner():
         if self.paramTypy=='r':
             result = minimize(
                 fun = self.chisquared_r, 
-                x0  = np.array([1,0.3240]),
+                x0  = np.array([1.,1.,0.3240]),
                 method = 'SLSQP',
-                bounds = [(0,2),(0,1)]
+                bounds = [(0.9,1.1),(0.9,1.1),(0,1)]
                 )
         else:
             result = minimize(
@@ -57,7 +66,7 @@ class bfCombiner():
         self.paramLS = result.x
 
     
-    def bfvar(self, invhess=True):
+    def paramSigma(self, invhess=True):
         if self.paramTypy =='r':
             hcalc = nd.Hessian(self.chisquared_r, step=1e-6, method='central')
         else:
@@ -89,104 +98,94 @@ class bfCombiner():
 
 
 
-###################################
-# Plotting
-###################################
-def showCovar(covar,sameCNorm=False):
-    lablesName = ['stat',r"$b^\tau_\mu$",r"$b^\tau_e$",
-                r"$\sigma_{VV}$",r"$\sigma_{Z}$",r"$\sigma_{W}$",
-                r"QCD in $\mu4j$",r"QCD in $e4j$",r"QCD in $l\tau$","L",r"$\sigma_{tt}$",r"$\sigma_{tW}$",
-                r"$\epsilon_e$",r"$\epsilon_\mu$",r"$\epsilon_\tau$",r'$j \to \tau$ MisID',
-                "e energy",r"$\mu$ energy",r"$\tau$ energy",
-                "JES","JER","bTag","Mistag"]
-    ticks_pos = [1,4,7,10]
-    ticks_name = [r'$\mu 1b$',r'$\mu 2b$',r'$e 1b$',r'$e 2b$']
+
+
+class bfCombiner_theta():
+    def __init__(self,var,sigma,beta0):
+        self.var = var
+        self.sigma = sigma
+        
+        self.var_stat = var[0]
+        self.var_syst = var[1:]
+        self.sigma_stat = sigma[0]
+        self.sigma_syst = sigma[1:]
+
+        self.nTheta = var.shape[0] - 1
+        self._getInv()
+        
+        self.beta0  = beta0
+        self.param0 = np.r_[np.array([0.1081]*3),
+                            0*np.ones([self.nTheta])
+                           ]
+
+        self.lsEstimator()
+
+        
+    def cost_nll (self, param):
+
+        param_beta = param[0:3]
+        param_syst = param[3:]
+        
+        beta = np.r_[param_beta,
+                     param_beta,
+                     param_beta,
+                     param_beta]
+        
+        for i in range(self.nTheta):
+            beta += self.sigma_syst[i] * param_syst[i]
+        
+        delta = beta-self.beta0
+        chiquared = delta.dot( self.invVar_stat.dot(delta) )/2
+        regulization = np.sum(param_syst**2/2)
+        cost = chiquared + regulization
+
+        return cost
     
-    n0,n1,n2,n3 = 1E-8, 5E-8, 1E-6, 8E-6
-    if sameCNorm:
-        n0,n1,n2,n3 = 1E-6,1E-6,1E-6,1E-6
+    def lsEstimator(self):
+        result = minimize(
+            fun = self.cost_nll, 
+            x0  = self.param0,
+            method = 'SLSQP',
+            bounds = [(0,1)]*3 + [(-3,3)]*self.nTheta
+            )
 
-    normList = [n2,n0,n0,n0,
-                n1,n1,n2,n2,
-                n2,n1,n0,n0,
-                n2,n2,n3,n3,
-                n1,n1,n2,n3,
-                n2,n3,n1,n3]
-
-
-    NCOL = 6
-    N = covar.shape[0]
+        self.paramLS = result.x
     
-    NROW = int(N/NCOL)+1
-    
-    for i in range(NROW):
-        for j in range(NCOL):
-            index = i*NCOL + j
-            if index<N:
-                matrix = covar[index]
+    def paramSigma(self):
+        hcalc = nd.Hessian(self.cost_nll, step=1e-6, method='central')
+        hess  = hcalc( self.paramLS )
 
-                norm = normList[index]
-                plt.subplot(NROW,NCOL,index+1)
-                
-                plt.imshow(matrix,cmap='RdBu_r',vmin=-norm,vmax=norm)
+        if np.linalg.det(hess) is not 0:
+            hessinv = np.linalg.inv(hess)
+            sigmasq = hessinv.diagonal()
 
-                plt.xticks([2.5,5.5,8.5],['','',''])
-                plt.yticks([2.5,5.5,8.5],['','',''])
-                plt.grid('True',lw=1,linestyle='--')
-                plt.title(lablesName[index]+ ' [{:1.0E}]'.format(norm),fontsize=12)
-
-
-    norm = 8E-6
-    plt.subplot(NROW,NCOL,NROW*NCOL)
-    plt.imshow(np.sum(covar,axis=0),cmap='RdBu_r',vmin=-norm,vmax=norm,)
-    # cbar = plt.colorbar( ticks=[-norm,  0,  norm],shrink=0.8)
-    # cbar.ax.set_yticklabels(['-{:1.0E}'.format(norm), '0', '{:1.0E}'.format(norm) ],fontsize=8)
-    
-    plt.xticks([])
-    plt.xticks([2.5,5.5,8.5],['','',''])
-    plt.yticks([2.5,5.5,8.5],['','',''])
-    plt.grid('True',lw=1,linestyle='--')
-    plt.title('Total'+ ' [{:1.0E}]'.format(norm),fontsize=12)
-
-
-
-def showSingleCovar(covar, norm=1e-6, titleName=''):
-
-    ticks_pos = [1,4,7,10]
-    ticks_name = [r'$\mu 1b$',r'$\mu 2b$',r'$e 1b$',r'$e 2b$']
-
-    matrix = covar
-
-    plt.imshow(matrix,cmap='RdBu_r',vmin=-norm,vmax=norm)
-    plt.xticks(ticks_pos,ticks_name)
-    plt.yticks(ticks_pos,ticks_name)
-    plt.title(titleName,fontsize=14)
-    plt.grid('False')
-
-    plt.axvline(2.5,c='k',lw=1,linestyle='--')
-    plt.axvline(5.5,c='k',lw=1,linestyle='--')
-    plt.axvline(8.5,c='k',lw=1,linestyle='--')
-    plt.axhline(2.5,c='k',lw=1,linestyle='--')
-    plt.axhline(5.5,c='k',lw=1,linestyle='--')
-    plt.axhline(8.5,c='k',lw=1,linestyle='--')
-
-    #plt.colorbar()
-
-
-def showParameterCov(corr):
-    ticks = [r'$\bar{\beta}_e$',r'$\bar{\beta}_\mu$',r'$\bar{\beta}_\tau$']
-    plt.figure(figsize=(6,4),facecolor='w')
-    plt.imshow(corr,cmap='PRGn_r',vmax=1,vmin=-1)
-    plt.xticks([0,1,2],ticks, fontsize=14)
-    plt.yticks([0,1,2],ticks, fontsize=14)
-    for i in range(3):
-        for j in range(3):
-            v = corr[i,j]
-            if abs(v)>0.5:
-                fontc = 'w'
+            if (sigmasq>=0).all():
+                sigma   = np.sqrt(sigmasq)
+                corvar  = hessinv/np.outer(sigma, sigma)
+                return sigma, corvar
             else:
-                fontc = 'k'
-            plt.text(i-0.2,j+0.1,'{:.2f}'.format(v), color=fontc, fontsize=14)
-    plt.colorbar( ticks=[-1, 0, 1],shrink=1)
-
-
+                print("Failed for boundaries, negetive sigma^2 exist in observed inv-hessian ")
+                return np.zeros([3]), np.zeros([3,3])
+        else:
+            print("Failed for sigularity in Hessian matrix")
+            return np.zeros([3]), np.zeros([3,3])
+        
+    
+    def _getInv(self):
+        self.invVar_stat = np.linalg.pinv(self.var_stat)
+        
+        invVar_syst = []
+        for i in range(self.nTheta):
+            mat = self.var_syst[i]
+            if i == 5: # mu fakes in mu4j
+                mat = mat[0:6,0:6]
+                invmat = np.linalg.pinv(mat)
+                invmat = np.pad(invmat,((0,6),(0,6)),'constant', constant_values=0)
+            elif i == 6: # e fakes in e4j
+                mat = mat[6:12,6:12]
+                invmat = np.linalg.pinv(mat)
+                invmat = np.pad(invmat,((6,0),(6,0)),'constant', constant_values=0)
+            else:
+                invmat = np.linalg.pinv(mat)
+            invVar_syst.append(invmat)
+        self.invVar_syst = np.array(invVar_syst)
