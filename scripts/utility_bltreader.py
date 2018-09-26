@@ -93,7 +93,7 @@ class BLTReader:
             ignoreEvent = ((name in ['zjets_m-50','zjets_m-10to50']) & (0 < tree.nPartons < 5))
             
             # do not double count DY1234Jet in inclusive DY samples amcatnlo
-            ignoreEvent = ignoreEvent | ( (name in ['zjets_m-50_amcatnlo','zjets_m-10to50_amcatnlo']) & (0 <= tree.nPartons <=2 ) )
+            # ignoreEvent = ignoreEvent | ( (name in ['zjets_m-50_amcatnlo','zjets_m-10to50_amcatnlo']) & (0 <= tree.nPartons <=2 ) )
             if ( ignoreEvent ):
                 n -= 1
                 continue

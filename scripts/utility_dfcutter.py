@@ -101,27 +101,27 @@ class DFCutter:
         if not "data2016" in self.name:
             dataFrame = self._variateDataFrame(dataFrame,variation)
 
-        # MARK -- grade mumu and ee
-        if self.selection in ["mumup","eep"]:
-            dataFrame = DNNGrader(self.selection,self.nbjet).gradeDF(dataFrame)
+        # # MARK -- MVA grade mumu and ee
+        # if self.selection in ["mumup","eep"]:
+        #     dataFrame = DNNGrader(self.selection,self.nbjet).gradeDF(dataFrame)
 
-        
         # MARK -- cut the dataframe
         dataFrame.query(self._cut(), inplace = True)
 
-        # MARK -- post processing
-        # drop if data of emu,mue
-        if (self.selection in ["emu","emu2"]) and ("data2016" in self.name):
-            dataFrame = dataFrame.drop_duplicates(subset=['runNumber', 'evtNumber'])
+        # MARK -- post processing for MC
+        if ("data2016" in self.name) :
+            # drop if data of emu,mue
+            if (self.selection in ["emu","emu2"]):
+                dataFrame = dataFrame.drop_duplicates(subset=['runNumber', 'evtNumber'])
 
-        # 0.95 is the default normalization in BLT, change it for 0.92 for Vtight working points
-        #dataFrame = self._modifyTauIDCorrection(dataFrame)     
-        if (self.selection in ["mutau","etau"]) and (not "data2016" in self.name):
-            dataFrame.eventWeight = dataFrame.eventWeight*(0.92/0.95)
+            # 0.95 is the default normalization in BLT, change it for 0.93 for Vtight working points  
+            if (self.selection in ["mutau","etau"]):
+                #dataFrame.eventWeight = dataFrame.eventWeight*(0.93/0.95)
+                dataFrame = self._modifyTauIDCorrection(dataFrame) 
+
 
         # reindex the dataframe
         dataFrame.reset_index(drop=True, inplace=True)
-
         return dataFrame
 
     def _cut(self):
@@ -140,20 +140,20 @@ class DFCutter:
         if '4j' in self.selection:
             njveto = " & (nJets >= 4)"
 
-        prime = ''
-        if self.selection == "mumup":
-            if self.nbjet == '==1':
-                prime = '& (softmax>0.25)'
-            else:
-                prime = '& (softmax>0.0002)'
-            #prime = '& (lepton2_pt < 25)'
+        # prime = ''
+        # if self.selection == "mumup":
+        #     if self.nbjet == '==1':
+        #         prime = '& (softmax>0.25)'
+        #     else:
+        #         prime = '& (softmax>0.0002)'
+        #     #prime = '& (lepton2_pt < 25)'
 
-        if self.selection == "eep":
-            if self.nbjet == '==1':
-                prime = '& (softmax>0.0005)'
-            else:
-                prime = '& (softmax>0.0001)'
-            #prime = '& (lepton2_pt < 30)'
+        # if self.selection == "eep":
+        #     if self.nbjet == '==1':
+        #         prime = '& (softmax>0.0005)'
+        #     else:
+        #         prime = '& (softmax>0.0001)'
+        #     #prime = '& (lepton2_pt < 30)'
 
 
         sltcut = {
@@ -172,8 +172,8 @@ class DFCutter:
                 "mu4j_fakes"  : " (lepton1_pt > 30) " + njveto + nbveto,
                 "e4j_fakes"   : " (lepton1_pt > 30) " + njveto + nbveto,
 
-                "mumup"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + leptonSign + zveto + prime + njveto + nbveto,
-                "eep"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + leptonSign + zveto + prime + njveto + nbveto,
+                # "mumup"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + leptonSign + zveto + prime + njveto + nbveto,
+                # "eep"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + leptonSign + zveto + prime + njveto + nbveto,
 
                 "mumu0"  : " (lepton1_pt > 25) & (lepton2_pt > 10) & (nJets==0)" + lmveto + leptonSign + zmass ,
                 "ee0"    : " (lepton1_pt > 30) & (lepton2_pt > 15) & (nJets==0)" + lmveto + leptonSign + zmass ,
@@ -257,15 +257,15 @@ class DFCutter:
         return df
 
     def _modifyTauIDCorrection(self, df):
-        if self.selection in ['mutau','etau']:
-            df.eventWeight = df.eventWeight/0.95
 
-            if ("mctt" in self.name) or ("mct" in self.name):
-                slt = df.genCategory==12
-                df[slt].eventWeight = df[slt].eventWeight*0.89
+        df.eventWeight = df.eventWeight/0.95
 
-                slt = df.genCategory==15
-                df[slt].eventWeight = df[slt].eventWeight*0.89
+        if ("mctt" in self.name) or ("mct" in self.name):
+            slt = (df.genCategory==12)
+            df[slt].eventWeight = df[slt].eventWeight*0.92
+
+            slt = (df.genCategory==15)
+            df[slt].eventWeight = df[slt].eventWeight*0.92
 
         return df
 

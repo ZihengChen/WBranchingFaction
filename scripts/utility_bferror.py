@@ -313,7 +313,7 @@ class BFSovler3D_Error:
                 a1[2,4,trigger+2] = a[2,4,trigger+2]*1.05
 
                 slv1 = BFSolver3D(a1)
-                BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg + nfake))
                 errs.append(BW1-BW)
 
 
@@ -330,6 +330,22 @@ class BFSovler3D_Error:
 
                 slv1 = BFSolver3D(a1)
                 BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg + nfake))
+                errs.append(BW1-BW)
+
+
+            elif errSource == "tauIDNotFactorized":
+                
+
+                if icata in [0,1]:
+                    trigger = 1
+                if icata in [2,3]:
+                    trigger = 0
+
+                a1 = a.copy()
+                a1[2,:,:] = a1[2,:,:]*1.05
+
+                slv1 = BFSolver3D(a1)
+                BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg*1.05 + nfake))
                 errs.append(BW1-BW)
 
 
