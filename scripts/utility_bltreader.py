@@ -123,7 +123,7 @@ class BLTReader:
             # get nGenTotal for the name
             histogram = self.inputRootFile.Get("TotalEvents_"+name)
             #print("TotalEvents_"+name)
-            nGenTotal = histogram.GetBinContent(9) - histogram.GetBinContent(10)
+            nGenTotal = histogram.GetBinContent(1) - histogram.GetBinContent(10)
             # calculate SF to lumin
             scaleFactor = self.lumin * xs/nGenTotal
         return scaleFactor
@@ -252,7 +252,7 @@ class BLTReader:
         
         self.mcwlist        = [ 'w1jets','w2jets','w3jets','w4jets' ]
 
-        self.mczlist        = [ 'zjets_m-10to50_amcatnlo','zjets_m-50_amcatnlo','z0jets_m-50_amcatnlo','z1jets_m-50_amcatnlo','z2jets_m-50_amcatnlo' ]
+        self.mczlist        = [ 'zjets_m-10to50_amcatnlo','zjets_m-50_amcatnlo']#,'z0jets_m-50_amcatnlo','z1jets_m-50_amcatnlo','z2jets_m-50_amcatnlo' ]
         
         self.mczlolist      = [ 'zjets_m-10to50', 'zjets_m-50',
                                 'z1jets_m-10to50','z1jets_m-50',
