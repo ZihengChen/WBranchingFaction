@@ -260,7 +260,7 @@ class BLTReader:
                                 'z3jets_m-10to50','z3jets_m-50',
                                 'z4jets_m-10to50','z4jets_m-50']
         
-        self.mcdylist       = self.mcwlist + self.mczlist + self.mczlolist
+        self.mcdylist       = self.mcwlist + self.mczlist #+ self.mczlolist
         
         
 

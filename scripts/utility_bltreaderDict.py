@@ -22,7 +22,7 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     out_dict['nPV']          =  tree.nPV
     out_dict['triggerLepton']=  tree.triggerLeptonStatus
 
-    if 'amcatnlo' in name:
+    if not ('2016' in name):
         out_dict['eventWeight']  =  scaleFactor * tree.eventWeight * tree.genWeight
     else:
         out_dict['eventWeight']  =  scaleFactor * tree.eventWeight 
@@ -231,16 +231,16 @@ def getAllVariables_fakeSelection( tree, selection, name, scaleFactor):
     out_dict['nBJets']       =  tree.nBJets
     out_dict['nPV']          =  tree.nPV
 
-    if 'amcatnlo' in name:
+    if not ('2016' in name):
         out_dict['eventWeight']  =  scaleFactor * tree.eventWeight * tree.genWeight
     else:
         out_dict['eventWeight']  =  scaleFactor * tree.eventWeight 
-        
+
     out_dict['eventWeightSF']=  scaleFactor
     out_dict['met']          =  tree.met
     out_dict['metPhi']       =  tree.metPhi
 
-    
+        
     # 1. Filling leptons
     lep1 = tree.leptonOneP4
     lep2 = tree.leptonTwoP4
