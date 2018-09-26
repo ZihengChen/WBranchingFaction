@@ -123,7 +123,7 @@ class BLTReader:
             # get nGenTotal for the name
             histogram = self.inputRootFile.Get("TotalEvents_"+name)
             #print("TotalEvents_"+name)
-            nGenTotal = histogram.GetBinContent(1) - histogram.GetBinContent(10)
+            nGenTotal = histogram.GetBinContent(1) - 2*histogram.GetBinContent(10)
             # calculate SF to lumin
             scaleFactor = self.lumin * xs/nGenTotal
         return scaleFactor

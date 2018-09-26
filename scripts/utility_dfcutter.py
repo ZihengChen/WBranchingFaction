@@ -36,14 +36,14 @@ class DFCutter:
             folderOfSelection = 'mumu'
 
 
-        if self.selection == "mumu0_fakes":
-            folderOfSelection = 'mumu0'
-        if self.selection == "mutau0_fakes":
-            folderOfSelection = 'mutau0'
-        if self.selection == "ee0_fakes":
-            folderOfSelection = 'ee0'
-        if self.selection == "etau0_fakes":
-            folderOfSelection = 'etau0'
+        # if self.selection == "mumu0_fakes":
+        #     folderOfSelection = 'mumu0'
+        # if self.selection == "mutau0_fakes":
+        #     folderOfSelection = 'mutau0'
+        # if self.selection == "ee0_fakes":
+        #     folderOfSelection = 'ee0'
+        # if self.selection == "etau0_fakes":
+        #     folderOfSelection = 'etau0'
 
         self.pickleDirectry = self.baseDir + "data/pickles/{}/".format(folderOfSelection)
 
@@ -66,10 +66,10 @@ class DFCutter:
         # for dy
         elif self.name == "mcdy":
             highmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
-            highmass = [i for i in highmass if ('m-50' in i) and ('raw' in i) ]
+            highmass = [i for i in highmass if ('m-50' in i) ]
             
             lowmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
-            lowmass = [i for i in lowmass if 'm-10to50' in i]
+            lowmass = [i for i in lowmass if ('m-10to50' in i) ]
 
             pickles = lowmass+highmass + glob.glob( self.pickleDirectry + "mcw/*.pkl")
 
@@ -77,16 +77,14 @@ class DFCutter:
 
 
         elif self.name == "mcz":
-            if '0' in self.selection:
-                pickles = glob.glob( self.pickleDirectry + "mcz/*.pkl")
-            else:
-                highmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
-                highmass = [i for i in highmass if ('m-50' in i) and ('raw' in i) ]
-            
-                lowmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
-                lowmass = [i for i in lowmass if 'm-10to50' in i]
 
-                pickles = lowmass+highmass
+            highmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
+            highmass = [i for i in highmass if ('m-50' in i) ]
+
+            lowmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
+            lowmass = [i for i in lowmass if （'m-10to50' in i） ]
+
+            pickles = lowmass+highmass
 
             dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True)
 
