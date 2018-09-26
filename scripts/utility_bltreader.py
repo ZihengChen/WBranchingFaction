@@ -108,10 +108,9 @@ class BLTReader:
     ## private helper functions
     #############################
     def _getAllVariables(self, tree, selection, name, scaleFactor):
-        if selection in ["ee","mumu","emu","mutau","etau","mu4j","e4j","mu4j_fakes","e4j_fakes"]:
+        if selection in ["ee","mumu","emu","mutau","etau","mu4j","e4j","mu4j_fakes","e4j_fakes","ee0","mumu0","mutau0","etau0"]:
             dictionary = getAllVariables_multileptonSelection(tree, selection, name, scaleFactor)
-        else: 
-            #selection in ["ee_e","mumu_e","mumu_mu","ee_mu"]:
+        if selection in ["ee_e","mumu_e","mumu_mu","ee_mu",'emu_tau']:
             dictionary = getAllVariables_fakeSelection(tree, selection, name, scaleFactor)
         return dictionary
         

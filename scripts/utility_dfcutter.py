@@ -114,10 +114,10 @@ class DFCutter:
             if (self.selection in ["emu","emu2"]):
                 dataFrame = dataFrame.drop_duplicates(subset=['runNumber', 'evtNumber'])
 
-            # 0.95 is the default normalization in BLT, change it for 0.93 for Vtight working points  
+            # 0.95 is the default normalization in BLT, change it for 0.92 for Vtight working points  
             if (self.selection in ["mutau","etau"]):
-                #dataFrame.eventWeight = dataFrame.eventWeight*(0.93/0.95)
-                dataFrame = self._modifyTauIDCorrection(dataFrame) 
+                dataFrame.eventWeight = dataFrame.eventWeight*(0.92/0.95)
+                #dataFrame = self._modifyTauIDCorrection(dataFrame) 
 
 
         # reindex the dataframe
@@ -266,6 +266,7 @@ class DFCutter:
 
             slt = (df.genCategory==15)
             df[slt].eventWeight = df[slt].eventWeight*0.92
+
 
         return df
 
