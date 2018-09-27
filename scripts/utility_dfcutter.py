@@ -46,6 +46,7 @@ class DFCutter:
         #     folderOfSelection = 'etau0'
 
         self.pickleDirectry = self.baseDir + "data/pickles/{}/".format(folderOfSelection)
+        #print(self.pickleDirectry)
 
 
     def getDataFrame(self,variation="", querySoftmax=None):
@@ -82,7 +83,7 @@ class DFCutter:
             highmass = [i for i in highmass if ('m-50' in i) ]
 
             lowmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
-            lowmass = [i for i in lowmass if （'m-10to50' in i） ]
+            lowmass = [i for i in lowmass if ('m-10to50' in i) ]
 
             pickles = lowmass+highmass
 
@@ -92,7 +93,6 @@ class DFCutter:
         # for not tt or DY, read all pickles in a directory
         else:
             pickles = glob.glob( self.pickleDirectry + "{}/*.pkl".format(self.name) )
-            #print(pickles)
             dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True)
         
         # MARK -- variate the dataframe for MC

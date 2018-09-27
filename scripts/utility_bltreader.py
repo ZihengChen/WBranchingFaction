@@ -29,7 +29,7 @@ class BLTReader:
     #############################
         
     def outputNGen(self):
-        names = ["t","tt","tt_2l","tt_semilepton"] 
+        names = ["t","tt","tt_2l2nu","tt_semilepton"] 
         nGens = [self.getNGen("t_tw")+self.getNGen("tbar_tw"),
                  self.getNGen("ttbar_inclusive"),
                  self.getNGen("ttbar_2l2nu"),
