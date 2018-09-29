@@ -1,7 +1,7 @@
 import utility_common as common
 import pandas as pd
 from pylab import *
-from utility_dnn import *
+from torch_dnn import *
 
 import glob
 import os, sys
@@ -67,33 +67,33 @@ class DFCutter:
         # for dy
         elif self.name == "mcdy":
             highmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
-            highmass = [i for i in highmass if ('m-50' in i) ]
+            highmass = [i for i in highmass if ('m-50' in i)]# and ('raw' in i)]
             
             lowmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
             lowmass = [i for i in lowmass if ('m-10to50' in i) ]
 
             pickles = lowmass+highmass + glob.glob( self.pickleDirectry + "mcw/*.pkl")
 
-            dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True)
+            dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True, sort=False)
 
 
         elif self.name == "mcz":
 
             highmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
-            highmass = [i for i in highmass if ('m-50' in i) ]
+            highmass = [i for i in highmass if ('m-50' in i)]#and ('raw' in i)]
 
             lowmass = glob.glob( self.pickleDirectry + "mcz/*.pkl")
             lowmass = [i for i in lowmass if ('m-10to50' in i) ]
 
             pickles = lowmass+highmass
 
-            dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True)
+            dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True, sort=False)
 
 
         # for not tt or DY, read all pickles in a directory
         else:
             pickles = glob.glob( self.pickleDirectry + "{}/*.pkl".format(self.name) )
-            dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True)
+            dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles], ignore_index=True, sort=False)
         
         # MARK -- variate the dataframe for MC
         if not "data2016" in self.name:
@@ -111,7 +111,7 @@ class DFCutter:
             # drop if data of emu,mue
             if (self.selection in ["emu","emu2"]):
                 dataFrame = dataFrame.drop_duplicates(subset=['runNumber', 'evtNumber'])
-
+        else:
             # 0.95 is the default normalization in BLT, change it for 0.92 for Vtight working points  
             if (self.selection in ["mutau","etau"]):
                 dataFrame.eventWeight = dataFrame.eventWeight*(0.92/0.95)

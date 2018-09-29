@@ -1,5 +1,6 @@
 import glob
 import os, sys
+from pathlib import Path
 
 
 
@@ -15,14 +16,12 @@ def makeDirectory(filePath, clear=True):
     if clear and len(os.listdir(filePath)) != 0:
         os.system('rm '+filePath+'/*')
 
-def getBaseDirectory(isLocal=True):
-    if isLocal:
-        # on my local macbook
-        baseDir = "/Users/zihengchen/Documents/Analysis/workplace/"
-        #baseDir = "/home/zchen/Documents/Analysis/workplace/"
-    else: 
-        # on bahumut
-        baseDir = "/home/zchen/Documents/Analysis/workplace/"
+def getBaseDirectory():
+    
+    home = str(Path.home())
+
+    baseDir = home + "/Documents/Analysis/workplace/"
+
     return baseDir
 
 def getFakeSF(obj):
