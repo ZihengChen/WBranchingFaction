@@ -1,46 +1,66 @@
 from torch_modellayer import *
-
+from torch_helper import *
 
 class PredictiveModel(tc.nn.Module):
     def __init__(self):
         super(PredictiveModel,self).__init__()
 
-        # define layers
-        self.layer_beta = PertLayer_Beta()
-        self.layer_xs   = PertLayer_XS()
-        self.layer_eff  = PertLayer_Eff()
-        self.layer_shape= PertLayer_Shape()
+        #################
+        # define layers #
+        #################
+
+
+        # perturbative layer parameterized by 
+        # bf of W decay
+        self.layer_beta = PertLayer_Beta() 
+
+        # bf of tau decay
+        self.layer_btl = PertLayer_Btl() 
+
+        # cross sections and Lumin
+        self.layer_xs = PertLayer_Xs()
+
+        # lepton efficiency
+        self.layer_eff = PertLayer_Eff()
+
+        # shape-modifying paramters
+        # lepton Energy, Jet Energy, bTagging
+        self.layer_shape = PertLayer_Shape()
         
     def forward(self, x):
-        # forward prop layers
-        h1,regu1 = self.layer_beta  (x)
-        h2,regu2 = self.layer_xs    (h1)
-        h3,regu3 = self.layer_eff   (h2)
-        h4,regu4 = self.layer_shape (h3)
+        '''
+        Forward propogation through parametrized layers.
+
+        input: x
+            [x] is templets as a tensor of shape (c,t,b).
+            c for number of channels, c=16.
+            t for number of templetes per channel, t=21x2+4=46.
+            b for number of bins per templetes, b=1 for now.
+
+        output: y, regu
+            [y] is prediction as a tensor of shape (c,b).
+            [regu] is a scalar regulaization of naussance parameters.
+            Chi2 of the gaussian error of nuisance parameters 
+            is used as the regulization here.
+        '''
         
-        # output summation
-        y = tc.sum(h4,1)
-        regu = regu1+regu2+regu3+regu4
+        # forward propogation through all layers
+        h1,regu1 = self.layer_beta  (x)
+        h2,regu2 = self.layer_btl   (h1)
+        h3,regu3 = self.layer_xs    (h2)
+        h4,regu4 = self.layer_eff   (h3)
+        h5,regu5 = self.layer_shape (h4)
+        
+        # prediction and regulization
+        y = tc.sum(h5,1)
+        regu = regu1+regu2+regu3+regu4+regu5
 
         return y,regu
 
 
 
-def calculate_hessian(loss, model):
-    grads = tc.autograd.grad(loss, model.parameters(), create_graph=True)
-    grads = tc.cat([g.view(-1) for g in grads])
 
-    temp = []
-    for g in grads:
-        grad2 = tc.autograd.grad(g, model.parameters(), create_graph=True)
-        temp.append(grad2)
 
-    hess = []
-    for i in temp:
-        ihess = []
-        for j in i:
-            ihess.append(j.data)
-        hess.append(ihess)
-    hess = np.array(hess)
-    return hess
+
+
     

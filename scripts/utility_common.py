@@ -177,3 +177,42 @@ def showParameterCov(corr):
                 fontc = 'k'
             plt.text(i-0.2,j+0.1,'{:.2f}'.format(v), color=fontc, fontsize=14)
     plt.colorbar( ticks=[-1, 0, 1],shrink=1)
+
+
+
+def showParameterCovMat(corr,sigma):
+    # make plots
+    lablesName = [r'$\beta_e$',r'$\beta_\mu$',r'$\beta_\tau$',
+                r"$b^\tau_\mu$",r"$b^\tau_e$",#r"$b^\tau_h$",
+                r"$\sigma_{tt}$",r"$\sigma_{tW}$",
+                r"$\sigma_{W}$",r"$\sigma_{Z}$",r"$\sigma_{VV}$",
+                r'$f_e$',r'$f_\mu$',r'$f_\tau$','L',
+                r"$\epsilon_e$",r"$\epsilon_\mu$",r"$\epsilon_\tau$",
+                r"$E_e$",r"$E_\mu$",r"$E_\tau$",
+                "JES","JER","b","bMis"
+                ]
+
+    lablesPos = np.arange(0,len(lablesName),1)  
+
+    plt.figure(figsize=(12,10),facecolor='w')
+    plt.imshow(corr,cmap='PRGn_r',vmax=1,vmin=-1)
+    plt.xticks(lablesPos,lablesName)
+    plt.yticks(lablesPos,lablesName)
+    for i in lablesPos:
+        for j in lablesPos:
+            value = corr[i,j]
+            if abs(value)>0.5:
+                fcolor = 'w'
+            else:
+                fcolor = 'k'
+                
+            plt.text(i-0.3,j+0.1,'{:4.2f}'.format(corr[i,j]),fontsize=6,color=fcolor )
+    plt.colorbar()
+    plt.axvline(2.5,color='grey',linewidth=1,linestyle='--')
+    plt.axhline(2.5,color='grey',linewidth=1,linestyle='--')
+
+    plt.title(r'$\beta_e   =10.80\times(1\pm${:4.2f}%),  '.format(sigma[0]/0.1080*100) + 
+            r'$\beta_\mu =10.80\times(1\pm${:4.2f}%),  '.format(sigma[1]/0.1080*100) + 
+            r'$\beta_\tau=10.80\times(1\pm${:4.2f}%)   '.format(sigma[2]/0.1080*100),
+            fontsize=12
+            )
