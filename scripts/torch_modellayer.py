@@ -148,9 +148,9 @@ class PertLayer_Eff(tc.nn.Module):
         super(PertLayer_Eff,self).__init__()
     
         # define nuisance paramters
-        self.effe  = Parameter(tc.tensor(1.), requires_grad=True)
-        self.effm  = Parameter(tc.tensor(1.), requires_grad=True)
-        self.efft  = Parameter(tc.tensor(1.), requires_grad=True)
+        self.effe  = Parameter(tc.tensor(1.), requires_grad=True).to(device)
+        self.effm  = Parameter(tc.tensor(1.), requires_grad=True).to(device)
+        self.efft  = Parameter(tc.tensor(1.), requires_grad=True).to(device)
             
 
     def forward(self, x):
@@ -182,14 +182,14 @@ class PertLayer_Shape(tc.nn.Module):
         super(PertLayer_Shape,self).__init__()
         self._getShapeVariation()
 
-        self.energye = Parameter(tc.tensor(0.), requires_grad=True)
-        self.energym = Parameter(tc.tensor(0.), requires_grad=True)
-        self.energyt = Parameter(tc.tensor(0.), requires_grad=True)
+        self.energye = Parameter(tc.tensor(0.), requires_grad=True).to(device)
+        self.energym = Parameter(tc.tensor(0.), requires_grad=True).to(device)
+        self.energyt = Parameter(tc.tensor(0.), requires_grad=True).to(device)
 
-        self.jes     = Parameter(tc.tensor(0.), requires_grad=True)
-        self.jer     = Parameter(tc.tensor(0.), requires_grad=True)
-        self.btag    = Parameter(tc.tensor(0.), requires_grad=True)
-        self.mistag  = Parameter(tc.tensor(0.), requires_grad=True)
+        self.jes     = Parameter(tc.tensor(0.), requires_grad=True).to(device)
+        self.jer     = Parameter(tc.tensor(0.), requires_grad=True).to(device)
+        self.btag    = Parameter(tc.tensor(0.), requires_grad=True).to(device)
+        self.mistag  = Parameter(tc.tensor(0.), requires_grad=True).to(device)
 
 
 
@@ -231,7 +231,7 @@ class PertLayer_Shape(tc.nn.Module):
         for variation in ['EPtDown','MuPtDown','TauPtDown']:
             x0 = np.load(baseDir + "data/templates/templatesX_{}.npy".format(''))
             x1 = np.load(baseDir + "data/templates/templatesX_{}.npy".format(variation))
-            dx = tc.from_numpy((x0-x1)).type(tc.FloatTensor)
+            dx = tc.from_numpy((x0-x1)).type(tc.FloatTensor).to(device)
             dx_list.append(dx)
 
         self.dx_energye = dx_list[0]
@@ -243,7 +243,7 @@ class PertLayer_Shape(tc.nn.Module):
         for variation in ['JES','JER','BTag','Mistag']:
             x1 = np.load(baseDir + "data/templates/templatesX_{}Down.npy".format(variation)) 
             x2 = np.load(baseDir + "data/templates/templatesX_{}Up.npy".format(variation))
-            dx = tc.from_numpy((x0-x1)/2).type(tc.FloatTensor)
+            dx = tc.from_numpy((x0-x1)/2).type(tc.FloatTensor).to(device)
             dx_list.append(dx)
         self.dx_jes     = dx_list[0]
         self.dx_jer     = dx_list[1]
