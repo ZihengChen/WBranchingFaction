@@ -1,14 +1,13 @@
 import glob
 import os, sys
 from pathlib import Path
-import matplotlib as mpl
 
 
 import pandas as pd
 from pylab import *
 from scipy.stats import beta
 
-mpl.rc('figure',facecolor='w',figsize=(6,4))
+
 
 
 def makeDirectory(filePath, clear=True):
