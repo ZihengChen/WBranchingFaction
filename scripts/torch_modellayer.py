@@ -7,9 +7,9 @@ class PertLayer_Beta(tc.nn.Module):
         super(PertLayer_Beta,self).__init__()
     
         # define parameters of interest
-        self.bwe   = Parameter(tc.tensor(.109), requires_grad=True).to(device)
-        self.bwm   = Parameter(tc.tensor(.108), requires_grad=True).to(device)
-        self.bwt   = Parameter(tc.tensor(.107), requires_grad=True).to(device)
+        self.bwe   = Parameter(tc.tensor(.109), requires_grad=True)
+        self.bwm   = Parameter(tc.tensor(.108), requires_grad=True)
+        self.bwt   = Parameter(tc.tensor(.107), requires_grad=True)
         
         # define constant
         self.ll, self.hh, self.lh = .1080**2, .6760**2, .1080*.6760
@@ -54,8 +54,8 @@ class PertLayer_Btl(tc.nn.Module):
         super(PertLayer_Btl,self).__init__()
 
         # define nuisance paramters
-        self.bte   = Parameter(tc.tensor(1.0), requires_grad=True).to(device)
-        self.btm   = Parameter(tc.tensor(1.1), requires_grad=True).to(device)
+        self.bte   = Parameter(tc.tensor(1.0), requires_grad=True)
+        self.btm   = Parameter(tc.tensor(1.1), requires_grad=True)
         
 
     def forward(self, x):
@@ -99,15 +99,15 @@ class PertLayer_Xs(tc.nn.Module):
         super(PertLayer_Xs,self).__init__()
     
         # define nuisance paramters
-        self.ttxs  = Parameter(tc.tensor(1.), requires_grad=True).to(device)
-        self.txs   = Parameter(tc.tensor(1.), requires_grad=True).to(device)
-        self.wxs   = Parameter(tc.tensor(1.), requires_grad=True).to(device)
-        self.zxs   = Parameter(tc.tensor(1.), requires_grad=True).to(device)
-        self.vvxs  = Parameter(tc.tensor(1.), requires_grad=True).to(device)
-        self.eqcdxs= Parameter(tc.tensor(1.), requires_grad=True).to(device)
-        self.mqcdxs= Parameter(tc.tensor(1.), requires_grad=True).to(device)
-        self.tqcdxs= Parameter(tc.tensor(1.), requires_grad=True).to(device)
-        self.lumin = Parameter(tc.tensor(1.), requires_grad=True).to(device)
+        self.ttxs  = Parameter(tc.tensor(1.), requires_grad=True)
+        self.txs   = Parameter(tc.tensor(1.), requires_grad=True)
+        self.wxs   = Parameter(tc.tensor(1.), requires_grad=True)
+        self.zxs   = Parameter(tc.tensor(1.), requires_grad=True)
+        self.vvxs  = Parameter(tc.tensor(1.), requires_grad=True)
+        self.eqcdxs= Parameter(tc.tensor(1.), requires_grad=True)
+        self.mqcdxs= Parameter(tc.tensor(1.), requires_grad=True)
+        self.tqcdxs= Parameter(tc.tensor(1.), requires_grad=True)
+        self.lumin = Parameter(tc.tensor(1.), requires_grad=True)
             
 
     def forward(self, x):
@@ -148,9 +148,9 @@ class PertLayer_Eff(tc.nn.Module):
         super(PertLayer_Eff,self).__init__()
     
         # define nuisance paramters
-        self.effe  = Parameter(tc.tensor(1.), requires_grad=True).to(device)
-        self.effm  = Parameter(tc.tensor(1.), requires_grad=True).to(device)
-        self.efft  = Parameter(tc.tensor(1.), requires_grad=True).to(device)
+        self.effe  = Parameter(tc.tensor(1.), requires_grad=True)
+        self.effm  = Parameter(tc.tensor(1.), requires_grad=True)
+        self.efft  = Parameter(tc.tensor(1.), requires_grad=True)
             
 
     def forward(self, x):
@@ -182,14 +182,14 @@ class PertLayer_Shape(tc.nn.Module):
         super(PertLayer_Shape,self).__init__()
         self._getShapeVariation()
 
-        self.energye = Parameter(tc.tensor(0.), requires_grad=True).to(device)
-        self.energym = Parameter(tc.tensor(0.), requires_grad=True).to(device)
-        self.energyt = Parameter(tc.tensor(0.), requires_grad=True).to(device)
+        self.energye = Parameter(tc.tensor(0.), requires_grad=True)
+        self.energym = Parameter(tc.tensor(0.), requires_grad=True)
+        self.energyt = Parameter(tc.tensor(0.), requires_grad=True)
 
-        self.jes     = Parameter(tc.tensor(0.), requires_grad=True).to(device)
-        self.jer     = Parameter(tc.tensor(0.), requires_grad=True).to(device)
-        self.btag    = Parameter(tc.tensor(0.), requires_grad=True).to(device)
-        self.mistag  = Parameter(tc.tensor(0.), requires_grad=True).to(device)
+        self.jes     = Parameter(tc.tensor(0.), requires_grad=True)
+        self.jer     = Parameter(tc.tensor(0.), requires_grad=True)
+        self.btag    = Parameter(tc.tensor(0.), requires_grad=True)
+        self.mistag  = Parameter(tc.tensor(0.), requires_grad=True)
 
 
 
