@@ -4,7 +4,7 @@ from utility_bfsolver import *
 from tqdm import tqdm, trange
 
 class BFSovler3D_Error:
-    def __init__(self, statCombined=False):
+    def __init__(self):
         self.tb = BFSolver_Toolbox()
         self.baseDir = common.getBaseDirectory() 
 
@@ -15,38 +15,38 @@ class BFSovler3D_Error:
         self.nmcbg, self.nmcbgVar = counts.nmcbg, counts.nmcbgVar
         self.nfake, self.nfakeVar = counts.nfake, counts.nfakeVar
 
-        self.statCombined = statCombined
-        if self.statCombined:
-            self.setStatCombinedWeights()
+        # self.statCombined = statCombined
+        # if self.statCombined:
+        #     self.setStatCombinedWeights()
 
-    def setStatCombinedWeights (self):
-        statVar  = self.errStat('data')**2
-        statVar += self.errStat('mcbg')**2
-        statVar += self.errStat('mcsg')**2
+    # def setStatCombinedWeights (self):
+    #     statVar  = self.errStat('data')**2
+    #     statVar += self.errStat('mcbg')**2
+    #     statVar += self.errStat('mcsg')**2
 
-        w = 1/statVar
+    #     w = 1/statVar
 
-        self.cWeight = w/np.sum(w,axis=0)
-        self.statErr = 1/np.sum(w,axis=0)**0.5
+    #     self.cWeight = w/np.sum(w,axis=0)
+    #     self.statErr = 1/np.sum(w,axis=0)**0.5
 
-        BW = 0
-        for icata in range(4):
-            a  = self.a[icata]
-            ndata = self.ndata[icata]
-            nmcbg = self.nmcbg[icata]
-            nfake = self.nfake[icata]
-            w  = self.cWeight[icata]
+    #     BW = 0
+    #     for icata in range(4):
+    #         a  = self.a[icata]
+    #         ndata = self.ndata[icata]
+    #         nmcbg = self.nmcbg[icata]
+    #         nfake = self.nfake[icata]
+    #         w  = self.cWeight[icata]
 
-            slv = BFSolver3D(a)
-            BW_icata = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg.dot(np.ones(3))+nfake))
-            BW  += BW_icata * w
-            print(BW_icata)
-        self.BW = BW
+    #         slv = BFSolver3D(a)
+    #         BW_icata = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg.dot(np.ones(3))+nfake))
+    #         BW  += BW_icata * w
+    #         print(BW_icata)
+    #     self.BW = BW
 
-        print("{:6.4f}+/-{:6.4f}, {:6.4f}+/-{:6.4f}, {:6.4f}+/-{:6.4f}".format( self.BW[0], self.statErr[0],
-                                                                                self.BW[1], self.statErr[1], 
-                                                                                self.BW[2], self.statErr[2]
-                                                                                ))
+    #     print("{:6.4f}+/-{:6.4f}, {:6.4f}+/-{:6.4f}, {:6.4f}+/-{:6.4f}".format( self.BW[0], self.statErr[0],
+    #                                                                             self.BW[1], self.statErr[1], 
+    #                                                                             self.BW[2], self.statErr[2]
+    #                                                                             ))
 
         
         
@@ -183,8 +183,8 @@ class BFSovler3D_Error:
             errs.append(BW1-BW)
                  
         errs = np.array(errs) # 4x3 2D-array
-        if self.statCombined:
-            errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
+        # if self.statCombined:
+        #     errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
         return errs
 
 
@@ -251,8 +251,8 @@ class BFSovler3D_Error:
             errs.append(BW1-BW)  
                          
         errs = np.array(errs) # 4x3 2D-array
-        if self.statCombined:
-            errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
+        # if self.statCombined:
+        #     errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
         return errs
 
 
@@ -354,8 +354,8 @@ class BFSovler3D_Error:
 
             
         errs = np.array(errs) # 4x3 2D-array
-        if self.statCombined:
-            errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
+        # if self.statCombined:
+        #     errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
         return errs
 
 
@@ -376,8 +376,8 @@ class BFSovler3D_Error:
             errs.append(BW-BW1) 
 
         errs = np.array(errs) # 4x3 2D-array
-        if self.statCombined:
-            errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
+        # if self.statCombined:
+        #     errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
         return errs
 
 
@@ -403,8 +403,8 @@ class BFSovler3D_Error:
             errs.append((BW1-BW2)/2)
                 
         errs = np.array(errs) # 4x3 2D-array
-        if self.statCombined:
-            errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
+        # if self.statCombined:
+        #     errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
         return errs
 
 
@@ -415,19 +415,19 @@ class BFSovler3D_Error:
         error = np.abs(error/0.1086 * 100)
 
 
-        if self.statCombined:
-            # print [source,br] matrix
-            for i in range(error.shape[0]):
-                print("{:5.3f},{:5.3f},{:5.3f}".format(error[i,0],error[i,1],error[i,2]))
-        else:
+        # if self.statCombined:
+        #     # print [source,br] matrix
+        #     for i in range(error.shape[0]):
+        #         print("{:5.3f},{:5.3f},{:5.3f}".format(error[i,0],error[i,1],error[i,2]))
+        # else:
             # print [cata,source,br] matrix
-            for i in range(error.shape[1]):
-                print("{:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}" \
-                    .format(error[0,i,0],error[0,i,1],error[0,i,2],
-                            error[1,i,0],error[1,i,1],error[1,i,2],
-                            error[2,i,0],error[2,i,1],error[2,i,2],
-                            error[3,i,0],error[3,i,1],error[3,i,2]
-                        ))
+        for i in range(error.shape[1]):
+            print("{:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}" \
+                .format(error[0,i,0],error[0,i,1],error[0,i,2],
+                        error[1,i,0],error[1,i,1],error[1,i,2],
+                        error[2,i,0],error[2,i,1],error[2,i,2],
+                        error[3,i,0],error[3,i,1],error[3,i,2]
+                    ))
 
     def smearAcc(self,a,aVar):
         smear = np.zeros_like(a)

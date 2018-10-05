@@ -106,12 +106,10 @@ class bfCombiner_theta():
         self.sigma = sigma
         
         self.var_stat = var[0]
-        self.var_syst = var[1:]
-        self.sigma_stat = sigma[0]
-        self.sigma_syst = sigma[1:]
+        self.invVar_stat = np.linalg.pinv(self.var_stat)
 
-        self.nTheta = var.shape[0] - 1
-        self._getInv()
+        self.sigma_syst = sigma[1:]
+        self.nTheta = sigma.shape[0] - 1
         
         self.beta0  = beta0
         self.param0 = np.r_[np.array([0.1081]*3),
@@ -121,7 +119,7 @@ class bfCombiner_theta():
         self.lsEstimator()
 
         
-    def cost_nll (self, param):
+    def loss (self, param):
 
         param_beta = param[0:3]
         param_syst = param[3:]
@@ -131,19 +129,20 @@ class bfCombiner_theta():
                      param_beta,
                      param_beta]
         
+        beta0Pert = 0
         for i in range(self.nTheta):
-            beta += self.sigma_syst[i] * param_syst[i]
+            beta0Pert += self.sigma_syst[i] * param_syst[i]
         
-        delta = beta-self.beta0
+        delta = beta - (self.beta0+beta0Pert)
         chiquared = delta.dot( self.invVar_stat.dot(delta) )/2
-        regulization = np.sum(param_syst**2/2)
+        regulization = np.sum( 0.5*((param_syst-0)/1)**2 )
         cost = chiquared + regulization
 
         return cost
     
     def lsEstimator(self):
         result = minimize(
-            fun = self.cost_nll, 
+            fun = self.loss, 
             x0  = self.param0,
             method = 'SLSQP',
             bounds = [(0,1)]*3 + [(-3,3)]*self.nTheta
@@ -152,7 +151,7 @@ class bfCombiner_theta():
         self.paramLS = result.x
     
     def paramSigma(self):
-        hcalc = nd.Hessian(self.cost_nll, step=1e-6, method='central')
+        hcalc = nd.Hessian(self.loss, step=1e-6, method='central')
         hess  = hcalc( self.paramLS )
 
         if np.linalg.det(hess) is not 0:
@@ -171,21 +170,21 @@ class bfCombiner_theta():
             return np.zeros([3]), np.zeros([3,3])
         
     
-    def _getInv(self):
-        self.invVar_stat = np.linalg.pinv(self.var_stat)
+    # def _getInv(self):
         
-        invVar_syst = []
-        for i in range(self.nTheta):
-            mat = self.var_syst[i]
-            if i == 5: # mu fakes in mu4j
-                mat = mat[0:6,0:6]
-                invmat = np.linalg.pinv(mat)
-                invmat = np.pad(invmat,((0,6),(0,6)),'constant', constant_values=0)
-            elif i == 6: # e fakes in e4j
-                mat = mat[6:12,6:12]
-                invmat = np.linalg.pinv(mat)
-                invmat = np.pad(invmat,((6,0),(6,0)),'constant', constant_values=0)
-            else:
-                invmat = np.linalg.pinv(mat)
-            invVar_syst.append(invmat)
-        self.invVar_syst = np.array(invVar_syst)
+        
+    #     invVar_syst = []
+    #     for i in range(self.nTheta):
+    #         mat = self.var_syst[i]
+    #         if i == 5: # mu fakes in mu4j
+    #             mat = mat[0:6,0:6]
+    #             invmat = np.linalg.pinv(mat)
+    #             invmat = np.pad(invmat,((0,6),(0,6)),'constant', constant_values=0)
+    #         elif i == 6: # e fakes in e4j
+    #             mat = mat[6:12,6:12]
+    #             invmat = np.linalg.pinv(mat)
+    #             invmat = np.pad(invmat,((6,0),(6,0)),'constant', constant_values=0)
+    #         else:
+    #             invmat = np.linalg.pinv(mat)
+    #         invVar_syst.append(invmat)
+    #     self.invVar_syst = np.array(invVar_syst)
