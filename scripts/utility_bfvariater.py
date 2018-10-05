@@ -3,7 +3,7 @@ from pylab import *
 from utility_bfsolver import *
 from tqdm import tqdm, trange
 
-class BFSovler3D_Error:
+class BFVariater:
     def __init__(self):
         self.tb = BFSolver_Toolbox()
         self.baseDir = common.getBaseDirectory() 

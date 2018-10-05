@@ -1,5 +1,5 @@
-from torch_modellayer import *
-from torch_helper import *
+from fit_torch_layer import *
+from fit_torch_helper import *
 
 class PredictiveModel(tc.nn.Module):
     def __init__(self):

@@ -92,7 +92,7 @@ class DFPlotter:
 
         # MARK -- config plotting parameters for each selection
         # mumu
-        if self.selection == "mumu":
+        if self.selection in ["mumu","mumuc"]:
             self.mcsgQueryList = [
                 'genCategory>=16',
                 'genCategory in [1,3,4,5,6,7,8,9,10,11,12]',
@@ -111,7 +111,7 @@ class DFPlotter:
             self.adjust = [1,1,1,1,1,1]
             #self.hasFake = False
         # ee
-        elif self.selection == "ee":
+        elif self.selection in ["ee","eec"]:
             self.mcsgQueryList = [
                 'genCategory>=16',
                 'genCategory in [2,3,4,5,6,7,8,9,13,14,15]',
@@ -428,6 +428,9 @@ class ASingleKinematicPlot:
         if plotoutdir is not None:
 
             if selection is not None:
+                if '0b' in plotoutdir:
+                    fig.savefig(plotoutdir+"{}_0b_{}.pdf".format(selection,self.v))
+
                 if '1b' in plotoutdir:
                     fig.savefig(plotoutdir+"{}_1b_{}.pdf".format(selection,self.v))
                 if '2b' in plotoutdir:

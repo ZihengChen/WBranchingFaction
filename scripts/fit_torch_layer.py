@@ -1,4 +1,4 @@
-from torch_helper import *
+from fit_torch_helper import *
 
 device = tc.device("cuda" if tc.cuda.is_available() else "cpu")
 
@@ -249,14 +249,6 @@ class PertLayer_Shape(tc.nn.Module):
         self.dx_jer     = dx_list[1]
         self.dx_btag    = dx_list[2]
         self.dx_mistag  = dx_list[3]
-
-
-
-
-
-
-
-
 
 
 

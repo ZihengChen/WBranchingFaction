@@ -16,7 +16,6 @@ class bfCombiner():
     def chisquared_beta(self,param):
         # three paramters
         # beta_e, beta_m, beta_tau
-
         beta = param
         beta = np.r_[beta,beta,beta,beta]
         delta = beta-self.beta0
@@ -90,10 +89,6 @@ class bfCombiner():
             print("Failed for sigularity in Hessian matrix")
             return np.zeros([3]), np.zeros([3,3])
 
-        #if invhess:
-        # else:
-        #     sigma = 1/hess.diagonal()**0.5
-        #     return sigma
 
 
 
@@ -135,7 +130,7 @@ class bfCombiner_theta():
         
         delta = beta - (self.beta0+beta0Pert)
         chiquared = delta.dot( self.invVar_stat.dot(delta) )/2
-        regulization = np.sum( 0.5*((param_syst-0)/1)**2 )
+        regulization = np.sum( 0.5*((param_syst-0.00)/1.00)**2 )
         cost = chiquared + regulization
 
         return cost
@@ -169,22 +164,3 @@ class bfCombiner_theta():
             print("Failed for sigularity in Hessian matrix")
             return np.zeros([3]), np.zeros([3,3])
         
-    
-    # def _getInv(self):
-        
-        
-    #     invVar_syst = []
-    #     for i in range(self.nTheta):
-    #         mat = self.var_syst[i]
-    #         if i == 5: # mu fakes in mu4j
-    #             mat = mat[0:6,0:6]
-    #             invmat = np.linalg.pinv(mat)
-    #             invmat = np.pad(invmat,((0,6),(0,6)),'constant', constant_values=0)
-    #         elif i == 6: # e fakes in e4j
-    #             mat = mat[6:12,6:12]
-    #             invmat = np.linalg.pinv(mat)
-    #             invmat = np.pad(invmat,((6,0),(6,0)),'constant', constant_values=0)
-    #         else:
-    #             invmat = np.linalg.pinv(mat)
-    #         invVar_syst.append(invmat)
-    #     self.invVar_syst = np.array(invVar_syst)

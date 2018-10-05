@@ -26,6 +26,10 @@ class DFCutter:
             folderOfSelection = 'mutau'
         if self.selection == "etau_fakes":
             folderOfSelection = 'etau'
+        if self.selection == 'mumuc':
+            folderOfSelection = 'mumu'
+        if self.selection == 'eec':
+            folderOfSelection = 'ee'  
         
         self.pickleDirectry = self.baseDir + "data/pickles/{}/".format(folderOfSelection)
 
@@ -118,6 +122,10 @@ class DFCutter:
                 "etau_fakes"  : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + sameSign,
                 "mu4j_fakes"  : " (lepton1_pt > 30) ",
                 "e4j_fakes"   : " (lepton1_pt > 30) ",
+
+
+                "mumuc"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + oppoSign + zmass,
+                "eec"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + oppoSign + zmass,
                 }
 
         totalcut = sltcut[self.selection] 
