@@ -3,10 +3,13 @@ from utility_dfcutter import *
 
 
 class DFTemplater():
-    def __init__(self, variation='', tempType='Counting'):
+    def __init__(self, variation='',
+                 tempType     = 'Counting',
+                 controlTauID = False
+                 ):
         self.varation = variation
         self.tempType = tempType
-
+        self.controlTauID = controlTauID
 
     def makeTargets(self):
 
@@ -15,14 +18,34 @@ class DFTemplater():
         '''
 
         targets = []
+
         
         for nbjet in ['==1','>1']:
             for selection in  ["emu","mumu","mutau","mu4j","ee","emu2","etau","e4j"]:
                 njet = None
                 v,bins = self._channelConfig(selection, nbjet, njet)
-                df = DFCutter(selection,nbjet,'data2016',None).getDataFrame()
+                df = DFCutter(selection,nbjet,'data2016',njet).getDataFrame()
                 temp = self._binDataFrame(df,v,bins)
                 targets.append(temp)
+
+        
+        if self.controlTauID:
+            for selection in ["mumuc","eec"]:
+                nbjet,njet = '==1', None
+                v,bins = self._channelConfig(selection, nbjet, njet)
+                df = DFCutter(selection,nbjet,'data2016',njet).getDataFrame()
+                temp = self._binDataFrame(df,v,bins)
+                targets.append(temp)
+
+            for selection in ["mutau","etau"]:
+                nbjet,njet = '<1', None
+                v,bins = self._channelConfig(selection, nbjet, njet)
+                df = DFCutter(selection,nbjet,'data2016',njet).getDataFrame()
+                temp = self._binDataFrame(df,v,bins)
+                targets.append(temp)
+
+
+
 
         targets = np.concatenate(targets)
         self.targets = targets
@@ -44,6 +67,22 @@ class DFTemplater():
                 channelTemplates = self._makeChTemp(selection, nbjet, njet)
                 #print(channelTemplates.shape)
                 templates.append(channelTemplates)
+
+        
+        if self.controlTauID:
+            for selection in ["mumuc","eec"]:
+                nbjet,njet = '==1', None
+                channelTemplates = self._makeChTemp(selection, nbjet, njet)
+                #print(channelTemplates.shape)
+                templates.append(channelTemplates)
+
+
+            for selection in ["mutau","etau"]:
+                nbjet,njet = '<1', None
+                channelTemplates = self._makeChTemp(selection, nbjet, njet)
+                #print(channelTemplates.shape)
+                templates.append(channelTemplates)
+        
                 
         templates = np.array(templates)
         self.templates = templates
@@ -159,5 +198,14 @@ class DFTemplater():
         if selection == 'e4j':
             v = 'lepton1_pt'
             bins = np.arange(30,180,5)
+
+        if selection == 'mumuc':
+            v = 'lepton2_pt'
+            bins = np.arange(10,70,2)
+
+        if selection == 'eec':
+            v = 'lepton2_pt'
+            bins = np.arange(10,70,2)
+
         
         return v, bins

@@ -1,9 +1,11 @@
 from scipy.optimize import minimize
 import numdifftools as nd
 from pylab import *
+import utility_common as common
+from fit_model import *
 
 
-class bfCombiner():
+class BFCombiner():
     def __init__(self,var,beta0, paramTypy='beta'):
         self.var    = var
         self.invVar = np.linalg.pinv(var)
@@ -91,48 +93,40 @@ class bfCombiner():
 
 
 
+class BFCombiner_theta():
+    def __init__(self,beta0):
+        baseDir = common.getBaseDirectory()
+        var     = np.load(baseDir + 'data/combine/covar.npy')
 
-
-
-
-class bfCombiner_theta():
-    def __init__(self,var,sigma,beta0):
-        self.var = var
-        self.sigma = sigma
-        
-        self.var_stat = var[0]
+        self.var_stat    = var[0]
         self.invVar_stat = np.linalg.pinv(self.var_stat)
 
-        self.sigma_syst = sigma[1:]
-        self.nTheta = sigma.shape[0] - 1
-        
-        self.beta0  = beta0
-        self.param0 = np.r_[np.array([0.1081]*3),
-                            0*np.ones([self.nTheta])
-                           ]
+        self.nTheta = var.shape[0] - 1
+        self.param0 = np.r_[0.1081*np.ones(3), np.zeros(self.nTheta)]
+
+
+        self.X = np.load(baseDir + "data/templates/templatesX_{}.npy".format('')) 
+        #self.Y = np.load(baseDir + "data/templates/templatesY_{}.npy".format('')) 
+        self.Y = np.sum(self.X,axis=1)
+
+
+        self.bfmodel = BFModel(beta0)
+        self.ctrlmodel  = PredictiveModel_np(self.X,controlTauID=True)
 
         self.lsEstimator()
 
         
     def loss (self, param):
 
-        param_beta = param[0:3]
-        param_syst = param[3:]
-        
-        beta = np.r_[param_beta,
-                     param_beta,
-                     param_beta,
-                     param_beta]
-        
-        beta0Pert = 0
-        for i in range(self.nTheta):
-            beta0Pert += self.sigma_syst[i] * param_syst[i]
-        
-        delta = beta - (self.beta0+beta0Pert)
+        beta = np.r_[param[:3],param[:3],param[:3],param[:3]]
+        delta = beta - self.bfmodel.predict(param)
         chiquared = delta.dot( self.invVar_stat.dot(delta) )/2
-        regulization = np.sum( 0.5*((param_syst-0.00)/1.00)**2 )
-        cost = chiquared + regulization
 
+        y, regu = self.ctrlmodel.predict(param)
+        target,prediction = self.Y[16:],y[16:]
+        control = np.sum( (prediction-target)**2/(2*target) )
+        #control = np.sum(- target*np.log( prediction ) + prediction ) 
+        cost = chiquared + regu + control
         return cost
     
     def lsEstimator(self):
@@ -141,7 +135,7 @@ class bfCombiner_theta():
             x0  = self.param0,
             method = 'SLSQP',
             bounds = [(0,1)]*3 + [(-3,3)]*self.nTheta
-            )
+            )  
 
         self.paramLS = result.x
     
@@ -164,3 +158,21 @@ class bfCombiner_theta():
             print("Failed for sigularity in Hessian matrix")
             return np.zeros([3]), np.zeros([3,3])
         
+
+class BFModel():
+    def __init__(self, beta0):
+        self.beta0 = beta0
+        baseDir = common.getBaseDirectory()
+        self.sigma_syst = np.load(baseDir+'data/combine/sigma.npy')[1:]
+
+
+    def predict(self, params):
+        params_beta  = params[0:3]
+        params_syst  = params[3:]
+
+        perturbation = np.zeros_like(self.beta0)
+        for i in range(params_syst.size):
+            perturbation += self.sigma_syst[i] * params_syst[i]
+        beta = self.beta0+perturbation
+        regu = np.sum( 0.5*((params-0.00)/1.00)**2 )
+        return beta
