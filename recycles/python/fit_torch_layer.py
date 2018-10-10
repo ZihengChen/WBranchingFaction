@@ -2,6 +2,7 @@ from fit_torch_helper import *
 
 device = tc.device("cuda" if tc.cuda.is_available() else "cpu")
 
+
 class PertLayer_beta(tc.nn.Module):
     def __init__(self):
         super(PertLayer_beta,self).__init__()
@@ -179,9 +180,9 @@ class PertLayer_eff(tc.nn.Module):
         return y
 
 
-class PertLayer_shape(tc.nn.Module):
+class PertLayer_itp(tc.nn.Module):
     def __init__(self, controlTauID):
-        super(PertLayer_shape,self).__init__()
+        super(PertLayer_interpolation,self).__init__()
         self.controlTauID = controlTauID
         self._getShapeVariation()
         

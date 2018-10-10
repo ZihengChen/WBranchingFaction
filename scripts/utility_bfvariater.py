@@ -279,7 +279,7 @@ class BFVariater:
 
 
             elif errSource == "jetMisTauID":
-                jetMisTauIDErr = 1.05 #jetMisTauIDErrList[icata]
+                jetMisTauIDErr = 1.08 #jetMisTauIDErrList[icata]
                 if icata in [0,1]:
                     trigger = 1
                 if icata in [2,3]:

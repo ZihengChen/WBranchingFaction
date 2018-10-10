@@ -23,11 +23,11 @@ class DFPlotter:
         MCsgList = [MCsg.query(q) for q in self.mcsgQueryList]
 
         # combine all dataframes as a list
-        if self.selection in ['mutau','etau']:
-            dfList = [MCzz,MCz,MCw] + MCsgList + [Data]
-        else:
-            MCdy = pd.concat([MCz,MCw],ignore_index=True,sort=False)
-            dfList = [MCzz,MCdy] + MCsgList + [Data]
+        # if self.selection in ['mutau','etau']:
+        dfList = [MCzz,MCz,MCw] + MCsgList + [Data]
+        # else:
+        #     MCdy = pd.concat([MCz,MCw],ignore_index=True,sort=False)
+        #     dfList = [MCzz,MCdy] + MCsgList + [Data]
         
         # add fakes if in mu4j and e4j
         if self.selection in ['mu4j','e4j']:
@@ -104,16 +104,16 @@ class DFPlotter:
                 'genCategory in [2]',
                 'genCategory in [13,14,15]'
             ]
-            self.labelList = ['Diboson','V+Jets',
+            self.labelList = ['Diboson','Z+Jets','W+Jets',
                 r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow \mu + \mu$',
                 r'$tt/tW \rightarrow \mu+ \tau$',
                 'data'
             ]
-            self.colorList = ["#a32020", "#e0301e", "#eb8c00", "#49feec", "deepskyblue", "mediumpurple", "k"]
+            self.colorList = ["#a32020", "#e0301e", "#eb8c00","gold", "#49feec", "deepskyblue", "mediumpurple", "k"]
             self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_mumu.csv")
-            self.adjust = [1,1,1,1,1,1]
+            self.adjust = [1,1,1,1,1,1,1]
             #self.hasFake = False
         # ee
         elif self.selection in ["ee","eec"]:
@@ -123,16 +123,16 @@ class DFPlotter:
                 'genCategory in [1]',
                 'genCategory in [10,11,12]'
             ]
-            self.labelList = ['Diboson','V+Jets',
+            self.labelList = ['Diboson','Z+Jets','W+Jets',
                 r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow e + e$',
-                r'$tt/tW \rightarrow e \tau$',
+                r'$tt/tW \rightarrow e + \tau$',
                 'data'
             ]
-            self.colorList = ["#a32020", "#e0301e", "#eb8c00", "#49feec", "deepskyblue", "mediumpurple", "k"]
+            self.colorList = ["#a32020", "#e0301e", "#eb8c00","gold", "#49feec", "deepskyblue", "mediumpurple", "k"]
             self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_ee.csv")
-            self.adjust = [1,1,1,1,1,1]
+            self.adjust = [1,1,1,1,1,1,1]
             #self.hasFake = False
         
         # mue and emu
@@ -144,7 +144,7 @@ class DFPlotter:
                 'genCategory in [10,11,12]',
                 'genCategory in [13,14,15]'
             ]
-            self.labelList = ['Diboson','V+Jets',
+            self.labelList = ['Diboson','Z+Jets','W+Jets',
                 r'$tt/tW \rightarrow$ (other)',
                 r'$tt/tW \rightarrow l + l$ (other)',
                 r'$tt/tW \rightarrow e + \mu$', 
@@ -152,9 +152,9 @@ class DFPlotter:
                 r'$tt/tW \rightarrow \mu + \tau$',
                 'data'
             ]
-            self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
+            self.colorList = ["#a32020","#e0301e","#eb8c00","gold","springgreen","#49feec","deepskyblue","mediumpurple","k"]
             self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_emu.csv")
-            self.adjust = [1,1,1,1,1,1,1]
+            self.adjust = [1,1,1,1,1,1,1,1]
             #self.hasFake = False
 
         # mutau
@@ -174,9 +174,9 @@ class DFPlotter:
                 r'$tt/tW \rightarrow \mu + \tau$',
                 'data'
             ]
-            self.colorList = ["#a32020","#e0301e","r","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
+            self.colorList = ["#a32020","#e0301e","#eb8c00","gold","springgreen","#49feec","deepskyblue","mediumpurple","k"]
             self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_mutau.csv")
-            self.adjust = [1,1,1,1,1,1,1,1]
+            self.adjust = [1,1,1,1,1,1,1,1,1]
             #self.adjust = [1/.95,1/.95,1/.95,1/.95,1/.95,1/.95,.89/.95]
             #self.hasFake = False
             if self.selection == 'mutau':
@@ -203,9 +203,9 @@ class DFPlotter:
                 r'$tt/tW \rightarrow e + \tau$',
                 'data'
             ]
-            self.colorList = ["#a32020","#e0301e","r","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
+            self.colorList = ["#a32020","#e0301e","#eb8c00","gold","springgreen","#49feec","deepskyblue","mediumpurple","k"]
             self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_etau.csv")
-            self.adjust = [1,1,1,1,1,1,1,1]
+            self.adjust = [1,1,1,1,1,1,1,1,1]
             #self.adjust = [1/.95,1/.95,1/.95,1/.95,1/.95,1/.95,.89/.95]
             #self.hasFake = False
             if self.selection == 'etau':
@@ -222,16 +222,16 @@ class DFPlotter:
                 'genCategory in [17]',
                 'genCategory in [13,14,15]'
             ]
-            self.labelList = ['Diboson','V+Jets',
+            self.labelList = ['Diboson','Z+Jets','W+Jets',
                 r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow \mu + h$',
-                r'$tt/tW \rightarrow \mu+ \tau$',
+                r'$tt/tW \rightarrow \mu + \tau$',
                 'data'
             ]
             self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_mu4j.csv")
-            self.colorList = ["#a32020","#e0301e","#eb8c00","#49feec","deepskyblue","mediumpurple","k"]
-            self.adjust = [1,1,1,1,1,1]
+            self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
+            self.adjust = [1,1,1,1,1,1,1]
 
             if self.selection == 'mu4j':
                 self.fakeSF = common.getFakeSF('mu')
@@ -248,7 +248,7 @@ class DFPlotter:
                 'genCategory in [16]',
                 'genCategory in [10,11,12]'
             ]
-            self.labelList = ['Diboson','V+Jets',
+            self.labelList = ['Diboson','Z+Jets','W+Jets',
                 r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow e + h$',
@@ -256,8 +256,8 @@ class DFPlotter:
                 'data'
             ]
             self.pp = pd.read_csv(baseDirectory+"scripts/plotterItemTables/itemTable_e4j.csv")
-            self.colorList = ["#a32020","#e0301e","#eb8c00","#49feec","deepskyblue","mediumpurple","k"]
-            self.adjust = [1,1,1,1,1,1]
+            self.colorList = ["#a32020","#e0301e","#eb8c00","gold","#49feec","deepskyblue","mediumpurple","k"]
+            self.adjust = [1,1,1,1,1,1,1]
 
             if self.selection == 'e4j':
                 self.fakeSF = common.getFakeSF('e')

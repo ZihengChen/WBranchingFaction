@@ -23,7 +23,7 @@ class PredictiveModel_Signal(PredictiveModel):
         h2 = self.pertLayer_btl  (h1, params_btl)
         h3 = self.pertLayer_xs   (h2, params_xs)
         h4 = self.pertLayer_eff  (h3, params_eff)
-        h5 = self.pertLayer_shape(h4, params_shape)
+        h5 = self.pertLayer_itp  (h4, params_shape)
         
         # prediction and regulization
         y = np.sum(h5,axis=1)
@@ -55,15 +55,12 @@ class PredictiveModel_Signal(PredictiveModel):
         y[:,44,:] = x[:,44,:] * vvxs * lumin
         
         # QCD in relevaent channels
-        y[ 7,45,:] = x[ 7,45,:] * eqcdxs 
-        y[15,45,:] = x[15,45,:] * eqcdxs 
-        y[ 3,45,:] = x[ 3,45,:] * mqcdxs 
-        y[11,45,:] = x[11,45,:] * mqcdxs
-        y[ 2,45,:] = x[ 2,45,:] * tqcdxs 
-        y[10,45,:] = x[10,45,:] * tqcdxs 
-        y[ 6,45,:] = x[ 6,45,:] * tqcdxs 
-        y[14,45,:] = x[14,45,:] * tqcdxs
-
+        for i in range(2):
+            idx = i*8
+            y[ 7+idx,45,:] = x[ 7+idx,45,:] * eqcdxs 
+            y[ 3+idx,45,:] = x[ 3+idx,45,:] * mqcdxs 
+            y[ 2+idx,45,:] = x[ 2+idx,45,:] * tqcdxs 
+            y[ 6+idx,45,:] = x[ 6+idx,45,:] * tqcdxs 
 
         return y
     
@@ -76,7 +73,7 @@ class PredictiveModel_Signal(PredictiveModel):
         effe = params[0]*0.01 + 1
         effm = params[1]*0.01 + 1
         efft = params[2]*0.05 + 1
-        efftmis = params[3]*0.05 + 1
+        efftmis = params[3]*0.08 + 1
         ######################
         
         for i in range(2):
