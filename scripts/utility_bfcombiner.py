@@ -94,85 +94,66 @@ class BFCombiner():
 
 
 class BFCombiner_theta():
-    def __init__(self,beta0):
+    def __init__(self,beta0, controlRegion=None):
+        self.beta0 = beta0
+
+        # read sigma of beta0
         baseDir = common.getBaseDirectory()
+        sig     = np.load(baseDir + 'data/combine/sigma.npy')
         var     = np.load(baseDir + 'data/combine/covar.npy')
+        self.sig_syst  = sig[1:]
+        self.var_stat  = var[0]
+        self.ivar_stat = np.linalg.pinv(self.var_stat)
+        
+        # some configuration
+        self.n      = var.shape[0]-1
+        self.param0 = np.r_[0.1081*np.ones(3), np.zeros(self.n)]
 
-        self.var_stat    = var[0]
-        self.invVar_stat = np.linalg.pinv(self.var_stat)
-
-        self.nTheta = var.shape[0] - 1
-        self.param0 = np.r_[0.1081*np.ones(3), np.zeros(self.nTheta)]
-
-
-        self.X = np.load(baseDir + "data/templates/templatesX_{}.npy".format('')) 
-        #self.Y = np.load(baseDir + "data/templates/templatesY_{}.npy".format('')) 
-        self.Y = np.sum(self.X,axis=1)
-
-
-        self.bfmodel = BFModel(beta0)
-        self.ctrlmodel  = PredictiveModel_np(self.X,controlTauID=True)
+        # config control region
+        self.controlRegion = controlRegion
+        if not controlRegion is None:
+            self.model1 = controlRegion[0]
+            self.X1     = controlRegion[1]
+            self.Y1     = controlRegion[2]
 
         self.lsEstimator()
 
         
     def loss (self, param):
+        
+        # perturbating beta0 with systematics
+        param_syst  = param[3:]
+        perturbation = np.zeros_like(self.beta0)
+        for i in range(param_syst.size):
+            perturbation += self.sig_syst[i] * param_syst[i]
 
-        beta = np.r_[param[:3],param[:3],param[:3],param[:3]]
-        delta = beta - self.bfmodel.predict(param)
-        chiquared = delta.dot( self.invVar_stat.dot(delta) )/2
+        # calcuate chisquared
+        beta  = np.r_[param[:3],param[:3],param[:3],param[:3]]
+        delta = beta - (self.beta0 + perturbation)
+        loss  = delta.dot( self.ivar_stat.dot(delta) )/2
 
-        y, regu = self.ctrlmodel.predict(param)
-        target,prediction = self.Y[16:],y[16:]
-        control = np.sum( (prediction-target)**2/(2*target) )
-        #control = np.sum(- target*np.log( prediction ) + prediction ) 
-        cost = chiquared + regu + control
-        return cost
+        # add regulation of systematics
+        loss += np.sum( 0.5*(param_syst)**2 )
+
+        # add control
+        if not self.controlRegion is None:
+            y1    = self.model1.predict(param)
+            loss += np.sum( (y1-self.Y1)**2/(2*self.Y1) )
+            
+        return loss
     
     def lsEstimator(self):
-        result = minimize(
-            fun = self.loss, 
-            x0  = self.param0,
-            method = 'SLSQP',
-            bounds = [(0,1)]*3 + [(-3,3)]*self.nTheta
-            )  
-
-        self.paramLS = result.x
+        paramBounds = [(0,1)]*3+[(-3,3)]*self.n
+        result = minimize(fun=self.loss, x0=self.param0, method='SLSQP',
+                          bounds=paramBounds)  
+        self.result = result.x
     
     def paramSigma(self):
         hcalc = nd.Hessian(self.loss, step=1e-6, method='central')
-        hess  = hcalc( self.paramLS )
+        hess  = hcalc( self.result )
+        ihess = np.linalg.inv(hess)
+        sig   = np.sqrt(ihess.diagonal())
+        cor   = ihess/np.outer(sig, sig)
 
-        if np.linalg.det(hess) is not 0:
-            hessinv = np.linalg.inv(hess)
-            sigmasq = hessinv.diagonal()
-
-            if (sigmasq>=0).all():
-                sigma   = np.sqrt(sigmasq)
-                corvar  = hessinv/np.outer(sigma, sigma)
-                return sigma, corvar
-            else:
-                print("Failed for boundaries, negetive sigma^2 exist in observed inv-hessian ")
-                return np.zeros([3]), np.zeros([3,3])
-        else:
-            print("Failed for sigularity in Hessian matrix")
-            return np.zeros([3]), np.zeros([3,3])
+        return sig, cor
         
-
-class BFModel():
-    def __init__(self, beta0):
-        self.beta0 = beta0
-        baseDir = common.getBaseDirectory()
-        self.sigma_syst = np.load(baseDir+'data/combine/sigma.npy')[1:]
-
-
-    def predict(self, params):
-        params_beta  = params[0:3]
-        params_syst  = params[3:]
-
-        perturbation = np.zeros_like(self.beta0)
-        for i in range(params_syst.size):
-            perturbation += self.sigma_syst[i] * params_syst[i]
-        beta = self.beta0+perturbation
-        regu = np.sum( 0.5*((params-0.00)/1.00)**2 )
-        return beta

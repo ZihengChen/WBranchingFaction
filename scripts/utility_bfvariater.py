@@ -14,41 +14,6 @@ class BFVariater:
         self.ndata, self.ndataVar = counts.ndata, counts.ndataVar
         self.nmcbg, self.nmcbgVar = counts.nmcbg, counts.nmcbgVar
         self.nfake, self.nfakeVar = counts.nfake, counts.nfakeVar
-
-        # self.statCombined = statCombined
-        # if self.statCombined:
-        #     self.setStatCombinedWeights()
-
-    # def setStatCombinedWeights (self):
-    #     statVar  = self.errStat('data')**2
-    #     statVar += self.errStat('mcbg')**2
-    #     statVar += self.errStat('mcsg')**2
-
-    #     w = 1/statVar
-
-    #     self.cWeight = w/np.sum(w,axis=0)
-    #     self.statErr = 1/np.sum(w,axis=0)**0.5
-
-    #     BW = 0
-    #     for icata in range(4):
-    #         a  = self.a[icata]
-    #         ndata = self.ndata[icata]
-    #         nmcbg = self.nmcbg[icata]
-    #         nfake = self.nfake[icata]
-    #         w  = self.cWeight[icata]
-
-    #         slv = BFSolver3D(a)
-    #         BW_icata = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg.dot(np.ones(3))+nfake))
-    #         BW  += BW_icata * w
-    #         print(BW_icata)
-    #     self.BW = BW
-
-    #     print("{:6.4f}+/-{:6.4f}, {:6.4f}+/-{:6.4f}, {:6.4f}+/-{:6.4f}".format( self.BW[0], self.statErr[0],
-    #                                                                             self.BW[1], self.statErr[1], 
-    #                                                                             self.BW[2], self.statErr[2]
-    #                                                                             ))
-
-        
         
     def errStat(self, errSource, returnCovar=False):
     
@@ -183,8 +148,6 @@ class BFVariater:
             errs.append(BW1-BW)
                  
         errs = np.array(errs) # 4x3 2D-array
-        # if self.statCombined:
-        #     errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
         return errs
 
 
@@ -251,8 +214,6 @@ class BFVariater:
             errs.append(BW1-BW)  
                          
         errs = np.array(errs) # 4x3 2D-array
-        # if self.statCombined:
-        #     errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
         return errs
 
 
@@ -318,7 +279,7 @@ class BFVariater:
 
 
             elif errSource == "jetMisTauID":
-                jetMisTauIDErr = jetMisTauIDErrList[icata]
+                jetMisTauIDErr = 1.05 #jetMisTauIDErrList[icata]
                 if icata in [0,1]:
                     trigger = 1
                 if icata in [2,3]:
@@ -354,8 +315,6 @@ class BFVariater:
 
             
         errs = np.array(errs) # 4x3 2D-array
-        # if self.statCombined:
-        #     errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
         return errs
 
 
@@ -376,8 +335,6 @@ class BFVariater:
             errs.append(BW-BW1) 
 
         errs = np.array(errs) # 4x3 2D-array
-        # if self.statCombined:
-        #     errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
         return errs
 
 
@@ -403,8 +360,6 @@ class BFVariater:
             errs.append((BW1-BW2)/2)
                 
         errs = np.array(errs) # 4x3 2D-array
-        # if self.statCombined:
-        #     errs = np.sum(errs * self.cWeight, axis=0 ) # 3 1D-array
         return errs
 
 
@@ -414,13 +369,6 @@ class BFVariater:
 
         error = np.abs(error/0.1086 * 100)
 
-
-        # if self.statCombined:
-        #     # print [source,br] matrix
-        #     for i in range(error.shape[0]):
-        #         print("{:5.3f},{:5.3f},{:5.3f}".format(error[i,0],error[i,1],error[i,2]))
-        # else:
-            # print [cata,source,br] matrix
         for i in range(error.shape[1]):
             print("{:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}, {:5.3f},{:5.3f},{:5.3f}" \
                 .format(error[0,i,0],error[0,i,1],error[0,i,2],
@@ -443,3 +391,67 @@ class BFVariater:
                         if i != j :
                             smear[slt,j,i] = smear[slt,i,j]
         return smear
+
+
+###############################################
+# plot a matrix
+# trigger = 'mu'
+# tb.imshow4Matrix(a,trigger)
+# plt.savefig("../plots/acceptances/{}1b".format(trigger))
+
+###############################################
+# signal constituents in percentage
+
+# !!! important, do not delete !!!
+# bVector = np.array([ 0.1086,0.1086, 0.1086*0.1785,  0.1086*0.1736 , 0.1086*0.6479, 0.6741 ])
+# bMatrix = np.outer(bVector,bVector)
+# bMatrix = bMatrix * (2*np.ones_like(bMatrix)-np.identity(6))
+
+# av = common.matrixToArray(a[3])
+# bv = common.matrixToArray(bMatrix)
+
+# n = av * bv
+
+# percent = (n/np.sum(n))*100
+# for i in range(21):
+#     if percent[i]>1:
+#         print(percent[i])
+#     else:
+#         print('--')
+
+
+###############################################
+        # self.statCombined = statCombined
+        # if self.statCombined:
+        #     self.setStatCombinedWeights()
+
+    # def setStatCombinedWeights (self):
+    #     statVar  = self.errStat('data')**2
+    #     statVar += self.errStat('mcbg')**2
+    #     statVar += self.errStat('mcsg')**2
+
+    #     w = 1/statVar
+
+    #     self.cWeight = w/np.sum(w,axis=0)
+    #     self.statErr = 1/np.sum(w,axis=0)**0.5
+
+    #     BW = 0
+    #     for icata in range(4):
+    #         a  = self.a[icata]
+    #         ndata = self.ndata[icata]
+    #         nmcbg = self.nmcbg[icata]
+    #         nfake = self.nfake[icata]
+    #         w  = self.cWeight[icata]
+
+    #         slv = BFSolver3D(a)
+    #         BW_icata = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg.dot(np.ones(3))+nfake))
+    #         BW  += BW_icata * w
+    #         print(BW_icata)
+    #     self.BW = BW
+
+    #     print("{:6.4f}+/-{:6.4f}, {:6.4f}+/-{:6.4f}, {:6.4f}+/-{:6.4f}".format( self.BW[0], self.statErr[0],
+    #                                                                             self.BW[1], self.statErr[1], 
+    #                                                                             self.BW[2], self.statErr[2]
+    #                                                                             ))
+
+        
