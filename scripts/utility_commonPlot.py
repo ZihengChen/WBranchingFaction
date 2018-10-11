@@ -151,3 +151,5 @@ def showLossHistory(losses):
     plt.xlabel('Steps')
     plt.ylabel('Loss')
     plt.grid(True,linestyle='--',alpha=0.6)
+
+
