@@ -27,16 +27,6 @@ def autograd2nd(loss, model):
     hess = np.array(hess)
     return hess
 
-
-def showLossHistory(losses):
-    losses = losses[10:]
-    plt.figure(facecolor='w',figsize=(6,4))
-    plt.plot(losses, lw=2)
-    plt.xlabel('Steps')
-    plt.ylabel('Loss')
-    plt.grid(True,linestyle='--',alpha=0.6)
-
-
 def templateVariation(region, shaping):
         
         baseDir = common.getBaseDirectory()

@@ -132,13 +132,22 @@ def showParameterCovMat(corr,sigma):
 
 def sysLabelsName():
     # make plots
-    lablesName = [r'$\beta_e$',r'$\beta_\mu$',r'$\beta_\tau$',
-                r"$b^\tau_\mu$",r"$b^\tau_e$",#r"$b^\tau_h$",
-                r"$\sigma_{tt}$",r"$\sigma_{tW}$",
-                r"$\sigma_{W}$",r"$\sigma_{Z}$",r"$\sigma_{VV}$",
-                r'$f_e$',r'$f_\mu$',r'$f_\tau$','L',
-                r"$\epsilon_e$",r"$\epsilon_\mu$",r"$\epsilon_\tau$",r"$j \to \tau$",
-                r"$E_e$",r"$E_\mu$",r"$E_\tau$",
-                "JES","JER","b","bMis"
-                ]
+    lablesName = [  r'$\beta_e$',r'$\beta_\mu$',r'$\beta_\tau$',
+                    r"$b^\tau_\mu$",r"$b^\tau_e$",#r"$b^\tau_h$",
+                    r"$\sigma_{tt}$",r"$\sigma_{tW}$",
+                    r"$\sigma_{W}$",r"$\sigma_{Z}$",r"$\sigma_{VV}$",
+                    r'$f_e$',r'$f_\mu$',r'$f_\tau$','L',
+                    r"$\epsilon_e$",r"$\epsilon_\mu$",r"$\epsilon_\tau$",r"$j \to \tau$",
+                    r"$E_e$",r"$E_\mu$",r"$E_\tau$",
+                    "JES","JER","b","bMis"
+                    ]
     return  lablesName
+
+
+
+def showLossHistory(losses):
+    plt.figure(facecolor='w',figsize=(6,4))
+    plt.plot(losses, lw=2)
+    plt.xlabel('Steps')
+    plt.ylabel('Loss')
+    plt.grid(True,linestyle='--',alpha=0.6)
