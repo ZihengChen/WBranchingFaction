@@ -67,6 +67,11 @@ def featureList():
         ]
     return ls
 
+def channelLsit():
+    ls = [  r'$\mu \mu$', r'$\mu e$',r'$\mu \tau$',r'$\mu h$',
+            r'$e \mu$', r'$ee$',r'$e\tau$',r'$e h$']
+    return ls
+
 
 def symlink( src, tar):
     if os.path.exists(tar):
