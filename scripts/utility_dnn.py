@@ -222,7 +222,7 @@ class DNNGrader():
         return df
 
 
-    
+
     def gradeDFList(self,dfList, querySoftmax=None):
         return [self.gradeDF(idf,querySoftmax) for idf in dfList]
 
