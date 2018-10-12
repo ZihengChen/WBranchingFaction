@@ -2,7 +2,7 @@ from fit_tchelper import *
 from fit_tcmodelLayer import *
 
 class TCPredictiveModel(tc.nn.Module):
-    def __init__(self):
+    def __init__(self, shaping = False):
         super(TCPredictiveModel,self).__init__()
         # perturbative layer parameterized by 
         # bf of W decay
@@ -14,7 +14,7 @@ class TCPredictiveModel(tc.nn.Module):
         # lepton efficiency
         self.layer_eff  = PertLayer_eff()
         # template-modifying paramters
-        self.layer_itp  = PertLayer_itp()
+        self.layer_itp  = PertLayer_itp(shaping)
 
     def forward(self, x, xctl=None):
 

@@ -153,3 +153,28 @@ def showLossHistory(losses):
     plt.grid(True,linestyle='--',alpha=0.6)
 
 
+def showPerformance():
+    trainingTime=np.array([ 0.52,  0.68, 1.58])
+    hessianTime = np.array([1.45, 0.77, 1.32])
+
+    c = np.arange(3)
+    width = 0.3    
+
+    displace = width/2+0.02
+
+    plt.figure(facecolor='w',figsize=(6,4))
+    plt.bar(c-displace,trainingTime,width, label='Training Process')
+    plt.bar(c+displace,hessianTime,width, label='Hessian Calculation')
+    #plt.yscale('log')
+    plt.xticks(c,['Scipy','pyTorch (CPU)','pyTorch (GPU)'])
+    plt.ylabel('running time [s]',fontsize=11)
+    plt.legend(loc='upper left',fontsize=12)
+    plt.ylim(0,2.5)
+    plt.grid(axis='y',linestyle='--')
+    for i in np.arange(3):
+        h = trainingTime[i]
+        plt.text(i-displace-0.1,0.1+h,str(h))
+        h = hessianTime[i]
+        plt.text(i+displace-0.1,0.1+h,str(h))
+        
+    #plt.savefig('../plots/fit/performance.png',dpi=300)

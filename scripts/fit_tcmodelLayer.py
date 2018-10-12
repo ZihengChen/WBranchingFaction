@@ -238,7 +238,7 @@ class PertLayer_eff(tc.nn.Module):
 
 
 class PertLayer_itp(tc.nn.Module):
-    def __init__(self, shaping=False):
+    def __init__(self, shaping):
         super(PertLayer_itp,self).__init__()
         self.configTemplateVariation(shaping)
 
@@ -254,16 +254,12 @@ class PertLayer_itp(tc.nn.Module):
         y = x + perturbation
         return y
 
-
-
     def forwardControl(self, x):
         perturbation = tc.zeros_like(x)
         for i in range(self.n):
             perturbation += self.dx_list_ctl[i] * self.params[i]
         y = x + perturbation
         return y
-
-
 
     def configTemplateVariation(self,shaping):
         self.dx_list_sig = templateVariation('signal', shaping)
