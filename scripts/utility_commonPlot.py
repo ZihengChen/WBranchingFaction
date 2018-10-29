@@ -22,7 +22,6 @@ def showCovar(covar,sameCNorm=False):
                 n1,n1,n2,n3,
                 n2,n3,n1,n3]
 
-
     NCOL = 6
     N = covar.shape[0]
     
@@ -100,34 +99,57 @@ def showParameterCov(corr):
 
 
 
-def showParameterCovMat(corr,sigma):
+def showParameterCovMat(cor,sig):
+    fig, axes = plt.subplots(2, 1, sharex=True, facecolor='w',
+                         gridspec_kw={'height_ratios':[6,1]},
+                         figsize=(10,12))
+    fig.subplots_adjust(hspace=0)
+
+
     # make plots
     lablesName = sysLabelsName()
 
     lablesPos = np.arange(0,len(lablesName),1)  
 
-    plt.figure(figsize=(12,10),facecolor='w')
-    plt.imshow(corr,cmap='PRGn_r',vmax=1,vmin=-1)
-    plt.xticks(lablesPos,lablesName)
-    plt.yticks(lablesPos,lablesName)
+    
+    ax = axes[0]
+    ax.imshow(cor,cmap='PRGn_r',vmax=1,vmin=-1)
+    ax.set_xticks(lablesPos)
+    ax.set_xticklabels(lablesName)
+    ax.set_yticks(lablesPos)
+    ax.set_yticklabels(lablesName)
     for i in lablesPos:
         for j in lablesPos:
-            value = corr[i,j]
+            value = cor[i,j]
             if abs(value)>0.5:
                 fcolor = 'w'
             else:
                 fcolor = 'k'
                 
-            plt.text(i-0.3,j+0.1,'{:4.2f}'.format(corr[i,j]),fontsize=6,color=fcolor )
-    plt.colorbar()
-    plt.axvline(2.5,color='grey',linewidth=1,linestyle='--')
-    plt.axhline(2.5,color='grey',linewidth=1,linestyle='--')
+            ax.text(i-0.3,j+0.1,'{:4.2f}'.format(cor[i,j]),fontsize=6,color=fcolor )
+            
+    ax.axvline(2.5,color='grey',linewidth=1,linestyle='--')
+    ax.axhline(2.5,color='grey',linewidth=1,linestyle='--')
+    ax.set_ylim(24.5,-0.5)
 
-    plt.title(r'$\beta_e   =10.80\times(1\pm${:4.2f}%),  '.format(sigma[0]/0.1080*100) + 
-            r'$\beta_\mu =10.80\times(1\pm${:4.2f}%),  '.format(sigma[1]/0.1080*100) + 
-            r'$\beta_\tau=10.80\times(1\pm${:4.2f}%)   '.format(sigma[2]/0.1080*100),
-            fontsize=12
-            )
+    
+    ax = axes[1]
+
+    height = np.r_[np.zeros(3), 1/sig[3:]]
+    ax.bar(lablesPos,height,color='grey')
+    ax.axvline(2.5,color='grey',linewidth=1,linestyle='--')
+    ax.axhline(1  ,color='k',linewidth=1,linestyle='-')
+    #ax.set_xticks(lablesPos,lablesName)
+    ax.set_xlim(-0.5,24.5)
+    ax.set_ylim(0,10)
+    ax.grid(axis='y',linestyle='--')
+    ax.set_ylabel('constraint')
+
+    # plt.title(r'$\beta_e   =10.80\times(1\pm${:4.2f}%),  '.format(sigma[0]/0.1080*100) + 
+    #         r'$\beta_\mu =10.80\times(1\pm${:4.2f}%),  '.format(sigma[1]/0.1080*100) + 
+    #         r'$\beta_\tau=10.80\times(1\pm${:4.2f}%)   '.format(sigma[2]/0.1080*100),
+    #         fontsize=12
+    #         )
 
 
 def sysLabelsName():
