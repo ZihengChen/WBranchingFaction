@@ -12,7 +12,7 @@ class BLTReader:
 
     def __init__(self, inputRootFileName, selection, includeTTTheory=False):
 
-        self.baseDir = common.getBaseDirectory(isLocal=False) 
+        self.baseDir = common.getBaseDirectory() 
 
         self.inputRootFile = root.TFile(self.baseDir+"data/root/"+inputRootFileName)
 
@@ -108,9 +108,9 @@ class BLTReader:
     ## private helper functions
     #############################
     def _getAllVariables(self, tree, selection, name, scaleFactor):
-        if selection in ["ee","mumu","emu","mutau","etau","mu4j","e4j","mu4j_fakes","e4j_fakes","ee0","mumu0","mutau0","etau0"]:
+        if selection in ["ee","mumu","emu","mutau","etau","mu4j","e4j","mu4j_fakes","e4j_fakes",'emu_tau']:
             dictionary = getAllVariables_multileptonSelection(tree, selection, name, scaleFactor)
-        if selection in ["ee_e","mumu_e","mumu_mu","ee_mu",'emu_tau']:
+        if selection in ["ee_e","mumu_e","mumu_mu","ee_mu"]:
             dictionary = getAllVariables_fakeSelection(tree, selection, name, scaleFactor)
         return dictionary
         
@@ -221,7 +221,7 @@ class BLTReader:
 
     def _getNameList(self):
         ## 1. define the datalist
-        if self.selection in ["mumu","mutau","mu4j","mu4j_fakes","mumu_mu","mumu_e","emu_tau"]:
+        if self.selection in ["mumu","mutau","mu4j","mu4j_fakes","mumu_mu","mumu_e"]:
             self.datalist = [
                 'muon_2016B', 'muon_2016C','muon_2016D','muon_2016E',
                 'muon_2016F','muon_2016G','muon_2016H'
@@ -233,7 +233,7 @@ class BLTReader:
                 'electron_2016F','electron_2016G','electron_2016H'
                 ]
 
-        elif self.selection in ["emu"]:
+        elif self.selection in ["emu","emu_tau"]:
             self.datalist = [
                 'muon_2016B', 'muon_2016C','muon_2016D','muon_2016E',
                 'muon_2016F','muon_2016G','muon_2016H',
@@ -266,12 +266,12 @@ class BLTReader:
 
         self.mctlist        = [ 't_tw','tbar_tw']
         
-        if self.selection in ["ee_mu","ee_e","mumu_mu","mumu_e","emu_tau"]:
+        if self.selection in ["ee_mu","ee_e","mumu_mu","mumu_e"]:
             self.mcttlist       = [ 'ttbar_inclusive']
             self.mcttbosonlist  = [ ]
         else:
             self.mcttlist       = [ 'ttbar_inclusive','ttbar_2l2nu','ttbar_semilepton']
-            self.mcttbosonlist  = [ 'TTZToLLNuNu']
+            self.mcttbosonlist  = [ ]#'TTZToLLNuNu']
 
         self.mcttTheorylist = [ 'ttbar_inclusive_fsrdown','ttbar_inclusive_fsrup',
                                 'ttbar_inclusive_isrdown','ttbar_inclusive_isrup',

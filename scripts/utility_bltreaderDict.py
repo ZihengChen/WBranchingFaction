@@ -5,15 +5,28 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     out_dict = {}
     
     # 0. Filling Event Info
-    if selection == 'emu':
+    if selection in ['emu','emu_tau']:
         out_dict['runNumber']    =  tree.runNumber
         out_dict['evtNumber']    =  tree.evtNumber
 
      # 0. Filling Event Info
-    if selection in ['etau','mutau']:
-        out_dict['tauMVA']    =  tree.tauMVA
-        out_dict['tauDecayMode'] =  tree.tauDecayMode
-
+    if selection in ['etau','mutau','emu_tau']:
+        out_dict['tauMVA']            = tree.tauMVA
+        out_dict['tauDecayMode']      = tree.tauDecayMode
+        out_dict['tauPuppiChHadIso']  = tree.tauPuppiChHadIso
+        out_dict['tauPuppiGammaIso']  = tree.tauPuppiGammaIso
+        out_dict['tauPuppiNeuHadIso'] = tree.tauPuppiNeuHadIso
+        if not ('2016' in name):
+            out_dict['tauGenFlavor']      = tree.tauGenFlavor
+            out_dict['tauGenFlavorHad']   = tree.tauGenFlavorHad
+        else:
+            out_dict['tauGenFlavor']      = 26 # default value
+            out_dict['tauGenFlavorHad']   = 26 # default value
+        if selection in ['emu_tau']:
+            tauP4 = tree.tauP4
+            out_dict['tauPt']  = tauP4.Pt()
+            out_dict['tauEta'] = tauP4.Eta()
+            out_dict['tauPhi'] = tauP4.Phi()
 
     out_dict['nMuons']       =  tree.nMuons
     out_dict['nElectrons']   =  tree.nElectrons
@@ -26,11 +39,11 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
         out_dict['eventWeight']  =  scaleFactor * tree.eventWeight * tree.genWeight
     else:
         out_dict['eventWeight']  =  scaleFactor * tree.eventWeight 
-    out_dict['eventWeightSF']=  scaleFactor
-
-    out_dict['met']          =  tree.met
-    out_dict['metPhi']       =  tree.metPhi
-    out_dict['genCategory']  =  tree.genCategory
+        
+    out_dict['eventWeightSF'] =  scaleFactor
+    out_dict['met']           =  tree.met
+    out_dict['metPhi']        =  tree.metPhi
+    out_dict['genCategory']   =  tree.genCategory
 
 
     if name == 'ttbar_inclusive':
