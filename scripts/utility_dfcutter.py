@@ -85,7 +85,7 @@ class DFCutter:
         if ("data" in self.name) :
             # for data
             # drop if data of emu,mue
-            if (self.selection in ["emu","emu2"]):
+            if (self.selection in ["emu","emu2",'emu_tau']):
                 dataFrame = dataFrame.drop_duplicates(subset=['runNumber', 'evtNumber'])
         else:
             # for MC
@@ -124,6 +124,8 @@ class DFCutter:
                 "e4j_fakes"   : " (lepton1_pt > 30) ",
 
 
+                "emu_tau"   : " ((triggerLepton == 1 | triggerLepton == 3) & (lepton1_pt > 25) & (lepton2_pt > 15))  | ((triggerLepton == 2 | triggerLepton == 3 ) & (lepton1_pt > 10) & (lepton2_pt > 30)) " + lmveto + oppoSign, 
+
                 "mumuc"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + oppoSign + zmass,
                 "eec"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + oppoSign + zmass,
                 }
@@ -141,11 +143,11 @@ class DFCutter:
             if self.selection in ['ee','etau','e4j']:
                 df.lepton1_pt = df.lepton1_pt * 0.995
 
-            if self.selection in ['ee','emu','emu2']:
+            if self.selection in ['ee','emu','emu2','emu_tau']:
                 df.lepton2_pt = df.lepton2_pt * 0.995
         
         if variation == 'MuPtDown':
-            if self.selection in ['mumu','emu','emu2','mutau','mu4j']:
+            if self.selection in ['mumu','emu','emu2','mutau','mu4j','emu_tau']:
                 df.lepton1_pt = df.lepton1_pt * 0.998
 
             if self.selection in ['mumu']:
