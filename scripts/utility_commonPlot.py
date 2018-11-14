@@ -99,7 +99,7 @@ def showParameterCov(corr):
 
 
 
-def showParameterCovMat(cor,sig):
+def showParameterCovMat(cor,sig,useBeta=True):
     fig, axes = plt.subplots(2, 1, sharex=True, facecolor='w',
                          gridspec_kw={'height_ratios':[6,1]},
                          figsize=(10,12))
@@ -107,7 +107,7 @@ def showParameterCovMat(cor,sig):
 
 
     # make plots
-    lablesName = sysLabelsName()
+    lablesName = sysLabelsName(useBeta)
 
     lablesPos = np.arange(0,len(lablesName),1)  
 
@@ -127,20 +127,32 @@ def showParameterCovMat(cor,sig):
                 fcolor = 'k'
                 
             ax.text(i-0.3,j+0.1,'{:4.2f}'.format(cor[i,j]),fontsize=6,color=fcolor )
-            
-    ax.axvline(2.5,color='grey',linewidth=1,linestyle='--')
-    ax.axhline(2.5,color='grey',linewidth=1,linestyle='--')
-    ax.set_ylim(24.5,-0.5)
+    if useBeta:
+        ax.axvline(2.5,color='grey',linewidth=1,linestyle='--')
+        ax.axhline(2.5,color='grey',linewidth=1,linestyle='--')
+    else:
+        ax.axvline(1.5,color='grey',linewidth=1,linestyle='--')
+        ax.axhline(1.5,color='grey',linewidth=1,linestyle='--')
+    ax.set_ylim(lablesPos.max()+0.5,lablesPos.min()-0.5)
 
     
     ax = axes[1]
 
-    height = np.r_[np.zeros(3), 1/sig[3:]]
-    ax.bar(lablesPos,height,color='grey')
-    ax.axvline(2.5,color='grey',linewidth=1,linestyle='--')
+
+    
+    if useBeta:
+        height = np.r_[np.zeros(3), 1/sig[3:]]
+        ax.bar(lablesPos,height,color='grey')
+        ax.axvline(2.5,color='grey',linewidth=1,linestyle='--')
+    else:
+        height = np.r_[np.zeros(2), 1/sig[2:]]
+        ax.bar(lablesPos,height,color='grey')
+        ax.axvline(1.5,color='grey',linewidth=1,linestyle='--')
+
+    
     ax.axhline(1  ,color='k',linewidth=1,linestyle='-')
     #ax.set_xticks(lablesPos,lablesName)
-    ax.set_xlim(-0.5,24.5)
+    ax.set_xlim(lablesPos.min()-0.5, lablesPos.max()+0.5)
     ax.set_ylim(0,10)
     ax.grid(axis='y',linestyle='--')
     ax.set_ylabel('constraint')
@@ -152,19 +164,24 @@ def showParameterCovMat(cor,sig):
     #         )
 
 
-def sysLabelsName():
-    # make plots
-    lablesName = [  r'$\beta_e$',r'$\beta_\mu$',r'$\beta_\tau$',
-                    r"$b^\tau_\mu$",r"$b^\tau_e$",#r"$b^\tau_h$",
-                    r"$\sigma_{tt}$",r"$\sigma_{tW}$",
-                    r"$\sigma_{W}$",r"$\sigma_{Z}$",r"$\sigma_{VV}$",
-                    r'$f_e$',r'$f_\mu$',r'$f_\tau$','L',
-                    r"$\epsilon_e$",r"$\epsilon_\mu$",r"$\epsilon_\tau$",r"$j \to \tau$",
-                    r"$E_e$",r"$E_\mu$",r"$E_\tau$",
-                    "JES","JER","b","bMis"
-                    ]
-    return  lablesName
+def sysLabelsName(useBeta=True):
+    if useBeta:
+        # make plots
+        lablesName = [  r'$\beta_e$',r'$\beta_\mu$',r'$\beta_\tau$']
+    else:
+        lablesName = [  r'$r$',r'$\beta_l$']
 
+    syslablesName = [
+            r"$b^\tau_\mu$",r"$b^\tau_e$",#r"$b^\tau_h$",
+            r"$\sigma_{tt}$",r"$\sigma_{tW}$",
+            r"$\sigma_{W}$",r"$\sigma_{Z}$",r"$\sigma_{VV}$",
+            r'$f_e$',r'$f_\mu$',r'$f_\tau$','L',
+            r"$\epsilon_e$",r"$\epsilon_\mu$",r"$\epsilon_\tau$",r"$j \to \tau$",
+            r"$E_e$",r"$E_\mu$",r"$E_\tau$",
+            "JES","JER","b","bMis"
+            ]
+        
+    return  lablesName + syslablesName
 
 
 def showLossHistory(losses):
