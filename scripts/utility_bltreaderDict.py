@@ -10,7 +10,7 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
         out_dict['evtNumber']    =  tree.evtNumber
 
      # 0. Filling Event Info
-    if selection in ['etau','mutau','emu_tau']:
+    if selection in ['etau','mutau','ee_tau','mumu_tau','emu_tau']:
         out_dict['tauMVA']            = tree.tauMVA
         out_dict['tauDecayMode']      = tree.tauDecayMode
         out_dict['tauPuppiChHadIso']  = tree.tauPuppiChHadIso
@@ -22,7 +22,7 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
         else:
             out_dict['tauGenFlavor']      = 26 # default value
             out_dict['tauGenFlavorHad']   = 26 # default value
-        if selection in ['emu_tau']:
+        if selection in ['ee_tau','mumu_tau','emu_tau']:
             tauP4 = tree.tauP4
             out_dict['tauPt']  = tauP4.Pt()
             out_dict['tauEta'] = tauP4.Eta()
