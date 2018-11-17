@@ -125,6 +125,8 @@ class DFCutter:
 
 
                 "emu_tau"   : " ((triggerLepton == 1 | triggerLepton == 3) & (lepton1_pt > 25) & (lepton2_pt > 15))  | ((triggerLepton == 2 | triggerLepton == 3 ) & (lepton1_pt > 10) & (lepton2_pt > 30)) " + lmveto + oppoSign, 
+                "mumu_tau"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + oppoSign,
+                "ee_tau"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + oppoSign,
 
                 "mumuc"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + oppoSign + zmass,
                 "eec"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + oppoSign + zmass,
@@ -140,17 +142,17 @@ class DFCutter:
 
         # variate e,m,t energy correction
         if variation == 'EPtDown':
-            if self.selection in ['ee','etau','e4j']:
+            if self.selection in ['ee','etau','e4j','ee_tau']:
                 df.lepton1_pt = df.lepton1_pt * 0.995
 
-            if self.selection in ['ee','emu','emu2','emu_tau']:
+            if self.selection in ['ee','emu','emu2','ee_tau','emu_tau']:
                 df.lepton2_pt = df.lepton2_pt * 0.995
         
         if variation == 'MuPtDown':
-            if self.selection in ['mumu','emu','emu2','mutau','mu4j','emu_tau']:
+            if self.selection in ['mumu','emu','emu2','mutau','mu4j','mumu_tau','emu_tau']:
                 df.lepton1_pt = df.lepton1_pt * 0.998
 
-            if self.selection in ['mumu']:
+            if self.selection in ['mumu','mumu_tau']:
                 df.lepton2_pt = df.lepton2_pt * 0.998
             
         if variation == 'TauPtDown':
