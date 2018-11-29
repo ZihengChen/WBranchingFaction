@@ -15,26 +15,8 @@ class DFTemplater():
         
         nbjet = '>=0'
 
-        for selection in  ["emu_tau"]:
-            njet = '>=0'
-            # config
-            v,bins = self._channelConfig(selection, nbjet, njet)
 
-            # templates
-            chTemplatesShp,chTemplatesCnt = self._makeChTemp(selection, nbjet, njet, v, bins)
-            templatesShp.append(chTemplatesShp)
-            templatesCnt.append(chTemplatesCnt)
-
-            if self.varation == '':
-                # targets
-                df = DFCutter(selection,nbjet,'data2016',njet).getDataFrame()
-                tempShp, tempCnt = self._binDataFrame(df,v,bins)
-                targetsShp.append(tempShp)
-                targetsCnt.append(tempCnt)
-
-
-
-        for selection in  ["mumu_tau","ee_tau"]:
+        for selection in  ["emu_tau","mumu_tau","ee_tau"]:
             for njet in ['==0','>0']:
                 # config
                 
@@ -70,7 +52,8 @@ class DFTemplater():
 
         chTemplatesShp,chTemplatesCnt = [],[]
 
-        breakdownList = [   'tauGenFlavor<7 and tauGenFlavor>0',    # quark  -> tauID
+        breakdownList = [   'tauGenFlavor<=5 and tauGenFlavor>=4',  # heavy quark  -> tauID
+                            'tauGenFlavor<=3 and tauGenFlavor>=1',  # light quark  -> tauID
                             'tauGenFlavor==21',                     # gluon  -> tauID
                             'tauGenFlavor==26 or tauGenFlavor==0',  # lepton -> tauID
                             'tauGenFlavor==15',                     # tau_h  -> tauID
