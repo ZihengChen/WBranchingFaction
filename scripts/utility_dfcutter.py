@@ -110,8 +110,8 @@ class DFCutter:
 
         sltcut  = {
                 "mumu"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + oppoSign + zveto,
-                "ee"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + oppoSign + zveto,
-                "emu"   : " ((triggerLepton == 1) | (triggerLepton == 3 & lepton1_pt>lepton2_pt)) & (lepton1_pt > 25) & (lepton2_pt > 15) " + lmveto + oppoSign, 
+                "ee"    : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + oppoSign + zveto,
+                "emu"   : " ((triggerLepton == 1) | (triggerLepton == 3 & lepton1_pt>lepton2_pt)) & (lepton1_pt > 25) & (lepton2_pt > 20) " + lmveto + oppoSign, 
                 "emu2"  : " ((triggerLepton == 2) | (triggerLepton == 3 & lepton1_pt<lepton2_pt)) & (lepton1_pt > 10) & (lepton2_pt > 30) " + lmveto + oppoSign, 
                 "mutau" : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + oppoSign,
                 "etau"  : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + oppoSign,
@@ -124,12 +124,12 @@ class DFCutter:
                 "e4j_fakes"   : " (lepton1_pt > 30) ",
 
 
-                "emu_tau"   : " ((triggerLepton == 1 | triggerLepton == 3) & (lepton1_pt > 25) & (lepton2_pt > 15))  | ((triggerLepton == 2 | triggerLepton == 3 ) & (lepton1_pt > 10) & (lepton2_pt > 30)) " + lmveto + oppoSign, 
+                "emu_tau"   : " ((triggerLepton == 1 | triggerLepton == 3) & (lepton1_pt > 25) & (lepton2_pt > 20))  | ((triggerLepton == 2 | triggerLepton == 3 ) & (lepton1_pt > 10) & (lepton2_pt > 30)) " + lmveto + oppoSign, 
                 "mumu_tau"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + oppoSign,
-                "ee_tau"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + oppoSign,
+                "ee_tau"    : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + oppoSign,
 
                 "mumuc"  : " (lepton1_pt > 25) & (lepton2_pt > 10) " + lmveto + oppoSign + zmass,
-                "eec"    : " (lepton1_pt > 30) & (lepton2_pt > 15) " + lmveto + oppoSign + zmass,
+                "eec"    : " (lepton1_pt > 30) & (lepton2_pt > 20) " + lmveto + oppoSign + zmass,
                 }
 
         totalcut = sltcut[self.selection] 

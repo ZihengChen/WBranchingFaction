@@ -221,9 +221,10 @@ class BFVariater:
     def errSystem_objectEff(self,errSource):
         # measured based on 20% per MisID from jet per 100GeV
         # df = DFCutter('etau','>1',"mctt").getDataFrame()
-        # np.sum( df.eventWeight*(1+0.002*df.lepton2_pt) )/ np.sum(df.eventWeight)
+        # np.sum( df.eventWeight*(1+0.002*df.lepton2_pt) ) / np.sum(df.eventWeight)
 
-        jetMisTauIDErrList = [1.07958,1.07994,1.07973, 1.07965]
+        #jetMisTauIDErrList = [1.07958,1.07994,1.07973, 1.07965]
+        jetMisTauIDErrList = [1.04,1.04,1.04, 1.04]
         errs = []
         for icata in range(4):
             
@@ -279,7 +280,7 @@ class BFVariater:
 
 
             elif errSource == "jetMisTauID":
-                jetMisTauIDErr = 1.08 #jetMisTauIDErrList[icata]
+                jetMisTauIDErr = 1.055 #jetMisTauIDErrList[icata]
                 if icata in [0,1]:
                     trigger = 1
                 if icata in [2,3]:
