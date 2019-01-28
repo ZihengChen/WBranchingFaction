@@ -16,6 +16,9 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
         out_dict['tauPuppiChHadIso']  = tree.tauPuppiChHadIso
         out_dict['tauPuppiGammaIso']  = tree.tauPuppiGammaIso
         out_dict['tauPuppiNeuHadIso'] = tree.tauPuppiNeuHadIso
+        out_dict['tauVetoedJetPt']    = tree.tauVetoedJetPt
+        out_dict['tauVetoedJetPtUnc'] = tree.tauVetoedJetPtUnc
+
         if not ('2016' in name):
             out_dict['tauGenFlavor']      = tree.tauGenFlavor
             out_dict['tauGenFlavorHad']   = tree.tauGenFlavorHad

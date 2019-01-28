@@ -7,7 +7,7 @@ import os, sys
 
 
 class DFCutter:
-    def __init__(self,selection, nbjet, name,  njet=None):
+    def __init__(self,selection, nbjet, name,  njet=None, TightTau=False):
         '''
         initialize a DFCutter with selection and name
         For Example, cutter = DFCutter("mumu","mctt")
@@ -32,6 +32,9 @@ class DFCutter:
             folderOfSelection = 'ee'  
         
         self.pickleDirectry = self.baseDir + "data/pickles/{}/".format(folderOfSelection)
+        if TightTau:
+            self.pickleDirectry = self.baseDir + "data/pickles_tightTau/{}/".format(folderOfSelection)
+
 
         # default jet requirments
         self.nb = " & (nBJets{})".format(nbjet)
