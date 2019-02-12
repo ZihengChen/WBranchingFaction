@@ -37,7 +37,7 @@ class DFCounter():
             n.append(temp)
             nVar.append(tempVar)
         n = np.array(n)
-        nVar = np.array(nVar)
+        nVar = np.array(nVar) 
         return n,nVar # 4x1,4x1
     
     def returnNMCbg(self):
@@ -91,7 +91,7 @@ class DFCounter():
             temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame(self.variation)
             n    = np.sum(temp.eventWeight)
             nVar = np.sum(temp.eventWeight**2)
-            for name in ['mcdiboson','mcdy','mct','mctt']:
+            for name in ['mcdiboson','mcz', 'mcw','mct','mctt']:
                 temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame(self.variation)
                 n    -= np.sum(temp.eventWeight)
                 nVar += np.sum(temp.eventWeight**2)
@@ -105,7 +105,7 @@ class DFCounter():
             temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame(self.variation)
             n    = np.sum(temp.eventWeight)
             nVar = np.sum(temp.eventWeight**2)
-            for name in ['mcdiboson','mcdy','mct','mctt']:
+            for name in ['mcdiboson','mcz', 'mcw','mct','mctt']:
                 temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame(self.variation)
                 n    -= np.sum(temp.eventWeight)
                 nVar += np.sum(temp.eventWeight**2)
@@ -119,7 +119,7 @@ class DFCounter():
             temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame(self.variation)
             n    = np.sum(temp.eventWeight)
             nVar = np.sum(temp.eventWeight**2)
-            for name in ['mcdiboson','mcdy','mct','mctt']:
+            for name in ['mcdiboson','mcz','mcw','mct','mctt']:
                 temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame(self.variation)
                 n    -= np.sum(temp.eventWeight)
                 nVar += np.sum(temp.eventWeight**2)
@@ -133,7 +133,7 @@ class DFCounter():
             temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame(self.variation)
             n    = np.sum(temp.eventWeight)
             nVar = np.sum(temp.eventWeight**2)
-            for name in ['mcdiboson','mcdy','mct','mctt']:
+            for name in ['mcdiboson','mcz', 'mcw','mct','mctt']:
                 temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame(self.variation)
                 n    -= np.sum(temp.eventWeight)
                 nVar += np.sum(temp.eventWeight**2)
@@ -155,7 +155,7 @@ class DFCounter():
 
         return np.array(n), np.array(nVar)
 
-    def getAcc(self,selection, nbjet, enhanceStat=True):
+    def getAcc(self,selection, nbjet, enhanceStat):
 
         # tW
         nGenMCt = self.dfNGen.query("name=='t'" ).ngen.values[0]

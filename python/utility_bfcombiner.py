@@ -93,67 +93,67 @@ class BFCombiner():
 
 
 
-class BFCombiner_theta():
-    def __init__(self,beta0, controlRegion=None):
-        self.beta0 = beta0
+# class BFCombiner_theta():
+#     def __init__(self,beta0, controlRegion=None):
+#         self.beta0 = beta0
 
-        # read sigma of beta0
-        baseDir = common.getBaseDirectory()
-        sig     = np.load(baseDir + 'data/combine/sigma.npy')
-        var     = np.load(baseDir + 'data/combine/covar.npy')
-        self.sig_syst  = sig[1:]
-        self.var_stat  = var[0]
-        self.ivar_stat = np.linalg.pinv(self.var_stat)
+#         # read sigma of beta0
+#         baseDir = common.getBaseDirectory()
+#         sig     = np.load(baseDir + 'data/combine/sigma.npy')
+#         var     = np.load(baseDir + 'data/combine/covar.npy')
+#         self.sig_syst  = sig[1:]
+#         self.var_stat  = var[0]
+#         self.ivar_stat = np.linalg.pinv(self.var_stat)
         
-        # some configuration
-        self.n      = var.shape[0]-1
-        self.param0 = np.r_[0.1081*np.ones(3), np.zeros(self.n)]
+#         # some configuration
+#         self.n      = var.shape[0]-1
+#         self.param0 = np.r_[0.1081*np.ones(3), np.zeros(self.n)]
 
-        # config control region
-        self.controlRegion = controlRegion
-        if not controlRegion is None:
-            self.model1 = controlRegion[0]
-            self.X1     = controlRegion[1]
-            self.Y1     = controlRegion[2]
+#         # config control region
+#         self.controlRegion = controlRegion
+#         if not controlRegion is None:
+#             self.model1 = controlRegion[0]
+#             self.X1     = controlRegion[1]
+#             self.Y1     = controlRegion[2]
 
-        self.lsEstimator()
+#         self.lsEstimator()
 
         
-    def loss (self, param):
+#     def loss (self, param):
         
-        # perturbating beta0 with systematics
-        param_syst  = param[3:]
-        perturbation = np.zeros_like(self.beta0)
-        for i in range(param_syst.size):
-            perturbation += self.sig_syst[i] * param_syst[i]
+#         # perturbating beta0 with systematics
+#         param_syst  = param[3:]
+#         perturbation = np.zeros_like(self.beta0)
+#         for i in range(param_syst.size):
+#             perturbation += self.sig_syst[i] * param_syst[i]
 
-        # calcuate chisquared
-        beta  = np.r_[param[:3],param[:3],param[:3],param[:3]]
-        delta = beta - (self.beta0 + perturbation)
-        loss  = delta.dot( self.ivar_stat.dot(delta) )/2
+#         # calcuate chisquared
+#         beta  = np.r_[param[:3],param[:3],param[:3],param[:3]]
+#         delta = beta - (self.beta0 + perturbation)
+#         loss  = delta.dot( self.ivar_stat.dot(delta) )/2
 
-        # add regulation of systematics
-        loss += np.sum( 0.5*(param_syst)**2 )
+#         # add regulation of systematics
+#         loss += np.sum( 0.5*(param_syst)**2 )
 
-        # add control
-        if not self.controlRegion is None:
-            y1    = self.model1.predict(param)
-            loss += np.sum( (y1-self.Y1)**2/(2*self.Y1) )
+#         # add control
+#         if not self.controlRegion is None:
+#             y1    = self.model1.predict(param)
+#             loss += np.sum( (y1-self.Y1)**2/(2*self.Y1) )
             
-        return loss
+#         return loss
     
-    def lsEstimator(self):
-        paramBounds = [(0,1)]*3+[(-3,3)]*self.n
-        result = minimize(fun=self.loss, x0=self.param0, method='SLSQP',
-                          bounds=paramBounds)  
-        self.result = result.x
+#     def lsEstimator(self):
+#         paramBounds = [(0,1)]*3+[(-3,3)]*self.n
+#         result = minimize(fun=self.loss, x0=self.param0, method='SLSQP',
+#                           bounds=paramBounds)  
+#         self.result = result.x
     
-    def paramSigma(self):
-        hcalc = nd.Hessian(self.loss, step=1e-6, method='central')
-        hess  = hcalc( self.result )
-        ihess = np.linalg.inv(hess)
-        sig   = np.sqrt(ihess.diagonal())
-        cor   = ihess/np.outer(sig, sig)
+#     def paramSigma(self):
+#         hcalc = nd.Hessian(self.loss, step=1e-6, method='central')
+#         hess  = hcalc( self.result )
+#         ihess = np.linalg.inv(hess)
+#         sig   = np.sqrt(ihess.diagonal())
+#         cor   = ihess/np.outer(sig, sig)
 
-        return sig, cor
+#         return sig, cor
         

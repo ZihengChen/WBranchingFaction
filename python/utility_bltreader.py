@@ -1,27 +1,48 @@
-import os, sys, tqdm
+import os, sys, tqdm, datetime
 
 import numpy as np
 import pandas as pd
 import ROOT as root
 
 import utility_common as common
-from utility_bltreaderDict import *
+from utility_bltreaderDict_multilep import *
 
 
-class BLTReaderLite:
+class BLTReader:
 
     def __init__(self, inputRootFileName, selection):
 
         self.baseDir = common.getBaseDirectory() 
 
-        self.inputRootFile = root.TFile(self.baseDir+"data/root/"+inputRootFileName)
+        self.inputRootFile = root.TFile(self.baseDir+'data/root/'+inputRootFileName)
 
         self.selection = selection
         self.lumin = 35.864
 
         self._getCrossection()
         self._getNameList()
+    
+    #############################
+    ## Save number of Gen 
+    #############################
         
+    def outputNGen(self):
+        names = ['t','tt']#,'tt_2l2nu','tt_semilepton'] 
+        nGens = [self.getNGen('t_tw')+self.getNGen('tbar_tw'),
+                 self.getNGen('ttbar_inclusive') ]#,self.getNGen('ttbar_2l2nu'),self.getNGen('ttbar_semilepton')] 
+
+        df = pd.DataFrame({'name':names, 'ngen':nGens })
+        df.to_pickle(self.baseDir+'data/pickles/ngen.pkl')
+        
+    def getNGen(self,name):
+        histogram = self.inputRootFile.Get('GenCategory_'+name)
+        nGen = []
+        for i in range(1,22,1):
+            nGen.append(histogram.GetBinContent(i))
+        nGen = np.array(nGen)
+        return nGen    
+    
+
     #############################
     ## Read BLT to pick 
     #############################
@@ -30,7 +51,7 @@ class BLTReaderLite:
         # loop over all names
         for name in self.mclist + self.datalist:
             self.makePickle(name)
-        print(self.selection + " finished!")
+        print(self.selection + ' finished!')
 
     # MARK-1 -- ntuple to pickle
     def makePickle(self,name):
@@ -67,8 +88,8 @@ class BLTReaderLite:
     ## private helper functions
     #############################
     def _getAllVariables(self, tree, selection, name, scaleFactor):
-        if selection in ["ee","mumu","emu","mutau","etau",'mumu_tau','ee_tau','emu_tau']:
-            dictionary = getAllVariables_exampleSelection(tree, selection, name, scaleFactor)
+        if selection in ['ee','mumu','emu','mutau','etau','mu4j','e4j','mu4j_fakes','e4j_fakes','mumu_tau','ee_tau','emu_tau']:
+            dictionary = getAllVariables_multileptonSelection(tree, selection, name, scaleFactor)
         return dictionary
         
     def _getScaleFactor(self,name):
@@ -78,8 +99,8 @@ class BLTReaderLite:
             # get crosssection for the name
             xs = self.xsTable[name]
             # get nGenTotal for the name
-            histogram = self.inputRootFile.Get("TotalEvents_"+name)
-            #print("TotalEvents_"+name)
+            histogram = self.inputRootFile.Get('TotalEvents_'+name)
+            #print('TotalEvents_'+name)
             nGenTotal = histogram.GetBinContent(1) - 2*histogram.GetBinContent(10)
             # calculate SF to lumin
             scaleFactor = self.lumin * xs/nGenTotal
@@ -113,37 +134,37 @@ class BLTReaderLite:
 
     def _getOutputPath(self,name):
 
-        outputPath  = self.baseDir+"data/pickleslite/"+self.selection+"/"
+        outputPath  = self.baseDir+'data/pickles/'+self.selection+'/'
 
         if name in self.datalist:
-            outputPath += "data2016/"
+            outputPath += 'data2016/'
         elif name in self.mcdibosonlist:
-            outputPath += "mcdiboson/"
+            outputPath += 'mcdiboson/'
         elif name in self.mczlist:
-            outputPath += "mcz/"
+            outputPath += 'mcz/'
         elif name in self.mcwlist:
-            outputPath += "mcw/"
+            outputPath += 'mcw/'
         elif name in self.mctlist:
-            outputPath += "mct/"
+            outputPath += 'mct/'
         elif name in self.mcttlist:
-            outputPath += "mctt/" 
+            outputPath += 'mctt/' 
         return outputPath
 
     def _getNameList(self):
         ## 1. define the datalist
-        if self.selection in ["mumu","mutau","mumu_tau"]:
+        if self.selection in ['mumu','mutau','mu4j','mu4j_fakes','mumu_tau']:
             self.datalist = [
                 'muon_2016B', 'muon_2016C','muon_2016D','muon_2016E',
                 'muon_2016F','muon_2016G','muon_2016H'
                 ]
 
-        elif self.selection in ["ee","etau","ee_tau"]:
+        elif self.selection in ['ee','etau','e4j','e4j_fakes','ee_tau']:
             self.datalist = [
                 'electron_2016B', 'electron_2016C','electron_2016D','electron_2016E',
                 'electron_2016F','electron_2016G','electron_2016H'
                 ]
 
-        elif self.selection in ["emu","emu_tau"]:
+        elif self.selection in ['emu','emu_tau']:
             self.datalist = [
                 'muon_2016B', 'muon_2016C','muon_2016D','muon_2016E',
                 'muon_2016F','muon_2016G','muon_2016H',
@@ -157,15 +178,7 @@ class BLTReaderLite:
         self.mczlist        = [ 'zjets_m-10to50_amcatnlo','zjets_m-50_amcatnlo']
         self.mcwlist        = [ 'w1jets','w2jets','w3jets','w4jets' ]
         self.mctlist        = [ 't_tw','tbar_tw']       
-        self.mcttlist       = [ 'ttbar_inclusive']
+        self.mcttlist       = [ 'ttbar_inclusive']#, 'ttbar_2l2nu','ttbar_semilepton']
         
         self.mclist = self.mcdibosonlist+self.mcwlist+self.mczlist+self.mctlist+self.mcttlist 
-
-    
-
-
-
-
-
-
 

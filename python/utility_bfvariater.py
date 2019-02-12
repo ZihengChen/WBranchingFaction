@@ -42,7 +42,6 @@ class BFVariater:
                     # push deriveratives
                     deltaBW = BW1-BW
                     dBW.append( deltaBW )
-
                     covar += np.outer(deltaBW,deltaBW)
                         
                 dBW = np.array(dBW)
@@ -57,6 +56,7 @@ class BFVariater:
             elif errSource == "mcbg":
             
                 dBW = []
+                covar = np.zeros([3,3])
                 for c in range(4):
                     # variate nmcbg to nmcbg1
                     nmcbg1 = nmcbg.copy()
@@ -64,14 +64,19 @@ class BFVariater:
                     # get BW1 corresponding to nmcbg1
                     BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg1+nfake))
                     # push deriveratives
-                    dBW.append( BW1-BW )
+                    deltaBW = BW1-BW
+                    dBW.append( deltaBW )
+                    covar += np.outer(deltaBW,deltaBW)
+
                 dBW = np.array(dBW)
                 # propagating error
                 errFromSource = np.sum(dBW**2,axis=0)**0.5
+                covars.append(covar)
 
             ## mcbg: by std of toys which variate mcbg
             elif errSource == "fake":
                 dBW = []
+                covar = np.zeros([3,3])
                 for c in range(4):
                     # variate nfake to nfake1
                     nfake1 = nfake.copy()
@@ -79,13 +84,18 @@ class BFVariater:
                     # get BW1 corresponding to nfake1
                     BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake1))
                     # push deriveratives
-                    dBW.append( BW1-BW )
+                    deltaBW = BW1-BW
+                    dBW.append( deltaBW )
+                    covar += np.outer(deltaBW,deltaBW)
+
                 dBW = np.array(dBW)
                 # propagating error
                 errFromSource = np.sum(dBW**2,axis=0)**0.5
+                covars.append(covar)
 
             elif errSource == "mcsg":
                 dBW = []
+                covar = np.zeros([3,3])
                 for c in range(4):
                     for i in range(6):
                         for j in range(6):
@@ -97,7 +107,9 @@ class BFVariater:
                                 # get BW1 corresponding to a1
                                 slv1 = BFSolver3D(a1)
                                 BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-                                dBW.append( BW1-BW )
+                                deltaBW = BW1-BW
+                                dBW.append( deltaBW )
+                                covar += np.outer(deltaBW,deltaBW)
                 
                             if i < j and a[c,i,j]>0:
                                 # variate a to a1
@@ -107,10 +119,13 @@ class BFVariater:
                                 # get BW1 corresponding to a1
                                 slv1 = BFSolver3D(a1)
                                 BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-                                dBW.append( BW1-BW )
+                                deltaBW = BW1-BW
+                                dBW.append( deltaBW )
+                                covar += np.outer(deltaBW,deltaBW)
                 dBW = np.array(dBW)
                 # propagating error
                 errFromSource = np.sum(dBW**2,axis=0)**0.5
+                covars.append(covar)
 
             else:
                 print("invalid stat err source")
@@ -187,10 +202,20 @@ class BFVariater:
                     variateScale = np.array([1,1,1,1.25])
                 BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*variateScale))
 
-            elif errSource == "faketau":
+            elif errSource == "fakemutau":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-                variateScale = np.array([1.,1.,1.25,1.])
+                variateScale = np.array([1.,1.,1.,1.])
+                if icata in [0,1]:
+                    variateScale = np.array([1.,1.,1.25,1.])
                 BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*variateScale))
+
+            elif errSource == "fakeetau":
+                BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                variateScale = np.array([1.,1.,1.,1.])
+                if icata in [2,3]:
+                    variateScale = np.array([1.,1.,1.25,1.])
+                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*variateScale))
+
 
             elif errSource == "lumin":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
@@ -223,8 +248,7 @@ class BFVariater:
         # df = DFCutter('etau','>1',"mctt").getDataFrame()
         # np.sum( df.eventWeight*(1+0.002*df.lepton2_pt) ) / np.sum(df.eventWeight)
 
-        #jetMisTauIDErrList = [1.07958,1.07994,1.07973, 1.07965]
-        jetMisTauIDErrList = [1.04,1.04,1.04, 1.04]
+        jetMisTauIDErrList = [1.066,1.066,1.066, 1.066]
         errs = []
         for icata in range(4):
             
@@ -280,7 +304,7 @@ class BFVariater:
 
 
             elif errSource == "jetMisTauID":
-                jetMisTauIDErr = 1.055 #jetMisTauIDErrList[icata]
+                jetMisTauIDErr = jetMisTauIDErrList[icata]
                 if icata in [0,1]:
                     trigger = 1
                 if icata in [2,3]:
