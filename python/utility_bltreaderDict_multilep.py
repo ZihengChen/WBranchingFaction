@@ -4,6 +4,7 @@ import numpy as np
 def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     isData = ('2016' in name)
     isDilepton = not ('4j' in selection)
+    isMCZ = 'zjets' in name
     
     out_dict = {}
     
@@ -19,8 +20,10 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     out_dict['nJets']        =  tree.nJets
     out_dict['nBJets']       =  tree.nBJets
     out_dict['nPV']          =  tree.nPV
+    out_dict['nPU']          =  tree.nPU
     out_dict['trTest']       =  tree.triggerLeptonStatus
     out_dict['genCategory']  =  tree.genCategory
+    out_dict['nPartons']      =  tree.nPartons
     
     if isData:
         out_dict['eventWeight']  =  scaleFactor * tree.eventWeight 
@@ -30,8 +33,8 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     out_dict['eventWeightSF'] =  scaleFactor
     out_dict['met']           =  tree.met
     out_dict['metPhi']        =  tree.metPhi
-
-
+    out_dict['ht']            =  tree.ht
+    out_dict['htSum']         =  tree.htSum
 
     # 1. Filling leptons
     lep1 = tree.leptonOneP4
@@ -86,5 +89,20 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
             out_dict['tauMass']= leptonTauP4.M()
         else:
             out_dict['tauMass']= lep2.M()
+
+    # 3. jet systematics
+    out_dict['nJetsJESUp']        =  tree.nJetsJESUp
+    out_dict['nJetsJESDown']      =  tree.nJetsJESDown
+    out_dict['nJetsJERUp']        =  tree.nJetsJERUp
+    out_dict['nJetsJERDown']      =  tree.nJetsJERDown
+
+    out_dict['nBJetsJESUp']       =  tree.nBJetsJESUp
+    out_dict['nBJetsJESDown']     =  tree.nBJetsJESDown
+    out_dict['nBJetsJERUp']       =  tree.nBJetsJERUp
+    out_dict['nBJetsJERDown']     =  tree.nBJetsJERDown
+    out_dict['nBJetsBTagUp']      =  tree.nBJetsBTagUp
+    out_dict['nBJetsBTagDown']    =  tree.nBJetsBTagDown
+    out_dict['nBJetsMistagUp']    =  tree.nBJetsMistagUp
+    out_dict['nBJetsMistagDown']  =  tree.nBJetsMistagDown
 
     return out_dict

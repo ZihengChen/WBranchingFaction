@@ -62,6 +62,7 @@ class DFCutter:
             pickles = glob.glob( self.pickleDirectry + '{}/*.pkl'.format(self.name) )
             dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles],ignore_index=True)
 
+        dataFrame.reset_index(drop=True, inplace=True)
         ###############################################
         # MARK -- variate the dataframe for MC
         ###############################################
@@ -130,24 +131,72 @@ class DFCutter:
 
     def _variateDataFrame(self, df, variation):
 
-        # variate e,m,t energy correction
+        ################
+        # energy scale #
+        ################
+        # variate e,m,tau energy correction
         if variation == 'EPtDown':
             if self.selection in ['ee','etau','e4j','ee_tau']:
-                df.lepton1_pt = df.lepton1_pt * 0.995
+                df.lepton1_pt *= 0.995
 
             if self.selection in ['ee','emu','emu2','ee_tau','emu_tau']:
-                df.lepton2_pt = df.lepton2_pt * 0.995
+                df.lepton2_pt *= 0.995
         
         if variation == 'MuPtDown':
             if self.selection in ['mumu','emu','emu2','mutau','mu4j','mumu_tau','emu_tau']:
-                df.lepton1_pt = df.lepton1_pt * 0.998
+                df.lepton1_pt *= 0.998
 
             if self.selection in ['mumu','mumu_tau']:
-                df.lepton2_pt = df.lepton2_pt * 0.998
-            
-        if variation == 'TauPtDown':
+                df.lepton2_pt *= 0.998
+
+        # tau ES up and down
+        if variation == 'Tau0PtDown':
             if self.selection in ['mutau','etau']:
-                df.lepton2_pt = df.lepton2_pt * 0.99
+                slt = (df.tauGenFlavor==15) & (df.tauDecayMode == 0)
+                df.loc[slt, 'lepton2_pt'] *= 0.988
+        
+        if variation == 'Tau1PtDown':
+            if self.selection in ['mutau','etau']:
+                slt = (df.tauGenFlavor==15) & (df.tauDecayMode == 1)
+                df.loc[slt, 'lepton2_pt'] *= 0.988
+
+        if variation == 'Tau10PtDown':
+            if self.selection in ['mutau','etau']:
+                slt = (df.tauGenFlavor==15) & (df.tauDecayMode == 10)
+                df.loc[slt, 'lepton2_pt'] *= 0.988
+
+        #################
+        # obj Eff scale #
+        #################
+        # variate e,m,tau energy correction
+        if variation == 'EEffDown':
+            if self.selection in ['emu','emu2','etau','e4j','emu_tau']:
+                df.eventWeight *= 0.99
+
+            if self.selection in ['ee','ee_tau']:
+                df.eventWeight *= 0.99**2
+        
+        if variation == 'MuEffDown':
+            if self.selection in ['emu','emu2','mutau','mu4j','emu_tau']:
+                df.eventWeight *= 0.99
+
+            if self.selection in ['mumu','mumu_tau']:
+                df.eventWeight *= 0.99**2
+
+        if variation == 'TauIDEffDown':
+            if self.selection in ['etau','mutau','ee_tau','mumu_tau','emu_tau']:
+                slt = (df.tauGenFlavor==15)
+                df.loc[slt, 'eventWeight'] *= 0.95
+
+        if variation == 'JetToTauIDEffDown':
+            if self.selection in ['etau','mutau','ee_tau','mumu_tau','emu_tau']:
+                slt = (df.tauGenFlavor<=6)
+                df.loc[slt, 'eventWeight'] *= (1-0.047)
+
+
+        #################
+        # Jet and bTag  #
+        #################
 
         # variate Jet Energy corrections
         if variation in ['JESUp','JESDown','JERUp','JERDown']:
@@ -157,10 +206,19 @@ class DFCutter:
         # variate bTagging 
         if variation in ['BTagUp','BTagDown','MistagUp','MistagDown']:
             df.nBJets = df['nBJets'+variation]
+
+        #################
+        # Pileup        #
+        #################
+        # variate pileup 
+        if variation in ['PileupUp','PileupDown']:
+            sf = np.load(self.baseDir+'/data/pileup/sf_{}.npy'.format(variation))
+            sfIndex = (df.nPU/0.1).astype(int)
+
+            temp = df.eventWeight * sf[sfIndex]
+            df.eventWeight = temp
         
         return df
-
-
 
 
     # # variate tt theoretical weight and LHE weights

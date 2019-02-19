@@ -14,13 +14,22 @@ class BFVariater:
         self.ndata, self.ndataVar = counts.ndata, counts.ndataVar
         self.nmcbg, self.nmcbgVar = counts.nmcbg, counts.nmcbgVar
         self.nfake, self.nfakeVar = counts.nfake, counts.nfakeVar
+
+
+        self.ttxs,self.txs = 832, 35.85*2
+        c_ttxs = self.ttxs/(self.ttxs+self.txs)
+        c_txs  = self.txs /(self.ttxs+self.txs)
+        self.ca    = np.array([c_txs,c_ttxs]).reshape(1,2,1,1)
+        self.caVar = np.array([c_txs**2,c_ttxs**2]).reshape(1,2,1,1)
         
     def errStat(self, errSource, returnCovar=False):
     
         errs = []
         covars = []
         for icata in range(4):
-            a,aVar  = self.a[icata], self.aVar[icata]
+            a    = np.sum(self.a[icata]*self.ca,axis=1)
+            aVar = np.sum(self.aVar[icata]*self.caVar,axis=1)
+
             ndata,ndataVar = self.ndata[icata],self.ndataVar[icata]
             nmcbg,nmcbgVar = self.nmcbg[icata].dot(np.ones(3)), self.nmcbgVar[icata].dot(np.ones(3))
             nfake,nfakeVar = self.nfake[icata],self.nfakeVar[icata]
@@ -48,10 +57,7 @@ class BFVariater:
                 # propagating error
                 errFromSource = np.sum(dBW**2,axis=0)**0.5
                 covars.append(covar)
-                
-
-
-            
+                 
             ## mcbg: by std of toys which variate mcbg
             elif errSource == "mcbg":
             
@@ -100,7 +106,7 @@ class BFVariater:
                     for i in range(6):
                         for j in range(6):
                             # variate a to a1
-                            if i == j and a[c,i,j]>0: 
+                            if i == j and a[c,i,j]>0.0: 
                                 # variate a to a1
                                 a1 = a.copy()
                                 a1[c,i,j] = a[c,i,j] + aVar[c,i,j]**0.5
@@ -111,7 +117,7 @@ class BFVariater:
                                 dBW.append( deltaBW )
                                 covar += np.outer(deltaBW,deltaBW)
                 
-                            if i < j and a[c,i,j]>0:
+                            if i < j and a[c,i,j]>0.0:
                                 # variate a to a1
                                 a1 = a.copy()
                                 a1[c,i,j] = a[c,i,j] + aVar[c,i,j]**0.5
@@ -144,10 +150,10 @@ class BFVariater:
 
         errs = []
         for icata in range(4):
-            a,aVar  = self.a[icata], self.aVar[icata]
-            ndata,ndataVar = self.ndata[icata],self.ndataVar[icata]
-            nmcbg,nmcbgVar = self.nmcbg[icata].dot(np.ones(3)), self.nmcbgVar[icata].dot(np.ones(3))
-            nfake,nfakeVar = self.nfake[icata],self.nfakeVar[icata]
+            a     = np.sum(self.a[icata]*self.ca,axis=1)
+            ndata = self.ndata[icata]
+            nmcbg = self.nmcbg[icata].dot(np.ones(3))
+            nfake = self.nfake[icata]
 
             slv = BFSolver3D(a)
             BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
@@ -171,7 +177,7 @@ class BFVariater:
         errs = []
         for icata in range(4):
 
-            a     = self.a[icata]
+            a     = np.sum(self.a[icata]*self.ca,axis=1)
             ndata = self.ndata[icata]
             nmcbg = self.nmcbg[icata].dot(np.array([1,1,1]))
             nfake = self.nfake[icata]
@@ -179,10 +185,11 @@ class BFVariater:
             slv = BFSolver3D(a)
             if errSource == "mcvv":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=self.nmcbg[icata].dot(np.array([1.1, 1, 1])) + nfake))
+                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=self.nmcbg[icata].dot(np.array([1.10, 1, 1])) + nfake))
+            
             elif errSource == "mcz":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=self.nmcbg[icata].dot(np.array([1, 1.05, 1])) + nfake))
+                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=self.nmcbg[icata].dot(np.array([1, 1.10, 1])) + nfake))
             
             elif errSource == "mcw":
                 BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
@@ -200,6 +207,11 @@ class BFVariater:
                 variateScale = np.array([1.,1.,1.,1.])
                 if icata in [2,3]:
                     variateScale = np.array([1,1,1,1.25])
+                BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*variateScale))
+
+            elif errSource == "faketau":
+                BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                variateScale = np.array([1.,1.,1.25,1.])
                 BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake*variateScale))
 
             elif errSource == "fakemutau":
@@ -222,17 +234,24 @@ class BFVariater:
                 BW1 = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg*1.025+nfake))
 
             elif errSource == "mctt":
-                BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
-                
-                counts1 = pd.read_pickle(self.baseDir + "data/counts/count_{}.pkl".format("TTXSUp"))
-                slv1 = BFSolver3D(counts1.acc[icata])
-                BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                BW = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+
+                ttxs,txs = self.ttxs*1.05, self.txs
+                ca1  = np.array([txs,ttxs])/(txs+ttxs)
+                ca1  = ca1.reshape(1,2,1,1)
+                a1   = np.sum(self.a[icata]*ca1,axis=1)
+                slv1 = BFSolver3D(a1)
+                BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+
             elif errSource == "mctw":
-                BW  = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                BW = slv.solveQuadEqn(slv.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
                 
-                counts1 = pd.read_pickle(self.baseDir + "data/counts/count_{}.pkl".format("TWXSUp"))
-                slv1 = BFSolver3D(counts1.acc[icata])
-                BW1 = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
+                ttxs,txs = self.ttxs, self.txs*1.05
+                ca1  = np.array([txs,ttxs])/(txs+ttxs)
+                ca1  = ca1.reshape(1,2,1,1)
+                a1   = np.sum(self.a[icata]*ca1,axis=1)
+                slv1 = BFSolver3D(a1)
+                BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=ndata, nMcbg=nmcbg+nfake))
 
             else:
                 print("invalid stat err source")
@@ -248,12 +267,12 @@ class BFVariater:
         # df = DFCutter('etau','>1',"mctt").getDataFrame()
         # np.sum( df.eventWeight*(1+0.002*df.lepton2_pt) ) / np.sum(df.eventWeight)
 
-        jetMisTauIDErrList = [1.066,1.066,1.066, 1.066]
+        jetMisTauIDErrList = [1.047,1.047,1.047, 1.047] # from SF_misid.csv'
         errs = []
         for icata in range(4):
             
 
-            a     = self.a[icata]
+            a     = np.sum(self.a[icata]*self.ca,axis=1)
             ndata = self.ndata[icata]
             nmcbg = self.nmcbg[icata].dot(np.ones(3))
             nfake = self.nfake[icata]
@@ -343,18 +362,24 @@ class BFVariater:
         return errs
 
 
-    def errSystem_energyScale(self,errSource="E"):
+    def errSystem_downVariation(self,errSource="EPt"):
+        '''
+        EPt, MuPt, Tau0Pt,Tau1Pt,Tau10Pt,
+        EEff, MuEff, TauIDEff, JetMisTauIDEff
+        '''
+
+
         errs = []
 
-        counts1 = pd.read_pickle(self.baseDir + "data/counts/count_{}.pkl".format(errSource+"PtDown"))
+        counts1 = pd.read_pickle(self.baseDir + "data/counts/count_{}.pkl".format(errSource+"Down"))
 
         for icata in range(4):
             
             # nominal tuning
-            slv  = BFSolver3D(self.a[icata])
+            slv  = BFSolver3D(np.sum(self.a[icata]*self.ca,axis=1))
             BW   = slv.solveQuadEqn(slv.setMeasuredX(nData=self.ndata[icata], nMcbg=self.nmcbg[icata].dot(np.ones(3))+self.nfake[icata]))
             # down tuning
-            slv1 = BFSolver3D( counts1.acc[icata] )
+            slv1 = BFSolver3D( np.sum(counts1.acc[icata]*self.ca,axis=1))
             BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata].dot(np.ones(3))+counts1.nfake[icata]))
             # difference between down and nominal
             errs.append(BW-BW1) 
@@ -365,7 +390,10 @@ class BFVariater:
 
     def errSystem_upDownVariation(self,errSource="JES"):
         '''
-        "ISR","FSR","UE","MEPS","JES","JER","BTag","Mistag","Renorm","Factor","PDF"
+        "ISR","FSR","UE","MEPS",
+        "Renorm","Factor","PDF",
+        "JES","JER","BTag","Mistag",
+        "Pileup","TauID","JetMisTauID"
         '''
 
         counts1 = pd.read_pickle(self.baseDir + "data/counts/count_{}.pkl".format(errSource+"Up"))
@@ -376,10 +404,10 @@ class BFVariater:
         for icata in range(4):
                 
             # up tuning
-            slv1 = BFSolver3D( counts1.acc[icata] )
+            slv1 = BFSolver3D( np.sum(counts1.acc[icata]*self.ca,axis=1) )
             BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata].dot(np.ones(3))+counts1.nfake[icata]))
             # down tuning
-            slv2 = BFSolver3D( counts2.acc[icata] )
+            slv2 = BFSolver3D( np.sum(counts2.acc[icata]*self.ca,axis=1) )
             BW2  = slv2.solveQuadEqn(slv2.setMeasuredX(nData=counts2.ndata[icata], nMcbg=counts2.nmcbg[icata].dot(np.ones(3))+counts2.nfake[icata]))
             # differentce between up and down tuning
             errs.append((BW1-BW2)/2)

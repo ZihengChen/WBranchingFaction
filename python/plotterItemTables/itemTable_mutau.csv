@@ -18,3 +18,6 @@ index,var,lower,upper,step,xlabel
 17,nPV,0,40,1,$n_{PV}$
 18,met,0,200,5,met [GeV]
 19,trTest,0,8,1,triggerTest
+20,ht,0,200,5,ht [GeV]
+21,htSum,0,400,10,htSum [GeV]
+22,nPU,0,100,5,$n_{PU}$

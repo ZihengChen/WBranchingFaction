@@ -67,7 +67,8 @@ class DFPlotter:
             v,a,b,step,xl = row['var'],row['lower'],row['upper'],row['step'],row['xlabel']
 
             sk = ASingleKinematicPlot(v,a,b,step,dfList,adjust=self.adjust)
-            sk.settingPlot(xl,self.labelList, self.colorList, withXsErr=True)
+                
+            sk.settingPlot(xl,self.labelList, self.colorList,logscale=False, withXsErr=True)
             sk.makePlot(self.outputPlotDir, self.selection)
 
             print('making plots -- {} nbjet{}: {}/{}'.format(self.selection, self.nbjet, index+1, len(self.pp)) )

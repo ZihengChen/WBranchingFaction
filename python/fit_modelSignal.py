@@ -40,7 +40,7 @@ class PredictiveModel_Signal(PredictiveModel):
         ttxs   = params[0]*0.05 + 1
         txs    = params[1]*0.05 + 1
         wxs    = params[2]*0.05 + 1
-        zxs    = params[3]*0.05 + 1
+        zxs    = params[3]*0.10 + 1
         vvxs   = params[4]*0.10 + 1
         eqcdxs = params[5]*0.25 + 1
         mqcdxs = params[6]*0.25 + 1

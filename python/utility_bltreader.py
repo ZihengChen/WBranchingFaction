@@ -72,9 +72,10 @@ class BLTReader:
     # MARK-2 -- tree to ntuple
     def fillNtuple(self, tree, name, scaleFactor):
         n = int(tree.GetEntriesFast())
+
         # loop over all events
         for i in range(n):
-
+            
             tree.GetEntry(i)
             entry = {}
 

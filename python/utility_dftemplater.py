@@ -3,13 +3,9 @@ from utility_dfcutter import *
 
 
 class DFTemplater():
-    def __init__(self, variation='',
-                 signalRegion = True
-                 ):
+    def __init__(self, variation=''):
                  
         self.varation = variation
-        self.controlRegion = not signalRegion
-        self.signalRegion  = signalRegion
 
 
     def makeTemplatesAndTargets(self):
@@ -20,32 +16,11 @@ class DFTemplater():
         #####################
         # signal region
         #####################
-        if self.signalRegion:
-            for nbjet in ['==1','>1']:
-                for selection in  ["emu","mumu","mutau","mu4j","ee","emu2","etau","e4j"]:
-                    # config
-                    njet = None
-                    v,bins = self._channelConfig(selection, nbjet, njet)
 
-                    # templates
-                    chTemplatesShp,chTemplatesCnt = self._makeChTemp(selection, nbjet, njet, v, bins)
-                    templatesShp.append(chTemplatesShp)
-                    templatesCnt.append(chTemplatesCnt)
-
-                    if self.varation == '':
-                        # targets
-                        df = DFCutter(selection,nbjet,'data2016',njet).getDataFrame()
-                        tempShp, tempCnt = self._binDataFrame(df,v,bins)
-                        targetsShp.append(tempShp)
-                        targetsCnt.append(tempCnt)
-
-        #####################
-        # control region
-        #####################
-        if self.controlRegion:
-            for selection in ["mumuc","eec","mutau","etau"]: #
-                # config 
-                nbjet,njet = '<1', None
+        for nbjet in ['==1','>1']:
+            for selection in  ["emu","mumu","mutau","mu4j","ee","emu2","etau","e4j"]:
+                # config
+                njet = None
                 v,bins = self._channelConfig(selection, nbjet, njet)
 
                 # templates
@@ -59,6 +34,7 @@ class DFTemplater():
                     tempShp, tempCnt = self._binDataFrame(df,v,bins)
                     targetsShp.append(tempShp)
                     targetsCnt.append(tempCnt)
+
 
 
         #####################
@@ -140,7 +116,7 @@ class DFTemplater():
         df   = DFCutter(selection+'_fakes', nbjet, "data2016", njet).getDataFrame()
         tempShp,tempCnt = self._binDataFrame(df,v,bins)
 
-        for name in ['mcdiboson','mcdy','mct','mctt']:
+        for name in ['mcdiboson','mcz','mcw','mct','mctt']:
             df    = DFCutter(selection+'_fakes', nbjet, name, njet).getDataFrame()
             temp1,temp2 = self._binDataFrame(df,v,bins)
             tempShp -= temp1
@@ -172,9 +148,6 @@ class DFTemplater():
         if selection == 'mutau':
             v = 'lepton2_pt'
             bins = np.arange(20,170,5)
-            if nbjet == '<1':
-                v = 'lepton1_mt'
-                bins = np.arange(0,150,5)
 
         if selection == 'mu4j':
             v = 'lepton1_pt'
@@ -191,22 +164,10 @@ class DFTemplater():
         if selection == 'etau':
             v = 'lepton2_pt'
             bins = np.arange(20,170,5)
-            if nbjet == '<1':
-                v = 'lepton1_mt'
-                bins = np.arange(0,150,5)
 
         if selection == 'e4j':
             v = 'lepton1_pt'
             bins = np.arange(30,180,5)
-
-        if selection == 'mumuc':
-            v = 'lepton2_pt'
-            bins = np.arange(10,70,2)
-
-        if selection == 'eec':
-            v = 'lepton2_pt'
-            bins = np.arange(10,70,2)
-
         
         return v, bins
 

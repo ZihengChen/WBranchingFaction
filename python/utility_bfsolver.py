@@ -313,27 +313,27 @@ class BFSolver_Toolbox:
 
 
         if trigger is "mu":
-            titles=[r"$A_{\mu e} [10^{-2}]$", 
-                    r"$A_{\mu \mu} [10^{-2}]$",
-                    r"$A_{\mu \tau_h} [10^{-2}]$",
-                    r"$A_{\mu h} [10^{-2}]$"]
+            titles=[r"$E_{\mu e} [10^{-2}]$", 
+                    r"$E_{\mu \mu} [10^{-2}]$",
+                    r"$E_{\mu \tau_h} [10^{-2}]$",
+                    r"$E_{\mu h} [10^{-2}]$"]
         else:
-            titles=[r"$A_{e e} [10^{-2}]$", 
-                    r"$A_{e \mu} [10^{-2}]$",
-                    r"$A_{e \tau_h} [10^{-2}]$",
-                    r"$A_{e h} [10^{-2}]$"]
+            titles=[r"$E_{e e} [10^{-2}]$", 
+                    r"$E_{e \mu} [10^{-2}]$",
+                    r"$E_{e \tau_h} [10^{-2}]$",
+                    r"$E_{e h} [10^{-2}]$"]
 
         if showError is True:
             if trigger is "mu":
-                titles=[r"$\delta A_{\mu e} / A_{\mu e} [\%]$", 
-                        r"$\delta A_{\mu \mu} / A_{\mu \mu} [\%]$",
-                        r"$\delta A_{\mu \tau_h} / A_{\mu \tau_h} [\%]$",
-                        r"$\delta A_{\mu h} / A_{\mu h} [\%]$"]
+                titles=[r"$\delta E_{\mu e} / E_{\mu e} [\%]$", 
+                        r"$\delta E_{\mu \mu} / E_{\mu \mu} [\%]$",
+                        r"$\delta E_{\mu \tau_h} / E_{\mu \tau_h} [\%]$",
+                        r"$\delta E_{\mu h} / E_{\mu h} [\%]$"]
             else:
-                titles=[r"$\delta A_{e e} /A_{e e} [\%]$", 
-                        r"$\delta A_{e \mu}/A_{e \mu} [\%]$",
-                        r"$\delta A_{e \tau_h}/A_{e \tau_h} [\%]$",
-                        r"$\delta A_{e h}/A_{e h} [\%]$"]
+                titles=[r"$\delta E_{e e} /E_{e e} [\%]$", 
+                        r"$\delta E_{e \mu}/E_{e \mu} [\%]$",
+                        r"$\delta E_{e \tau_h}/E_{e \tau_h} [\%]$",
+                        r"$\delta E_{e h}/E_{e h} [\%]$"]
 
         
         for islt, mtx in enumerate([a_e,a_m,a_t,a_h]):

@@ -164,7 +164,7 @@ def showParameterCovMat(cor,sig,useBeta=True):
     #         )
 
 
-def sysLabelsName(useBeta=True):
+def sysLabelsName():
     if useBeta:
         # make plots
         lablesName = [  r'$\beta_e$',r'$\beta_\mu$',r'$\beta_\tau$']

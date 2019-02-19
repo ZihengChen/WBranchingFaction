@@ -69,7 +69,8 @@ def featureList():
 
 def channelLsit():
     ls = [  r'$\mu e$', r'$\mu \mu$',r'$\mu \tau$',r'$\mu h$',
-            r'$e e$', r'$e\mu$',r'$e\tau$',r'$e h$']
+            r'$e e$',   r'$e\mu$',   r'$e\tau$',   r'$e h$' ]
+
     return ls
 
 
