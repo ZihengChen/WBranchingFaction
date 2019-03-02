@@ -365,7 +365,7 @@ class BFVariater:
     def errSystem_downVariation(self,errSource="EPt"):
         '''
         EPt, MuPt, Tau0Pt,Tau1Pt,Tau10Pt,
-        EEff, MuEff, TauIDEff, JetMisTauIDEff
+        EIDEff,ERecoEff, MuEff, TauIDEff, JetMisTauIDEff
         '''
 
 

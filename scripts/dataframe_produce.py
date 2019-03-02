@@ -17,7 +17,7 @@ def runMP(filename, selections):
         ps.join()
 
 if __name__ == '__main__':
-    filename = "preapproval.root"
+    filename = "arc.root"
 
     ee = BLTReader(filename,"ee")
     ee.outputNGen()

@@ -169,12 +169,17 @@ class DFCutter:
         # obj Eff scale #
         #################
         # variate e,m,tau energy correction
-        if variation == 'EEffDown':
-            if self.selection in ['emu','emu2','etau','e4j','emu_tau']:
-                df.eventWeight *= 0.99
-
-            if self.selection in ['ee','ee_tau']:
-                df.eventWeight *= 0.99**2
+        if variation == 'ERecoEffDown':
+            if self.selection in ['ee','etau','e4j','ee_tau']:
+                df.eventWeight *= (1-df.lepton1_recostd)
+            if self.selection in ['emu','emu2','emu_tau']:
+                df.eventWeight *= (1-df.lepton2_recostd)
+        
+        if variation == 'EIDEffDown':
+            if self.selection in ['ee','etau','e4j','ee_tau']:
+                df.eventWeight *= (1-df.lepton1_idstd)
+            if self.selection in ['emu','emu2','emu_tau']:
+                df.eventWeight *= (1-df.lepton2_idstd)
         
         if variation == 'MuEffDown':
             if self.selection in ['emu','emu2','mutau','mu4j','emu_tau']:
