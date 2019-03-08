@@ -172,19 +172,18 @@ class DFCutter:
         if variation == 'ERecoEffDown':
             if self.selection in ['ee','etau','e4j','ee_tau']:
                 df.eventWeight *= (1-df.lepton1_recostd)
-            if self.selection in ['emu','emu2','emu_tau']:
+            if self.selection in ['ee','emu','emu2','emu_tau','ee_tau']:
                 df.eventWeight *= (1-df.lepton2_recostd)
-        
+    
         if variation == 'EIDEffDown':
             if self.selection in ['ee','etau','e4j','ee_tau']:
-                df.eventWeight *= (1-df.lepton1_idstd)
-            if self.selection in ['emu','emu2','emu_tau']:
-                df.eventWeight *= (1-df.lepton2_idstd)
+                df.eventWeight *= 0.99 #(1-df.lepton1_idstd)
+            if self.selection in ['ee','emu','emu2','emu_tau','ee_tau']:
+                df.eventWeight *= 0.99 #(1-df.lepton2_idstd)
         
         if variation == 'MuEffDown':
             if self.selection in ['emu','emu2','mutau','mu4j','emu_tau']:
                 df.eventWeight *= 0.99
-
             if self.selection in ['mumu','mumu_tau']:
                 df.eventWeight *= 0.99**2
 

@@ -45,15 +45,20 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     out_dict['lepton1_eta']     = lep1.Eta()
     out_dict['lepton1_phi']     = lep1.Phi()
     out_dict['lepton1_mt']      = (2*lep1.Pt()*tree.met*(1-np.cos(lep1.Phi()-tree.metPhi )))**0.5
-    if tree.leptonOneRecoWeight>0.9:
-        out_dict['lepton1_recostd'] = np.sqrt(tree.leptonOneRecoVar)/tree.leptonOneRecoWeight
-    else:
-        out_dict['lepton1_recostd'] = 0
 
-    if tree.leptonOneIDWeight>0.9:   
-        out_dict['lepton1_idstd'] = np.sqrt(tree.leptonOneIDVar)/tree.leptonOneIDWeight
-    else:
-        out_dict['lepton1_idstd'] = 0
+    tempstd = 0.0
+    if tree.leptonOneRecoWeight>0.8:
+        tempstd = np.sqrt(tree.leptonOneRecoVar)/tree.leptonOneRecoWeight
+        if tempstd > 0.1:
+            tempstd = 0.0
+    out_dict['lepton1_recostd'] = tempstd
+
+    tempstd = 0.0
+    if tree.leptonOneIDWeight>0.8:
+        tempstd = np.sqrt(tree.leptonOneIDVar)/tree.leptonOneIDWeight
+        if tempstd > 0.1:
+            tempstd = 0.0
+    out_dict['lepton1_idstd'] = tempstd
     
     if isDilepton:
         lep2 = tree.leptonTwoP4
@@ -65,15 +70,19 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
         out_dict['lepton2_phi']     = lep2.Phi()
         out_dict['lepton2_mt']      = (2*lep2.Pt()*tree.met*(1-np.cos(lep2.Phi()-tree.metPhi )))**0.5
 
-        if tree.leptonTwoRecoWeight>0.9:
-            out_dict['lepton2_recostd'] = np.sqrt(tree.leptonTwoRecoVar)/tree.leptonTwoRecoWeight
-        else:
-            out_dict['lepton2_recostd'] = 0
+        tempstd = 0.0
+        if tree.leptonTwoRecoWeight>0.8:
+            tempstd = np.sqrt(tree.leptonTwoRecoVar)/tree.leptonTwoRecoWeight
+            if tempstd > 0.06:
+                tempstd = 0.0
+        out_dict['lepton2_recostd'] = tempstd
 
-        if tree.leptonTwoIDWeight>0.9:   
-            out_dict['lepton2_idstd'] = np.sqrt(tree.leptonTwoIDVar)/tree.leptonTwoIDWeight
-        else:
-            out_dict['lepton2_idstd'] = 0
+        tempstd = 0.0
+        if tree.leptonTwoIDWeight>0.8:
+            tempstd = np.sqrt(tree.leptonTwoIDVar)/tree.leptonTwoIDWeight
+            if tempstd > 0.06:
+                tempstd = 0.0
+        out_dict['lepton2_idstd'] = tempstd
 
         out_dict['lepton_delta_eta']= abs(lep1.Eta() - lep2.Eta())
         out_dict['lepton_delta_phi']= abs(lep1.DeltaPhi(lep2))

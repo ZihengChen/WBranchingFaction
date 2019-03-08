@@ -44,12 +44,12 @@ if __name__ == '__main__':
     nThread = 4
 
     variations = [
-        '',
+        # '',
         'EIDEffDown','ERecoEffDown',
-        'MuEffDown','TauIDEffDown','JetToTauIDEffDown',
-        'EPtDown','MuPtDown','Tau0PtDown','Tau1PtDown','Tau10PtDown',
-        'JESUp','JESDown','JERUp','JERDown','BTagUp','BTagDown','MistagUp','MistagDown'
-        'PileupUp','PileupDown'
+        # 'MuEffDown','TauIDEffDown','JetToTauIDEffDown',
+        # 'EPtDown','MuPtDown','Tau0PtDown','Tau1PtDown','Tau10PtDown',
+        # 'JESUp','JESDown','JERUp','JERDown','BTagUp','BTagDown','MistagUp','MistagDown'
+        # 'PileupUp','PileupDown'
         ]
 
     nVar = len(variations)
@@ -64,34 +64,34 @@ if __name__ == '__main__':
     # get signal composition
     ############################
     
-    print("get signal composition")
-    sigcomp = []
-    for selection in ["emu","mumu","mutau","mu4j","ee","emu2","etau","e4j"]:
-        for nbjet in ['==1','>1']:
+    # print("get signal composition")
+    # sigcomp = []
+    # for selection in ["emu","mumu","mutau","mu4j","ee","emu2","etau","e4j"]:
+    #     for nbjet in ['==1','>1']:
             
-            mctt = DFCutter(selection,nbjet,"mctt").getDataFrame()
-            mct  = DFCutter(selection,nbjet,"mct" ).getDataFrame()
-            mcsg = pd.concat([mct,mctt],ignore_index=True)
+    #         mctt = DFCutter(selection,nbjet,"mctt").getDataFrame()
+    #         mct  = DFCutter(selection,nbjet,"mct" ).getDataFrame()
+    #         mcsg = pd.concat([mct,mctt],ignore_index=True)
             
-            nSig =  mcsg.eventWeight.sum()
-            temp = []
+    #         nSig =  mcsg.eventWeight.sum()
+    #         temp = []
             
-            for i in range(21):
-                nSig_i = mcsg[mcsg.genCategory==i+1].eventWeight.sum()
-                temp.append(nSig_i/nSig)
-            sigcomp.append(temp)
+    #         for i in range(21):
+    #             nSig_i = mcsg[mcsg.genCategory==i+1].eventWeight.sum()
+    #             temp.append(nSig_i/nSig)
+    #         sigcomp.append(temp)
 
-    sigcomp = np.array(sigcomp).T
-    np.save(common.getBaseDirectory()+'data/counts/sigcomp_',sigcomp)
-    print("signal composition saved")
+    # sigcomp = np.array(sigcomp).T
+    # np.save(common.getBaseDirectory()+'data/counts/sigcomp_',sigcomp)
+    # print("signal composition saved")
 
 
-    ############################
-    # generate latex tabel
-    ############################
-    os.system('python {}'.format(common.getBaseDirectory()+'scripts/note_sigcomp.py'))
-    os.system('python {}'.format(common.getBaseDirectory()+'scripts/note_sigacc.py'))
-    os.system('python {}'.format(common.getBaseDirectory()+'scripts/note_yields.py'))
+    # ############################
+    # # generate latex tabel
+    # ############################
+    # os.system('python {}'.format(common.getBaseDirectory()+'scripts/note_sigcomp.py'))
+    # os.system('python {}'.format(common.getBaseDirectory()+'scripts/note_sigacc.py'))
+    # os.system('python {}'.format(common.getBaseDirectory()+'scripts/note_yields.py'))
     
 
 
