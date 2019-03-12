@@ -56,7 +56,12 @@ class DFCutter:
         elif self.name == 'mctt_hadron':
             dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_hadron.pkl')
 
-        # for Z,W,VV
+        elif self.name in ['data2016B','data2016C','data2016D','data2016E','data2016F','data2016G','data2016H']:
+            period = self.name[-1]
+            pickles = glob.glob( self.pickleDirectry + 'data2016/*{}.pkl'.format(period) )
+            dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles],ignore_index=True)
+
+        # for Z,W,VV,data2016
         else:
             # print(self.pickleDirectry + '{}/*.pkl'.format(self.name))
             pickles = glob.glob( self.pickleDirectry + '{}/*.pkl'.format(self.name) )
@@ -177,15 +182,27 @@ class DFCutter:
     
         if variation == 'EIDEffDown':
             if self.selection in ['ee','etau','e4j','ee_tau']:
-                df.eventWeight *= 0.99 #(1-df.lepton1_idstd)
+                df.eventWeight *= (1-df.lepton1_idstd)
             if self.selection in ['ee','emu','emu2','emu_tau','ee_tau']:
-                df.eventWeight *= 0.99 #(1-df.lepton2_idstd)
-        
-        if variation == 'MuEffDown':
-            if self.selection in ['emu','emu2','mutau','mu4j','emu_tau']:
-                df.eventWeight *= 0.99
+                df.eventWeight *= (1-df.lepton2_idstd)
+
+        if variation == 'MuRecoEffDown':
+            if self.selection in ['mumu','mutau','emu','emu2','mu4j','mumu_tau','emu_tau']:
+                df.eventWeight *= (1-df.lepton1_recostd)
             if self.selection in ['mumu','mumu_tau']:
-                df.eventWeight *= 0.99**2
+                df.eventWeight *= (1-df.lepton2_recostd)
+    
+        if variation == 'MuIDEffDown':
+            if self.selection in ['mumu','mutau','emu','emu2','mu4j','mumu_tau','emu_tau']:
+                df.eventWeight *= (1-df.lepton1_idstd)
+            if self.selection in ['mumu','mumu_tau']:
+                df.eventWeight *= (1-df.lepton2_idstd)
+        
+        # if variation == 'MuEffDown':
+        #     if self.selection in ['emu','emu2','mutau','mu4j','emu_tau']:
+        #         df.eventWeight *= 0.99
+        #     if self.selection in ['mumu','mumu_tau']:
+        #         df.eventWeight *= 0.99**2
 
         if variation == 'TauIDEffDown':
             if self.selection in ['etau','mutau','ee_tau','mumu_tau','emu_tau']:

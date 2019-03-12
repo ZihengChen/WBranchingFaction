@@ -31,9 +31,10 @@ if __name__ == '__main__':
 
     variations = [
         '',
-        'EIDEffDown','ERecoEffDown','MuEffDown','TauIDEffDown','JetToTauIDEffDown',
+        'EIDEffDown','ERecoEffDown','MuIDEffDown','MuRecoEffDown',
+        'TauIDEffDown','JetToTauIDEffDown',
         'EPtDown','MuPtDown','Tau0PtDown','Tau1PtDown','Tau10PtDown',
-        'JESUp','JESDown','JERUp','JERDown','BTagUp','BTagDown','MistagUp','MistagDown'
+        'JESUp','JESDown','JERUp','JERDown','BTagUp','BTagDown','MistagUp','MistagDown',
         'PileupUp','PileupDown'
         ]    
 

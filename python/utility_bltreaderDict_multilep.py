@@ -45,20 +45,6 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     out_dict['lepton1_eta']     = lep1.Eta()
     out_dict['lepton1_phi']     = lep1.Phi()
     out_dict['lepton1_mt']      = (2*lep1.Pt()*tree.met*(1-np.cos(lep1.Phi()-tree.metPhi )))**0.5
-
-    tempstd = 0.0
-    if tree.leptonOneRecoWeight>0.8:
-        tempstd = np.sqrt(tree.leptonOneRecoVar)/tree.leptonOneRecoWeight
-        if tempstd > 0.1:
-            tempstd = 0.0
-    out_dict['lepton1_recostd'] = tempstd
-
-    tempstd = 0.0
-    if tree.leptonOneIDWeight>0.8:
-        tempstd = np.sqrt(tree.leptonOneIDVar)/tree.leptonOneIDWeight
-        if tempstd > 0.1:
-            tempstd = 0.0
-    out_dict['lepton1_idstd'] = tempstd
     
     if isDilepton:
         lep2 = tree.leptonTwoP4
@@ -69,20 +55,6 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
         out_dict['lepton2_eta']     = lep2.Eta()
         out_dict['lepton2_phi']     = lep2.Phi()
         out_dict['lepton2_mt']      = (2*lep2.Pt()*tree.met*(1-np.cos(lep2.Phi()-tree.metPhi )))**0.5
-
-        tempstd = 0.0
-        if tree.leptonTwoRecoWeight>0.8:
-            tempstd = np.sqrt(tree.leptonTwoRecoVar)/tree.leptonTwoRecoWeight
-            if tempstd > 0.06:
-                tempstd = 0.0
-        out_dict['lepton2_recostd'] = tempstd
-
-        tempstd = 0.0
-        if tree.leptonTwoIDWeight>0.8:
-            tempstd = np.sqrt(tree.leptonTwoIDVar)/tree.leptonTwoIDWeight
-            if tempstd > 0.06:
-                tempstd = 0.0
-        out_dict['lepton2_idstd'] = tempstd
 
         out_dict['lepton_delta_eta']= abs(lep1.Eta() - lep2.Eta())
         out_dict['lepton_delta_phi']= abs(lep1.DeltaPhi(lep2))
@@ -132,5 +104,32 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     out_dict['nBJetsBTagDown']    =  tree.nBJetsBTagDown
     out_dict['nBJetsMistagUp']    =  tree.nBJetsMistagUp
     out_dict['nBJetsMistagDown']  =  tree.nBJetsMistagDown
+
+
+    # 4. extra
+    ############################
+    # lepton1 reco/id uncertainties
+    tempstd = 0.0
+    if tree.leptonOneRecoWeight>0.8:
+        tempstd = np.sqrt(tree.leptonOneRecoVar)/tree.leptonOneRecoWeight
+    out_dict['lepton1_recostd'] = tempstd
+    tempstd = 0.0
+    if tree.leptonOneIDWeight>0.8:
+        tempstd = np.sqrt(tree.leptonOneIDVar)/tree.leptonOneIDWeight
+    out_dict['lepton1_idstd'] = tempstd
+
+
+    # lepton2 reco/id uncertainties
+    if isDilepton:
+        tempstd = 0.0
+        if tree.leptonTwoRecoWeight>0.8:
+            tempstd = np.sqrt(tree.leptonTwoRecoVar)/tree.leptonTwoRecoWeight
+        out_dict['lepton2_recostd'] = tempstd
+        tempstd = 0.0
+        if tree.leptonTwoIDWeight>0.8:
+            tempstd = np.sqrt(tree.leptonTwoIDVar)/tree.leptonTwoIDWeight
+        out_dict['lepton2_idstd'] = tempstd
+    ############################
+
 
     return out_dict

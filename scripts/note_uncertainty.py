@@ -4,7 +4,8 @@ from pylab import *
 
 beginTable = r'''\begin{sidewaystable}[p]
   \small
-  \renewcommand{\arraystretch}{1.5}
+  \renewcommand{\arraystretch}{1.2}
+  \centering
 
   \begin{tabular}{|l|ccc|ccc|ccc|ccc|ccc|}
   \hline
@@ -40,16 +41,17 @@ syst_colNames = [
     r'25$\%$ err of QCD in $\mu 4j$',
     r'25$\%$ err of QCD in $e\tau$',
     r'25$\%$ err of QCD in $\mu\tau$',
-    r'1$\%$ err of $\epsilon_e$ reco',
-    r'1$\%$ err of $\epsilon_e$ id',
-    r'1$\%$ err of $\epsilon_\mu$',
+    r'0.6$\%$ err of $\epsilon_e$ reco',
+    r'1.4$\%$ err of $\epsilon_e$ id',
+    r'0.1$\%$ err of $\epsilon_\mu$ reco',
+    r'0.2$\%$ err of $\epsilon_\mu$ id',
     r'5$\%$ err of $\epsilon_\tau$',
     r'4.7$\%$ err of $\epsilon_{j\to\tau}$',
     r'0.5$\%$ err of $ES_{e}$',
     r'0.2$\%$ err of $ES_{\mu}$',
     r'1.2$\%$ err of $ES_{\tau\to\pi^\pm}$',
-    r'1.2$\%$ err of $ES_{\tau}\to\pi^\pm\pi^0$',
-    r'1.2$\%$ err of $ES_{\tau}\to3\pi^\pm$',
+    r'1.2$\%$ err of $ES_{\tau\to\pi^\pm\pi^0}$',
+    r'1.2$\%$ err of $ES_{\tau\to3\pi^\pm}$',
     r'Pileup',
     r'JES',
     r'JER',
