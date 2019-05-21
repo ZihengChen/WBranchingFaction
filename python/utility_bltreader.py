@@ -50,6 +50,7 @@ class BLTReader:
     def readBLT(self):
         # loop over all names
         for name in self.mclist + self.datalist:
+        # for name in self.datalist:
             self.makePickle(name)
         print(self.selection + ' finished!')
 

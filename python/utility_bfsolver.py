@@ -4,7 +4,7 @@ import sympy as sym
 from scipy.optimize import root
 
 BWPDG = np.array([0.1071,0.1063,0.1138])
-BWLPDG = 0.1080
+BWLPDG = 0.1080 # this is not been used
 
 
 # Model of singal+bg
