@@ -5,6 +5,7 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     isData = ('2016' in name)
     isDilepton = not ('4j' in selection)
     isMCZ = 'zjets' in name
+    isTauReweight = 'tauReweight' in name
     
     out_dict = {}
     
@@ -25,8 +26,9 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     out_dict['genCategory']  =  tree.genCategory
     out_dict['nPartons']     =  tree.nPartons
 
-    # out_dict['genTauOneDaughters']  =  tree.genTauOneDaughters
-    # out_dict['genTauTwoDaughters']  =  tree.genTauTwoDaughters
+    if isTauReweight:
+      out_dict['genTauOneDaughters']  =  tree.genTauOneDaughters
+      out_dict['genTauTwoDaughters']  =  tree.genTauTwoDaughters
 
     
     if isData:

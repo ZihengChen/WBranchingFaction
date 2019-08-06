@@ -1,6 +1,6 @@
 import utility_common as common
 from utility_dfcutter import *
-from IPython.display import clear_output
+# from IPython.display import clear_output
 
 
 class DFPlotter:
@@ -48,7 +48,7 @@ class DFPlotter:
 
             Fake = pd.DataFrame()
             for name in names:
-                temp =  DFCutter(self.selection+'_fakes',self.nbjet,name,self.njet).getDataFrame(variation)
+                temp =  DFCutter(self.selection+'_ss',self.nbjet,name,self.njet).getDataFrame(variation)
                 if not name == 'data2016':
                     temp.eventWeight = -1*temp.eventWeight
                 Fake = Fake.append(temp,ignore_index=True)
@@ -72,7 +72,7 @@ class DFPlotter:
             sk.makePlot(self.outputPlotDir, self.selection)
 
             print('making plots -- {} nbjet{}: {}/{}'.format(self.selection, self.nbjet, index+1, len(self.pp)) )
-            clear_output(wait=True)
+            # clear_output(wait=True)
             plt.close()
 
 
@@ -181,7 +181,7 @@ class DFPlotter:
                 self.fakeSF = common.getFakeSF('tau')
                 self.colorList = ['grey'] + self.colorList
                 self.adjust    = [self.fakeSF] + self.adjust
-                self.labelList = ['Fakes']+self.labelList
+                self.labelList = ['QCD']+self.labelList
             
         
         # etau
@@ -210,7 +210,7 @@ class DFPlotter:
                 self.fakeSF = common.getFakeSF('tau')
                 self.colorList = ['grey'] + self.colorList
                 self.adjust    = [self.fakeSF] + self.adjust
-                self.labelList = ['Fakes']+self.labelList
+                self.labelList = ['QCD']+self.labelList
 
         # mu4j
         elif 'mu4j' in self.selection:
@@ -236,7 +236,7 @@ class DFPlotter:
 
                 self.colorList = ['grey'] + self.colorList
                 self.adjust    = [self.fakeSF] + self.adjust
-                self.labelList = ['Fakes']+self.labelList
+                self.labelList = ['QCD']+self.labelList
 
         # e4j
         elif 'e4j' in self.selection:
@@ -262,7 +262,7 @@ class DFPlotter:
 
                 self.colorList = ['grey'] + self.colorList
                 self.adjust    = [self.fakeSF] + self.adjust
-                self.labelList = ['Fakes']+self.labelList
+                self.labelList = ['QCD']+self.labelList
 
 
 class ASingleKinematicPlot:

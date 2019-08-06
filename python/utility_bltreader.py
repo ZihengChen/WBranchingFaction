@@ -27,9 +27,11 @@ class BLTReader:
     #############################
         
     def outputNGen(self):
-        names = ['t','tt']#,'tt_2l2nu','tt_semilepton'] 
+        names = ['t','tt','tt_tauReweight']#,'tt_2l2nu','tt_semilepton'] 
         nGens = [self.getNGen('t_tw')+self.getNGen('tbar_tw'),
-                 self.getNGen('ttbar_inclusive') ]#,self.getNGen('ttbar_2l2nu'),self.getNGen('ttbar_semilepton')] 
+                 self.getNGen('ttbar_inclusive'),
+                 self.getNGen('ttbar_inclusive_tauReweight')]
+                 #,self.getNGen('ttbar_2l2nu'),self.getNGen('ttbar_semilepton')] 
 
         df = pd.DataFrame({'name':names, 'ngen':nGens })
         df.to_pickle(self.baseDir+'data/pickles/ngen.pkl')
@@ -90,7 +92,8 @@ class BLTReader:
     ## private helper functions
     #############################
     def _getAllVariables(self, tree, selection, name, scaleFactor):
-        if selection in ['ee','mumu','emu','mutau','etau','mu4j','e4j','mu4j_fakes','e4j_fakes','mumu_tau','ee_tau','emu_tau']:
+        if selection in [ 'ee','mumu','emu','mutau','etau','mutau_fakes','etau_fakes',
+                          'mu4j','e4j','mu4j_fakes','e4j_fakes','mumu_tau','ee_tau','emu_tau']:
             dictionary = getAllVariables_multileptonSelection(tree, selection, name, scaleFactor)
         return dictionary
         
@@ -130,6 +133,7 @@ class BLTReader:
                     't_tw'            :  35850,
                     'tbar_tw'         :  35850,
                     'ttbar_inclusive' :  832000,
+                    'ttbar_inclusive_tauReweight' :  832000,
                     'ttbar_2l2nu'     :  87340,
                     'ttbar_semilepton':  364456,
                 }
@@ -154,13 +158,13 @@ class BLTReader:
 
     def _getNameList(self):
         ## 1. define the datalist
-        if self.selection in ['mumu','mutau','mu4j','mu4j_fakes','mumu_tau']:
+        if self.selection in ['mumu','mutau','mutau_fakes','mu4j','mu4j_fakes','mumu_tau']:
             self.datalist = [
                 'muon_2016B', 'muon_2016C','muon_2016D','muon_2016E',
                 'muon_2016F','muon_2016G','muon_2016H'
                 ]
 
-        elif self.selection in ['ee','etau','e4j','e4j_fakes','ee_tau']:
+        elif self.selection in ['ee','etau','etau_fakes','e4j','e4j_fakes','ee_tau']:
             self.datalist = [
                 'electron_2016B', 'electron_2016C','electron_2016D','electron_2016E',
                 'electron_2016F','electron_2016G','electron_2016H'
@@ -180,7 +184,7 @@ class BLTReader:
         self.mczlist        = [ 'zjets_m-10to50_amcatnlo','zjets_m-50_amcatnlo']
         self.mcwlist        = [ 'w1jets','w2jets','w3jets','w4jets' ]
         self.mctlist        = [ 't_tw','tbar_tw']       
-        self.mcttlist       = [ 'ttbar_inclusive']#, 'ttbar_2l2nu','ttbar_semilepton']
+        self.mcttlist       = [ 'ttbar_inclusive','ttbar_inclusive_tauReweight']#, 'ttbar_2l2nu','ttbar_semilepton']
         
         self.mclist = self.mcdibosonlist+self.mcwlist+self.mczlist+self.mctlist+self.mcttlist 
 

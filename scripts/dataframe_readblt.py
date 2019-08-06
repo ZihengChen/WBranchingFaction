@@ -1,29 +1,22 @@
 #!/usr/bin/env python
 
 from utility_bltreader import *
-import multiprocessing as mp
+from multiprocessing import Pool
 
-def runMP(filename, selections):
-    
-    processes = []
-    
-    for slt in selections:
-        rd = BLTReader(filename, slt)
-        processes.append(mp.Process(target=rd.readBLT))
-    
-    for ps in processes:
-        ps.start()
-    for ps in processes:
-        ps.join()
+def run(configs):
+    filename, slt = configs
+    rd = BLTReader(filename, slt)
+    rd.readBLT()
 
 if __name__ == '__main__':
     
-    filename = "20190626.root"
-
+    filename = "20190805.root"
     ee = BLTReader(filename,"ee")
     ee.outputNGen()
 
-    runMP(filename,["ee","mumu","emu","mutau","etau"])
-    runMP(filename,["mu4j","mu4j_fakes","e4j","e4j_fakes"])
 
+    selections = ["ee","mumu","emu","mutau","etau","mutau_fakes","etau_fakes","mu4j","mu4j_fakes","e4j","e4j_fakes"]
+    pool = Pool(4)
+    pool.map(run, [(filename,slt) for slt in selections])
+ 
 

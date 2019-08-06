@@ -22,10 +22,10 @@ class DFCutter:
 
         if self.selection == 'emu2':
             folderOfSelection = 'emu'
-        if self.selection == 'mutau_fakes':
-            folderOfSelection = 'mutau'
-        if self.selection == 'etau_fakes':
-            folderOfSelection = 'etau'
+            
+        if self.selection[-3:] == '_ss':
+            folderOfSelection = self.selection[:-3]
+
         
         self.pickleDirectry = self.baseDir + 'data/{}/{}/'.format(folderOfPickles, folderOfSelection)
 
@@ -48,13 +48,17 @@ class DFCutter:
         ###############################################
         # for tt
         if self.name == 'mctt':
-            dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_inclusive.pkl')
+            if 'TauReweight' in variation:
+                dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_inclusive_tauReweight.pkl')
+            else:
+                dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_inclusive.pkl')
         elif self.name == 'mctt_2l2nu':
             dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_2l2nu.pkl')
         elif self.name == 'mctt_semilepton':
             dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_semilepton.pkl')
         elif self.name == 'mctt_hadron':
             dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_hadron.pkl')
+
 
         elif self.name in ['data2016B','data2016C','data2016D','data2016E','data2016F','data2016G','data2016H']:
             period = self.name[-1]
@@ -87,11 +91,12 @@ class DFCutter:
             # drop if data of emu,mue
             if (self.selection in ['emu','emu2','emu_tau']):
                 dataFrame = dataFrame.drop_duplicates(subset=['runNumber', 'evtNumber'])
-        # else:
-        #     for MC
-        #     0.95 is the default normalization in BLT, change it for 0.92 for Vtight working points  
-        #     if (self.selection in ['mutau','etau']):
-        #         dataFrame.eventWeight = dataFrame.eventWeight*(0.92/0.95)
+        else:
+            # for MC
+            #0.92 is the default normalization in BLT, change it to 1 for non tau misid
+            if (self.selection in ['mutau','etau','mutau_ss','etau_ss']):
+                slt = dataFrame.tauGenFlavor!=15
+                dataFrame.loc[slt, 'eventWeight'] *= (1/0.92)
 
 
         # reindex the dataframe
@@ -113,10 +118,13 @@ class DFCutter:
                 
                 'mutau' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
                 'etau'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
-                'mutau_fakes' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
-                'etau_fakes'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
+                'mutau_ss' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
+                'etau_ss'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
 
-                
+                'mutau_fakes' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
+                'etau_fakes'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
+                'mutau_fakes_ss' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
+                'etau_fakes_ss'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
                 
                 'mu4j'  : ' (lepton1_pt > 30) ' ,
                 'e4j'   : ' (lepton1_pt > 30) ' ,
@@ -201,19 +209,23 @@ class DFCutter:
         if variation == 'TauIDEffDown':
             if self.selection in ['etau','mutau','ee_tau','mumu_tau','emu_tau']:
                 slt = (df.tauGenFlavor==15)
-                df.loc[slt, 'eventWeight'] *= 0.95
+                df.loc[slt, 'eventWeight'] *= (1-0.05)
 
         if variation == 'JetToTauIDEffDown':
             if self.selection in ['etau','mutau','ee_tau','mumu_tau','emu_tau']:
                 slt = (df.tauGenFlavor<=6)
                 df.loc[slt, 'eventWeight'] *= (1-0.047)
 
+        if variation == 'TopPtReweightDown':
+            if self.name =="mctt":
+                df.eventWeight *= (1-df.topPtVar**0.5/df.topPtWeight)
+
 
         #################
         # Tau_h reweighting #
         #################
         
-        if variation == 'TauHDecayReweight1000Down':
+        if variation == 'TauReweight1000Down':
             if self.name =="mctt":
                 deviationValue = 0.00481
                 slt = df.genTauOneDaughters==1000
@@ -221,7 +233,7 @@ class DFCutter:
                 slt = df.genTauTwoDaughters==1000
                 df.loc[slt, 'eventWeight'] *= (1-deviationValue)
 
-        if variation == 'TauHDecayReweight11000Down':
+        if variation == 'TauReweight11000Down':
             if self.name =="mctt":
                 deviationValue = 0.00455
                 slt = df.genTauOneDaughters==11000
@@ -229,7 +241,7 @@ class DFCutter:
                 slt = df.genTauTwoDaughters==11000
                 df.loc[slt, 'eventWeight'] *= (1-deviationValue)
         
-        if variation == 'TauHDecayReweight21000Down':
+        if variation == 'TauReweight21000Down':
             if self.name =="mctt":
                 deviationValue = 0.00141
                 slt = df.genTauOneDaughters==21000
@@ -237,7 +249,7 @@ class DFCutter:
                 slt = df.genTauTwoDaughters==21000
                 df.loc[slt, 'eventWeight'] *= (1-deviationValue)
 
-        if variation == 'TauHDecayReweight3000Down':
+        if variation == 'TauReweight3000Down':
             if self.name =="mctt":
                 deviationValue = 0.00574
                 slt = df.genTauOneDaughters==3000
@@ -245,7 +257,7 @@ class DFCutter:
                 slt = df.genTauTwoDaughters==3000
                 df.loc[slt, 'eventWeight'] *= (1-deviationValue)
         
-        if variation == 'TauHDecayReweight13000Down':
+        if variation == 'TauReweight13000Down':
             if self.name =="mctt":
                 deviationValue = 0.00574
                 slt = df.genTauOneDaughters==13000

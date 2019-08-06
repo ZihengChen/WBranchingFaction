@@ -106,23 +106,47 @@ class DFTemplater():
         
         if selection == "mu4j":
             fakeSF = common.getFakeSF('mu')
+            df   = DFCutter(selection+'_fakes', nbjet, "data2016", njet).getDataFrame()
+            tempShp,tempCnt = self._binDataFrame(df,v,bins)
+
+            for name in ['mcdiboson','mcz','mcw','mct','mctt']:
+                df    = DFCutter(selection+'_fakes', nbjet, name, njet).getDataFrame()
+                temp1,temp2 = self._binDataFrame(df,v,bins)
+                tempShp -= temp1
+                tempCnt -= temp2
+            tempShp *= fakeSF
+            tempCnt *= fakeSF
+
+
         elif selection == "e4j":
             fakeSF = common.getFakeSF('e')
+            df   = DFCutter(selection+'_fakes', nbjet, "data2016", njet).getDataFrame()
+            tempShp,tempCnt = self._binDataFrame(df,v,bins)
+
+            for name in ['mcdiboson','mcz','mcw','mct','mctt']:
+                df    = DFCutter(selection+'_fakes', nbjet, name, njet).getDataFrame()
+                temp1,temp2 = self._binDataFrame(df,v,bins)
+                tempShp -= temp1
+                tempCnt -= temp2
+            tempShp *= fakeSF
+            tempCnt *= fakeSF
+
         elif selection in ["etau",'mutau']:
             fakeSF = common.getFakeSF('tau')
+            df   = DFCutter(selection+'_ss', nbjet, "data2016", njet).getDataFrame()
+            tempShp,tempCnt = self._binDataFrame(df,v,bins)
+
+            for name in ['mcdiboson','mcz','mcw','mct','mctt']:
+                df    = DFCutter(selection+'_s', nbjet, name, njet).getDataFrame()
+                temp1,temp2 = self._binDataFrame(df,v,bins)
+                tempShp -= temp1
+                tempCnt -= temp2
+            tempShp *= fakeSF
+            tempCnt *= fakeSF
+
         else:
             return returnZeroShp, returnZeroCnt
         
-        df   = DFCutter(selection+'_fakes', nbjet, "data2016", njet).getDataFrame()
-        tempShp,tempCnt = self._binDataFrame(df,v,bins)
-
-        for name in ['mcdiboson','mcz','mcw','mct','mctt']:
-            df    = DFCutter(selection+'_fakes', nbjet, name, njet).getDataFrame()
-            temp1,temp2 = self._binDataFrame(df,v,bins)
-            tempShp -= temp1
-            tempCnt -= temp2
-        tempShp *= fakeSF
-        tempCnt *= fakeSF
 
         return tempShp,tempCnt
 

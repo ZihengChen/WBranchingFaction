@@ -2,7 +2,7 @@
 
 from utility_dfcounter import *
 from utility_dfcutter import *
-import multiprocessing as mp
+from multiprocessing import Pool
 
 import os 
 
@@ -31,39 +31,20 @@ def countDataFrames(variation=''):
     print( 'counting finished with variation {}'.format(variation))
 
 
-def runCountDataFrames(vlist):
-    processes = []
-    for v in vlist:
-        processes.append(mp.Process(target=countDataFrames,args=(v,)))
-    for ps in processes:
-        ps.start()
-    for ps in processes:
-        ps.join()
-
 if __name__ == '__main__':
-    nThread = 4
-
     variations = [
         '',
         'EIDEffDown','ERecoEffDown','MuIDEffDown','MuRecoEffDown',
         'TauIDEffDown','JetToTauIDEffDown',
         'EPtDown','MuPtDown','Tau0PtDown','Tau1PtDown','Tau10PtDown',
         'JESUp','JESDown','JERUp','JERDown','BTagUp','BTagDown','MistagUp','MistagDown',
-        'PileupUp','PileupDown'
-        # 'TauHDecayReweightNominal',
-        # 'TauHDecayReweight1000Down',
-        # 'TauHDecayReweight11000Down',
-        # 'TauHDecayReweight21000Down',
-        # 'TauHDecayReweight3000Down',
-        # 'TauHDecayReweight13000Down',
+        'PileupUp','PileupDown','TopPtReweightDown',
+        'TauReweightNominal','TauReweight1000Down','TauReweight11000Down',
+        'TauReweight21000Down','TauReweight3000Down','TauReweight13000Down',
         ]
-
-    nVar = len(variations)
-    for i in range(0, nVar, nThread):
-        if i+nThread <= nVar:
-            runCountDataFrames(variations[i:i+nThread])
-        else:
-            runCountDataFrames(variations[i:nVar])
+    
+    pool = Pool(4)
+    pool.map(countDataFrames, variations)
 
 
     ############################

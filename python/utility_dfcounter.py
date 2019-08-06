@@ -140,11 +140,11 @@ class DFCounter():
         elif selection == "mutau":
             fakeSF = common.getFakeSF('tau')
 
-            temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame(self.variation)
+            temp = DFCutter(selection+'_ss',nbjet,"data2016").getDataFrame(self.variation)
             n    = np.sum(temp.eventWeight)
             nVar = np.sum(temp.eventWeight**2)
             for name in ['mcdiboson','mcz','mcw','mct','mctt']:
-                temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame(self.variation)
+                temp  = DFCutter(selection+'_ss',nbjet,name).getDataFrame(self.variation)
                 n    -= np.sum(temp.eventWeight)
                 nVar += np.sum(temp.eventWeight**2)
 
@@ -154,11 +154,11 @@ class DFCounter():
         elif selection == "etau":
             fakeSF = common.getFakeSF('tau')
 
-            temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame(self.variation)
+            temp = DFCutter(selection+'_ss',nbjet,"data2016").getDataFrame(self.variation)
             n    = np.sum(temp.eventWeight)
             nVar = np.sum(temp.eventWeight**2)
             for name in ['mcdiboson','mcz', 'mcw','mct','mctt']:
-                temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame(self.variation)
+                temp  = DFCutter(selection+'_ss',nbjet,name).getDataFrame(self.variation)
                 n    -= np.sum(temp.eventWeight)
                 nVar += np.sum(temp.eventWeight**2)
 
@@ -185,7 +185,10 @@ class DFCounter():
         # tt
         if not enhanceStat:
             # inclusive tt
+            
             nGenMCtt = self.dfNGen[self.dfNGen.name=='tt'].ngen.values[0]
+            if "TauReweight" in self.variation:
+                nGenMCtt = self.dfNGen[self.dfNGen.name=='tt_tauReweight'].ngen.values[0]
             df = DFCutter(selection,nbjet,'mctt').getDataFrame(self.variation)
             nMCtt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
 

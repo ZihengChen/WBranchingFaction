@@ -41,6 +41,7 @@ syst_colNames = [
     r'25$\%$ err of QCD in $\mu 4j$',
     r'25$\%$ err of QCD in $e\tau$',
     r'25$\%$ err of QCD in $\mu\tau$',
+    r'top pT reweighting', 
     r'0.6$\%$ err of $\epsilon_e$ reco',
     r'1.4$\%$ err of $\epsilon_e$ id',
     r'0.1$\%$ err of $\epsilon_\mu$ reco',

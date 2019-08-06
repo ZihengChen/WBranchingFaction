@@ -418,11 +418,14 @@ class BFVariater:
 
     def errSystem_nominalDownVariation(self,errSource):
         '''
-        count_TauHDecayReweightNominal
-        count_TauHDecayReweight1000Down
+        count_TauReweightNominal
+        count_TauReweight1000Down
         '''
-        if "TauHDecayReweight" in errSource:
-          counts1 = pd.read_pickle(self.baseDir + "data/counts/count_TauHDecayReweightNominal.pkl")
+        if "TauReweight" in errSource:
+          counts1 = pd.read_pickle(self.baseDir + "data/counts/count_TauReweightNominal.pkl")
+        else:
+          counts1 = pd.read_pickle(self.baseDir + "data/counts/count_.pkl")
+
         counts2 = pd.read_pickle(self.baseDir + "data/counts/count_{}.pkl".format(errSource+"Down"))
 
         errs = []
