@@ -362,7 +362,7 @@ class BFVariater:
         return errs
 
 
-    def errSystem_downVariation(self,errSource="EPt"):
+    def errSystem_downVariation(self,errSource):
         '''
         EPt, MuPt, Tau0Pt,Tau1Pt,Tau10Pt,
         EIDEff,ERecoEff, MuEff, TauIDEff, JetMisTauIDEff
@@ -388,7 +388,7 @@ class BFVariater:
         return errs
 
 
-    def errSystem_upDownVariation(self,errSource="JES"):
+    def errSystem_upDownVariation(self,errSource):
         '''
         "ISR","FSR","UE","MEPS",
         "Renorm","Factor","PDF",
@@ -416,9 +416,32 @@ class BFVariater:
         return errs
 
 
-    def io_printErrorForExcelFormat(self,error):
+    def errSystem_nominalDownVariation(self,errSource):
+        '''
+        count_TauHDecayReweightNominal
+        count_TauHDecayReweight1000Down
+        '''
+        if "TauHDecayReweight" in errSource:
+          counts1 = pd.read_pickle(self.baseDir + "data/counts/count_TauHDecayReweightNominal.pkl")
+        counts2 = pd.read_pickle(self.baseDir + "data/counts/count_{}.pkl".format(errSource+"Down"))
 
-        
+        errs = []
+        for icata in range(4):
+                
+            # nominal tuning
+            slv1 = BFSolver3D( np.sum(counts1.acc[icata]*self.ca,axis=1) )
+            BW1  = slv1.solveQuadEqn(slv1.setMeasuredX(nData=counts1.ndata[icata], nMcbg=counts1.nmcbg[icata].dot(np.ones(3))+counts1.nfake[icata]))
+            # down tuning
+            slv2 = BFSolver3D( np.sum(counts2.acc[icata]*self.ca,axis=1) )
+            BW2  = slv2.solveQuadEqn(slv2.setMeasuredX(nData=counts2.ndata[icata], nMcbg=counts2.nmcbg[icata].dot(np.ones(3))+counts2.nfake[icata]))
+            # differentce between nominal and down tuning
+            errs.append((BW1-BW2))
+                
+        errs = np.array(errs) # 4x3 2D-array
+        return errs
+
+
+    def io_printErrorForExcelFormat(self,error):
 
         error = np.abs(error/0.1086 * 100)
 

@@ -52,6 +52,13 @@ syst_colNames = [
     r'1.2$\%$ err of $ES_{\tau\to\pi^\pm}$',
     r'1.2$\%$ err of $ES_{\tau\to\pi^\pm\pi^0}$',
     r'1.2$\%$ err of $ES_{\tau\to3\pi^\pm}$',
+
+    r'0.5$\%$ err of $Br_{\tau\to\pi^\pm}$',
+    r'0.5$\%$ err of $Br_{\tau\to\pi^\pm\pi^0}$',
+    r'0.2$\%$ err of $Br_{\tau\to\pi^\pm2\pi^0}$',
+    r'0.6$\%$ err of $Br_{\tau\to3\pi^\pm}$',
+    r'0.6$\%$ err of $Br_{\tau\to3\pi^\pm\pi^0}$',
+      
     r'Pileup',
     r'JES',
     r'JER',

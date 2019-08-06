@@ -50,6 +50,12 @@ if __name__ == '__main__':
         'EPtDown','MuPtDown','Tau0PtDown','Tau1PtDown','Tau10PtDown',
         'JESUp','JESDown','JERUp','JERDown','BTagUp','BTagDown','MistagUp','MistagDown',
         'PileupUp','PileupDown'
+        # 'TauHDecayReweightNominal',
+        # 'TauHDecayReweight1000Down',
+        # 'TauHDecayReweight11000Down',
+        # 'TauHDecayReweight21000Down',
+        # 'TauHDecayReweight3000Down',
+        # 'TauHDecayReweight13000Down',
         ]
 
     nVar = len(variations)

@@ -197,12 +197,6 @@ class DFCutter:
                 df.eventWeight *= (1-df.lepton1_idstd)
             if self.selection in ['mumu','mumu_tau']:
                 df.eventWeight *= (1-df.lepton2_idstd)
-        
-        # if variation == 'MuEffDown':
-        #     if self.selection in ['emu','emu2','mutau','mu4j','emu_tau']:
-        #         df.eventWeight *= 0.99
-        #     if self.selection in ['mumu','mumu_tau']:
-        #         df.eventWeight *= 0.99**2
 
         if variation == 'TauIDEffDown':
             if self.selection in ['etau','mutau','ee_tau','mumu_tau','emu_tau']:
@@ -215,6 +209,49 @@ class DFCutter:
                 df.loc[slt, 'eventWeight'] *= (1-0.047)
 
 
+        #################
+        # Tau_h reweighting #
+        #################
+        
+        if variation == 'TauHDecayReweight1000Down':
+            if self.name =="mctt":
+                deviationValue = 0.00481
+                slt = df.genTauOneDaughters==1000
+                df.loc[slt, 'eventWeight'] *= (1-deviationValue)
+                slt = df.genTauTwoDaughters==1000
+                df.loc[slt, 'eventWeight'] *= (1-deviationValue)
+
+        if variation == 'TauHDecayReweight11000Down':
+            if self.name =="mctt":
+                deviationValue = 0.00455
+                slt = df.genTauOneDaughters==11000
+                df.loc[slt, 'eventWeight'] *= (1-deviationValue)
+                slt = df.genTauTwoDaughters==11000
+                df.loc[slt, 'eventWeight'] *= (1-deviationValue)
+        
+        if variation == 'TauHDecayReweight21000Down':
+            if self.name =="mctt":
+                deviationValue = 0.00141
+                slt = df.genTauOneDaughters==21000
+                df.loc[slt, 'eventWeight'] *= (1-deviationValue)
+                slt = df.genTauTwoDaughters==21000
+                df.loc[slt, 'eventWeight'] *= (1-deviationValue)
+
+        if variation == 'TauHDecayReweight3000Down':
+            if self.name =="mctt":
+                deviationValue = 0.00574
+                slt = df.genTauOneDaughters==3000
+                df.loc[slt, 'eventWeight'] *= (1-deviationValue)
+                slt = df.genTauTwoDaughters==3000
+                df.loc[slt, 'eventWeight'] *= (1-deviationValue)
+        
+        if variation == 'TauHDecayReweight13000Down':
+            if self.name =="mctt":
+                deviationValue = 0.00574
+                slt = df.genTauOneDaughters==13000
+                df.loc[slt, 'eventWeight'] *= (1-deviationValue)
+                slt = df.genTauTwoDaughters==13000
+                df.loc[slt, 'eventWeight'] *= (1-deviationValue)
         #################
         # Jet and bTag  #
         #################
@@ -240,6 +277,8 @@ class DFCutter:
             df.eventWeight = temp
         
         return df
+
+
 
 
     # # variate tt theoretical weight and LHE weights

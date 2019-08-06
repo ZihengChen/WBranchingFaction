@@ -24,12 +24,18 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     out_dict['trTest']       =  tree.triggerLeptonStatus
     out_dict['genCategory']  =  tree.genCategory
     out_dict['nPartons']     =  tree.nPartons
+
+    # out_dict['genTauOneDaughters']  =  tree.genTauOneDaughters
+    # out_dict['genTauTwoDaughters']  =  tree.genTauTwoDaughters
+
     
     if isData:
         out_dict['eventWeight']  =  scaleFactor * tree.eventWeight 
     else:
         out_dict['eventWeight']  =  scaleFactor * tree.eventWeight * tree.genWeight
-        
+    
+    out_dict['topPtWeight']   =  tree.topPtWeight
+    out_dict['topPtVar']      =  tree.topPtVar
     out_dict['eventWeightSF'] =  scaleFactor
     out_dict['met']           =  tree.met
     out_dict['metPhi']        =  tree.metPhi

@@ -18,7 +18,7 @@ def runMP(filename, selections):
 
 if __name__ == '__main__':
     
-    filename = "arc.root"
+    filename = "20190626.root"
 
     ee = BLTReader(filename,"ee")
     ee.outputNGen()
