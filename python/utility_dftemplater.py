@@ -137,7 +137,7 @@ class DFTemplater():
             tempShp,tempCnt = self._binDataFrame(df,v,bins)
 
             for name in ['mcdiboson','mcz','mcw','mct','mctt']:
-                df    = DFCutter(selection+'_s', nbjet, name, njet).getDataFrame()
+                df    = DFCutter(selection+'_ss', nbjet, name, njet).getDataFrame()
                 temp1,temp2 = self._binDataFrame(df,v,bins)
                 tempShp -= temp1
                 tempCnt -= temp2
