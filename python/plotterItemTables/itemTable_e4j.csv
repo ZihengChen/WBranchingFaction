@@ -1,0 +1,15 @@
+index,var,lower,upper,step,xlabel
+1,lepton1_eta,-5,5,0.2,$\eta_{e}$
+2,lepton1_pt,20,161,5,$p^T_{e}$
+3,lepton1_mt,0,150,5,$m^T_{e}$
+4,nJets,0,10,1,$n_{j}$
+5,nBJets,0,10,1,$n_{b}$
+6,nElectrons,0,10,1,$n_{e}$
+7,nMuons,0,10,1,$n_{\mu}$
+8,nTaus,0,10,1,$n_{\tau}$
+9,nPV,0,40,1,$n_{PV}$
+10,met,0,200,5,met [GeV]
+11,trTest,0,8,1,triggerTest
+20,ht,0,200,5,ht [GeV]
+21,htSum,0,400,10,htSum [GeV]
+22,nPU,0,100,5,$n_{PU}$

@@ -1,0 +1,23 @@
+index,var,lower,upper,step,xlabel
+1,lepton1_eta,-5,5,0.2,$\eta_{e_1}$
+2,lepton1_pt,0,150,5,$p^T_{e_1}$ [GeV]
+3,lepton1_mt,0,200,5,$m^T_{e_1}$ [GeV]
+4,lepton2_eta,-5,5,0.2,$\eta_{e_2}$
+5,lepton2_pt,0,150,5,$p^T_{e_2}$ [GeV]
+6,lepton2_mt,0,200,5,$m^T_{e_2}$ [GeV]
+7,lepton_delta_eta,0,4.5,0.1,$\Delta \eta_{ee}$
+8,lepton_delta_phi,0,3.2,0.1,$\Delta \phi_{ee}$
+9,lepton_delta_r,0,6,0.2,$\Delta R_{ee}$
+10,dilepton_mass,0,200,5,$m_{ee}$ [GeV]
+11,dilepton_pt,0,200,5,$p^T_{ee}$ [GeV]
+12,nJets,0,10,1,$n_{j}$
+13,nBJets,0,10,1,$n_{b}$
+14,nElectrons,0,10,1,$n_{e}$
+15,nMuons,0,10,1,$n_{\mu}$
+16,nTaus,0,10,1,$n_{\tau}$
+17,nPV,0,40,1,$n_{PV}$
+18,met,0,200,5,met [GeV]
+19,trTest,0,8,1,triggerTest
+20,ht,0,200,5,ht [GeV]
+21,htSum,0,400,10,htSum [GeV]
+22,nPU,0,100,5,$n_{PU}$
