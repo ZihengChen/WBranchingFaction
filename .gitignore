@@ -3,4 +3,6 @@ plots/*
 python/__pycache__
 notebooks/.ipynb_checkpoints
 .DS_Store
-*.DS_Store
+*/.DS_Store
+*/*/.DS_Store
+*/*/*/.DS_Store
