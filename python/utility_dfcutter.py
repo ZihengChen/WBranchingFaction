@@ -7,7 +7,7 @@ import os, sys
 
 
 class DFCutter:
-    def __init__(self,selection, nbjet, name,  njet=None, folderOfPickles='pickles'):
+    def __init__(self,selection, nbjet, name,  njet=None, folderOfPickles='pickles_2016'):
         '''
         initialize a DFCutter with selection and name
         For Example, cutter = DFCutter('mumu','mctt')
@@ -19,14 +19,8 @@ class DFCutter:
         self.baseDir   = common.getBaseDirectory() 
 
         folderOfSelection = self.selection
-
-        if self.selection == 'emu2':
-            folderOfSelection = 'emu'
-            
-        if self.selection[-3:] == '_ss':
-            folderOfSelection = self.selection[:-3]
-
-        
+        folderOfSelection = 'emu' if self.selection == 'emu2' else self.selection
+        folderOfSelection = self.selection[:-3] if self.selection[-3:] == '_ss' else self.selection
         self.pickleDirectry = self.baseDir + 'data/{}/{}/'.format(folderOfPickles, folderOfSelection)
 
 
@@ -54,21 +48,28 @@ class DFCutter:
             elif ('fsr' in variation) or ('isr' in variation) or ('ue' in variation) or ('meps' in variation):
                 dataFrame = pd.read_pickle(self.pickleDirectry + 'mcttsys/ntuple_ttbar_inclusive_{}.pkl'.format(variation))
             else:
-                dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_inclusive.pkl')
-        # elif self.name == 'mctt_2l2nu':
-        #     dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_2l2nu.pkl')
-        # elif self.name == 'mctt_semilepton':
-        #     dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_semilepton.pkl')
-        # elif self.name == 'mctt_hadron':
-        #     dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_hadron.pkl')
+                if "2016" in self.pickleDirectry:
+                  dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_inclusive.pkl')
+                else:
+                  pickles = glob.glob( self.pickleDirectry + '{}/*.pkl'.format(self.name) )
+                  dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles],ignore_index=True)
 
 
-        elif self.name in ['data2016B','data2016C','data2016D','data2016E','data2016F','data2016G','data2016H']:
-            period = self.name[-1]
-            pickles = glob.glob( self.pickleDirectry + 'data2016/*{}.pkl'.format(period) )
-            dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles],ignore_index=True)
+        
+        elif self.name == 'mctt_2l2nu':
+            dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_2l2nu.pkl')
+        elif self.name == 'mctt_semilepton':
+            dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_semilepton.pkl')
+        elif self.name == 'mctt_hadron':
+            dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_hadron.pkl')
 
-        # for Z,W,VV,data2016
+
+        # elif self.name in ['data2016B','data2016C','data2016D','data2016E','data2016F','data2016G','data2016H']:
+        #     period = self.name[-1]
+        #     pickles = glob.glob( self.pickleDirectry + data/*{}.pkl'.format(period) )
+        #     dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles],ignore_index=True)
+
+        # for Z,W,VV,data
         else:
             # print(self.pickleDirectry + '{}/*.pkl'.format(self.name))
             pickles = glob.glob( self.pickleDirectry + '{}/*.pkl'.format(self.name) )
@@ -113,19 +114,21 @@ class DFCutter:
                 'mutau_ss' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
                 'etau_ss'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
 
-                'mutau_fakes' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
-                'etau_fakes'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
-                'mutau_fakes_ss' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
-                'etau_fakes_ss'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
-                
                 'mu4j'  : ' (lepton1_pt > 30) ' ,
                 'e4j'   : ' (lepton1_pt > 30) ' ,
                 'mu4j_fakes'  : ' (lepton1_pt > 30) ',
                 'e4j_fakes'   : ' (lepton1_pt > 30) ',
 
-                'emu_tau'   : ' (trTest==1 & lepton1_pt>25 & lepton2_pt>20) | (trTest==2 & lepton1_pt>10 & lepton2_pt>30) | (trTest==3 & lepton1_pt>25 & lepton2_pt>30)) ' + lmveto + oppoSign, 
-                'mumu_tau'  : ' (lepton1_pt > 25) & (lepton2_pt > 10) ' + lmveto + oppoSign,
-                'ee_tau'    : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
+                #'emutau'   : ' ((trTest==1 & lepton1_pt>25 & lepton2_pt>20) | (trTest==2 & lepton1_pt>10 & lepton2_pt>30) | (trTest==3 & lepton1_pt>25 & lepton2_pt>30))
+
+                'mutau_fakes' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
+                'etau_fakes'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
+                'mutau_fakes_ss' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
+                'etau_fakes_ss'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
+              
+                'emutau' : '((trTest == 1 | trTest == 3) & (lepton1_pt > 25) & (lepton2_pt > 20))  | ((trTest == 2 | trTest == 3 ) & (lepton1_pt > 10) & (lepton2_pt > 30))' + lmveto + oppoSign, 
+                'mumutau'  : ' (lepton1_pt > 25) & (lepton2_pt > 10) '+ lmveto + oppoSign,
+                'eetau'    : ' (lepton1_pt > 30) & (lepton2_pt > 20) '+ lmveto + oppoSign,
                 }
 
         totalcut = sltcut[self.selection] 
@@ -138,7 +141,7 @@ class DFCutter:
         if ('data' in self.name) :
             # for data
             # drop if data of emu,mue
-            if (self.selection in ['emu','emu2','emu_tau']):
+            if (self.selection in ['emu','emu2','emutau']):
                 df = df.drop_duplicates(subset=['runNumber', 'evtNumber'])
         else:
             # for MC
@@ -147,13 +150,23 @@ class DFCutter:
                 slt = df.tauGenFlavor!=15
                 df.loc[slt, 'eventWeight'] *= (1/0.92)
 
+                # slt = df.tauGenFlavor==15
+                # df.loc[slt, 'eventWeight'] *= (0.95/0.92)
+      
                 #b->tau sf, j->tau scale factor measured in ll+tau region
-                sf = {(20,25):[1.061694561, 0.976550401], 
-                      (25,30):[1.177661174, 0.880820553],
-                      (30,40):[1.488901406, 0.818182921],
-                      (40,50):[0.972327128, 0.789590788],
-                      (50,65):[0.897842372, 0.896520371],
-                      (65,80):[0.857519502, 0.67297619] }
+                # sf = {(20,25):[1.061694561, 0.976550401], 
+                #       (25,30):[1.177661174, 0.880820553],
+                #       (30,40):[1.488901406, 0.818182921],
+                #       (40,50):[0.972327128, 0.789590788],
+                #       (50,65):[0.897842372, 0.896520371],
+                #       (65,80):[0.857519502, 0.67297619] }
+                
+                sf = {(20,25):[1.00201524, 0.97030279], 
+                      (25,30):[1.1602231 , 0.8759335 ],
+                      (30,40):[1.39581073, 0.82453092],
+                      (40,50):[0.95554603, 0.79587623],
+                      (50,65):[0.86272906, 0.9193196 ],
+                      (65,80):[0.74175916, 0.71058156] }
 
                 for key in sf.keys():
                     sltpt = np.logical_and(df.lepton2_pt>key[0], df.lepton2_pt<key[1])
@@ -180,17 +193,17 @@ class DFCutter:
         ################
         # variate e,m,tau energy correction
         if variation == 'EPtDown':
-            if self.selection in ['ee','etau','e4j','ee_tau']:
+            if self.selection in ['ee','etau','e4j','eetau']:
                 df.lepton1_pt *= 0.995
 
-            if self.selection in ['ee','emu','emu2','ee_tau','emu_tau']:
+            if self.selection in ['ee','emu','emu2','eetau','emutau']:
                 df.lepton2_pt *= 0.995
         
         if variation == 'MuPtDown':
-            if self.selection in ['mumu','emu','emu2','mutau','mu4j','mumu_tau','emu_tau']:
+            if self.selection in ['mumu','emu','emu2','mutau','mu4j','mumutau','emutau']:
                 df.lepton1_pt *= 0.998
 
-            if self.selection in ['mumu','mumu_tau']:
+            if self.selection in ['mumu','mumutau']:
                 df.lepton2_pt *= 0.998
 
         # tau ES up and down
@@ -214,42 +227,50 @@ class DFCutter:
         #################
         # variate e,m,tau energy correction
         if variation == 'ERecoEffDown':
-            if self.selection in ['ee','etau','e4j','ee_tau']:
+            if self.selection in ['ee','etau','e4j','eetau']:
                 df.eventWeight *= (1-df.lepton1_recostd)
-            if self.selection in ['ee','emu','emu2','emu_tau','ee_tau']:
+            if self.selection in ['ee','emu','emu2','emutau','eetau']:
                 df.eventWeight *= (1-df.lepton2_recostd)
     
         if variation == 'EIDEffDown':
-            if self.selection in ['ee','etau','e4j','ee_tau']:
+            if self.selection in ['ee','etau','e4j','eetau']:
                 df.eventWeight *= (1-df.lepton1_idstd)
-            if self.selection in ['ee','emu','emu2','emu_tau','ee_tau']:
+            if self.selection in ['ee','emu','emu2','emutau','eetau']:
                 df.eventWeight *= (1-df.lepton2_idstd)
 
+        if variation == 'ETriggerEffTagSystDown':
+            if self.selection in ['ee','emu','emu2','etau','e4j']:
+                df.eventWeight *= (1-df.eleTriggerVarTagSyst) # it actually std not var
+
+        if variation == 'ETriggerEffProbeSystDown':
+            if self.selection in ['ee','emu','emu2','etau','e4j']:
+                df.eventWeight *= (1-df.eleTriggerVarProbeSyst) # it actually std not var
+
         if variation == 'MuRecoEffDown':
-            if self.selection in ['mumu','mutau','emu','emu2','mu4j','mumu_tau','emu_tau']:
+            if self.selection in ['mumu','mutau','emu','emu2','mu4j','mumutau','emutau']:
                 df.eventWeight *= (1-df.lepton1_recostd)
-            if self.selection in ['mumu','mumu_tau']:
+            if self.selection in ['mumu','mumutau']:
                 df.eventWeight *= (1-df.lepton2_recostd)
     
         if variation == 'MuIDEffDown':
-            if self.selection in ['mumu','mutau','emu','emu2','mu4j','mumu_tau','emu_tau']:
+            if self.selection in ['mumu','mutau','emu','emu2','mu4j','mumutau','emutau']:
                 df.eventWeight *= (1-df.lepton1_idstd)
-            if self.selection in ['mumu','mumu_tau']:
+            if self.selection in ['mumu','mumutau']:
                 df.eventWeight *= (1-df.lepton2_idstd)
 
         if variation == 'TauIDEffDown':
-            if self.selection in ['etau','mutau','ee_tau','mumu_tau','emu_tau']:
+            if self.selection in ['etau','mutau','eetau','mumutau','emutau']:
                 slt = (df.tauGenFlavor==15)
                 df.loc[slt, 'eventWeight'] *= (1-0.05)
 
         if variation == 'JetToTauIDEffDown':
-            if self.selection in ['etau','mutau','ee_tau','mumu_tau','emu_tau']:
+            if self.selection in ['etau','mutau','eetau','mumutau','emutau']:
                 slt = (df.tauGenFlavor<=6)
                 df.loc[slt, 'eventWeight'] *= (1-0.047)
 
         if variation == 'TopPtReweightDown':
-            if self.name =="mctt":
-                df.eventWeight *= (1-df.topPtVar**0.5/df.topPtWeight)
+            if self.name in ["mctt","mctt_semilepton","mctt_2l2nu","mct"]:
+                df.eventWeight *= df.topPtWeight
 
 
         #################

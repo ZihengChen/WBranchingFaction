@@ -283,6 +283,7 @@ class BFVariater:
             
                 
             if errSource == "e":
+              # not used
 
                 effUp = np.array([0.01,0,0,0]) + 1
                 ## tuning up a
@@ -293,6 +294,7 @@ class BFVariater:
                 errs.append(BW1-BW)  
 
             elif errSource == "mu":
+              # not used
 
                 effUp = np.array([0,0.01,0,0]) + 1
                 ## tuning up a
@@ -304,6 +306,7 @@ class BFVariater:
 
 
             elif errSource == "tauID":
+              # not used
                 
 
                 if icata in [0,1]:
@@ -323,6 +326,7 @@ class BFVariater:
 
 
             elif errSource == "jetMisTauID":
+              # not used
                 jetMisTauIDErr = jetMisTauIDErrList[icata]
                 if icata in [0,1]:
                     trigger = 1
@@ -339,6 +343,7 @@ class BFVariater:
 
 
             elif errSource == "tauIDNotFactorized":
+              # not used 
                 
 
                 if icata in [0,1]:

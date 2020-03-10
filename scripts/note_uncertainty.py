@@ -53,7 +53,8 @@ syst_colNames = [
     r'1.2$\%$ err of $ES_{\tau\to\pi^\pm}$',
     r'1.2$\%$ err of $ES_{\tau\to\pi^\pm\pi^0}$',
     r'1.2$\%$ err of $ES_{\tau\to3\pi^\pm}$',
-
+    r'Single-e Trigger (probe syst)',
+    r'Single-e Trigger (tag syst)',
     r'0.5$\%$ err of $Br_{\tau\to\pi^\pm}$',
     r'0.4$\%$ err of $Br_{\tau\to\pi^\pm\pi^0}$',
     r'1.1$\%$ err of $Br_{\tau\to\pi^\pm2\pi^0}$',
@@ -66,7 +67,7 @@ syst_colNames = [
     r'Btag',
     r'Mistag',
 
-    r'tt fsr',
+    # r'tt fsr',
     # r'tt isr',
     # r'tt UE',
     # r'tt MEPS',

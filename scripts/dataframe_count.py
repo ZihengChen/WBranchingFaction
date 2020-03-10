@@ -39,6 +39,7 @@ if __name__ == '__main__':
         'EPtDown','MuPtDown','Tau0PtDown','Tau1PtDown','Tau10PtDown',
         'JESUp','JESDown','JERUp','JERDown','BTagUp','BTagDown','MistagUp','MistagDown',
         'PileupUp','PileupDown','TopPtReweightDown',
+        'ETriggerEffTagSystDown','ETriggerEffProbeSystDown',
         'tauReweight1000Down','tauReweight11000Down','tauReweight21000Down','tauReweight3000Down','tauReweight13000Down',
         'tauReweight1000Up','tauReweight11000Up','tauReweight21000Up','tauReweight3000Up','tauReweight13000Up',
         'fsrUp','fsrDown','isrUp','isrDown',

@@ -6,16 +6,19 @@ import ROOT as root
 
 import utility_common as common
 from utility_bltreaderDict_multilep import *
+from multiprocessing import Pool
+
 
 
 class BLTReader:
 
-    def __init__(self, inputRootFileName, selection="ee", inputRootType=""):
+    def __init__(self, inputRootFileName, selection="ee", inputRootType="", outputFolder="pickles_2016"):
 
         self.baseDir = common.getBaseDirectory() 
 
         self.inputRootFile = root.TFile(self.baseDir+'data/root/'+inputRootFileName)
         self.inputRootType = inputRootType
+        self.outputFolder = outputFolder
 
         
 
@@ -40,16 +43,19 @@ class BLTReader:
                     'tt_mepsUp','tt_mepsDown' ]
           nGens = [ self.getNGen('ttbar_inclusive_tauReweight'),
                     self.getNGen('ttbar_inclusive_fsrUp'), self.getNGen('ttbar_inclusive_fsrDown'),
-                    self.getNGen('ttbar_inclusive_ifsrUp'),self.getNGen('ttbar_inclusive_isrDown'),
+                    self.getNGen('ttbar_inclusive_isrUp'),self.getNGen('ttbar_inclusive_isrDown'),
                     self.getNGen('ttbar_inclusive_ueUp'),  self.getNGen('ttbar_inclusive_ueDown'),
                     self.getNGen('ttbar_inclusive_mepsUp'),self.getNGen('ttbar_inclusive_mepsDown') ]
         else:
-          names = [ 't','tt']
+          names = [ 't','tt','tt_2l2nu','tt_semilepton']
           nGens = [ self.getNGen('t_tw')+self.getNGen('tbar_tw'), 
-                    self.getNGen('ttbar_inclusive')] 
+                    self.getNGen('ttbar_inclusive'),
+                    self.getNGen('ttbar_2l2nu'),
+                    self.getNGen('ttbar_semilepton')
+                    ] 
 
         df = pd.DataFrame({'name':names, 'ngen':nGens })
-        df.to_json(self.baseDir+'data/pickles/ngen_{}.json'.format(self.inputRootType))
+        df.to_json(self.baseDir+'data/'+ self.outputFolder+'/ngen_{}.json'.format(self.inputRootType))
         
     def getNGen(self, name):
         histogram = self.inputRootFile.Get('GenCategory_'+name)
@@ -72,6 +78,11 @@ class BLTReader:
             self.makePickle(name)
         print(self.selection + ' finished!')
 
+        # pool = Pool(16)
+        # pool.map(self.makePickle, self.mclist + self.datalist)
+
+        
+
     # MARK-1 -- ntuple to pickle
     def makePickle(self,name):
         scaleFactor = self._getScaleFactor(name)
@@ -80,9 +91,9 @@ class BLTReader:
         common.makeDirectory(outputPath, clear=False)
         tree = self.inputRootFile.Get('{}/bltTree_{}'.format(self.selection,name))
 
-        # correct a typo in root file
-        if name == "ttbar_inclusive_isrUp": 
-            tree = self.inputRootFile.Get('{}/bltTree_ttbar_inclusive_ifsrUp'.format(self.selection,name))
+        # # correct a typo in root file
+        # if name == "ttbar_inclusive_isrUp": 
+        #     tree = self.inputRootFile.Get('{}/bltTree_ttbar_inclusive_ifsrUp'.format(self.selection,name))
 
         if tree.GetEntriesFast() > 0:
             ntuple = self.fillNtuple(tree, name, scaleFactor)
@@ -112,7 +123,7 @@ class BLTReader:
     #############################
     def _getAllVariables(self, tree, selection, name, scaleFactor):
         if selection in [ 'ee','mumu','emu','mutau','etau','mutau_fakes','etau_fakes',
-                          'mu4j','e4j','mu4j_fakes','e4j_fakes','mumu_tau','ee_tau','emu_tau']:
+                          'mu4j','e4j','mu4j_fakes','e4j_fakes','mumutau','eetau','emutau']:
             dictionary = getAllVariables_multileptonSelection(tree, selection, name, scaleFactor)
         return dictionary
         
@@ -124,10 +135,12 @@ class BLTReader:
             xs = self.xsTable[name]
             # get nGenTotal for the name
             histogram = self.inputRootFile.Get('TotalEvents_'+name)
+
             # correct a typo in root file
-            if name == "ttbar_inclusive_isrUp": 
-              histogram = self.inputRootFile.Get('TotalEvents_ttbar_inclusive_ifsrUp')              
-            # print('TotalEvents_'+name)
+            # if name == "ttbar_inclusive_isrUp": 
+            #   histogram = self.inputRootFile.Get('TotalEvents_ttbar_inclusive_ifsrUp')              
+            print('TotalEvents_'+name)
+
             nGenTotal = histogram.GetBinContent(1) - 2*histogram.GetBinContent(10)
             # calculate SF to lumin
             scaleFactor = self.lumin * xs/nGenTotal
@@ -171,10 +184,10 @@ class BLTReader:
 
     def _getOutputPath(self,name):
 
-        outputPath  = self.baseDir+'data/pickles/'+self.selection+'/'
+        outputPath  = self.baseDir+'data/'+self.outputFolder+'/'+self.selection+'/'
 
         if name in self.datalist:
-            outputPath += 'data2016/'
+            outputPath += 'data/'
         elif name in self.mcdibosonlist:
             outputPath += 'mcdiboson/'
         elif name in self.mczlist:
@@ -191,19 +204,19 @@ class BLTReader:
 
     def _getNameList(self):
         ## 1. define the datalist
-        if self.selection in ['mumu','mutau','mutau_fakes','mu4j','mu4j_fakes','mumu_tau']:
+        if self.selection in ['mumu','mutau','mutau_fakes','mu4j','mu4j_fakes','mumutau']:
             self.datalist = [
                 'muon_2016B', 'muon_2016C','muon_2016D','muon_2016E',
                 'muon_2016F','muon_2016G','muon_2016H'
                 ]
 
-        elif self.selection in ['ee','etau','etau_fakes','e4j','e4j_fakes','ee_tau']:
+        elif self.selection in ['ee','etau','etau_fakes','e4j','e4j_fakes','eetau']:
             self.datalist = [
                 'electron_2016B', 'electron_2016C','electron_2016D','electron_2016E',
                 'electron_2016F','electron_2016G','electron_2016H'
                 ]
 
-        elif self.selection in ['emu','emu_tau']:
+        elif self.selection in ['emu','emutau']:
             self.datalist = [
                 'muon_2016B', 'muon_2016C','muon_2016D','muon_2016E',
                 'muon_2016F','muon_2016G','muon_2016H',
@@ -216,8 +229,8 @@ class BLTReader:
         self.mcdibosonlist  = [ 'ww','wz_2l2q','wz_3lnu','zz_2l2nu','zz_2l2q','zz_4l']
         self.mczlist        = [ 'zjets_m-10to50_amcatnlo','zjets_m-50_amcatnlo']
         self.mcwlist        = [ 'w1jets','w2jets','w3jets','w4jets' ]
-        self.mctlist        = [ 't_tw','tbar_tw']       
-        self.mcttlist       = [ 'ttbar_inclusive']
+        self.mctlist        = [ 't_tw','tbar_tw']
+        self.mcttlist       = [ 'ttbar_inclusive','ttbar_2l2nu','ttbar_semilepton']
         self.mcttsyslist    = [ 'ttbar_inclusive_tauReweight',
                                 'ttbar_inclusive_fsrUp','ttbar_inclusive_fsrDown',
                                 'ttbar_inclusive_isrUp','ttbar_inclusive_isrDown',

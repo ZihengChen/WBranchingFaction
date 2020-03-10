@@ -3,9 +3,10 @@ from utility_dfcutter import *
 
 
 class DFTemplater():
-    def __init__(self, variation=''):
+    def __init__(self, variation='', folderOfPickles="pickles"):
                  
         self.varation = variation
+        self.folderOfPickles = folderOfPickles
 
 
     def makeTemplatesAndTargets(self):
@@ -30,7 +31,7 @@ class DFTemplater():
 
                 if self.varation == '':
                     # targets
-                    df = DFCutter(selection,nbjet,'data2016',njet).getDataFrame()
+                    df = DFCutter(selection,nbjet,'data',njet,self.folderOfPickles).getDataFrame()
                     tempShp, tempCnt = self._binDataFrame(df,v,bins)
                     targetsShp.append(tempShp)
                     targetsCnt.append(tempCnt)
@@ -55,31 +56,31 @@ class DFTemplater():
         chTemplatesShp,chTemplatesCnt = [],[]
                 
         # singals
-        df = DFCutter(selection,nbjet,'mctt',njet).getDataFrame(self.varation)
+        df = DFCutter(selection,nbjet,'mctt',njet,self.folderOfPickles).getDataFrame(self.varation)
         for i in range(1,22,1):
             dfi = df[df.genCategory==i]
             tempShp, tempCnt = self._binDataFrame(dfi,v,bins)
             chTemplatesShp.append(tempShp)
             chTemplatesCnt.append(tempCnt)
             
-        df = DFCutter(selection,nbjet,'mct',njet).getDataFrame(self.varation)
+        df = DFCutter(selection,nbjet,'mct',njet,self.folderOfPickles).getDataFrame(self.varation)
         for i in range(1,22,1):
             dfi = df[df.genCategory==i]
             tempShp, tempCnt = self._binDataFrame(dfi,v,bins)
             chTemplatesShp.append(tempShp)
             chTemplatesCnt.append(tempCnt)
         # backgrounds
-        df = DFCutter(selection,nbjet,'mcw',njet).getDataFrame(self.varation)
+        df = DFCutter(selection,nbjet,'mcw',njet,self.folderOfPickles).getDataFrame(self.varation)
         tempShp, tempCnt =  self._binDataFrame(df,v,bins)
         chTemplatesShp.append(tempShp)
         chTemplatesCnt.append(tempCnt)
         
-        df = DFCutter(selection,nbjet,'mcz',njet).getDataFrame(self.varation)
+        df = DFCutter(selection,nbjet,'mcz',njet,self.folderOfPickles).getDataFrame(self.varation)
         tempShp, tempCnt =  self._binDataFrame(df,v,bins)
         chTemplatesShp.append(tempShp)
         chTemplatesCnt.append(tempCnt)
 
-        df = DFCutter(selection,nbjet,'mcdiboson',njet).getDataFrame(self.varation)
+        df = DFCutter(selection,nbjet,'mcdiboson',njet,self.folderOfPickles).getDataFrame(self.varation)
         tempShp, tempCnt =  self._binDataFrame(df,v,bins)
         chTemplatesShp.append(tempShp)
         chTemplatesCnt.append(tempCnt)
@@ -106,11 +107,11 @@ class DFTemplater():
         
         if selection == "mu4j":
             fakeSF = common.getFakeSF('mu')
-            df   = DFCutter(selection+'_fakes', nbjet, "data2016", njet).getDataFrame()
+            df   = DFCutter(selection+'_fakes', nbjet, "data", njet,self.folderOfPickles).getDataFrame()
             tempShp,tempCnt = self._binDataFrame(df,v,bins)
 
             for name in ['mcdiboson','mcz','mcw','mct','mctt']:
-                df    = DFCutter(selection+'_fakes', nbjet, name, njet).getDataFrame()
+                df    = DFCutter(selection+'_fakes', nbjet, name, njet,self.folderOfPickles).getDataFrame()
                 temp1,temp2 = self._binDataFrame(df,v,bins)
                 tempShp -= temp1
                 tempCnt -= temp2
@@ -120,11 +121,11 @@ class DFTemplater():
 
         elif selection == "e4j":
             fakeSF = common.getFakeSF('e')
-            df   = DFCutter(selection+'_fakes', nbjet, "data2016", njet).getDataFrame()
+            df   = DFCutter(selection+'_fakes', nbjet, "data", njet,self.folderOfPickles).getDataFrame()
             tempShp,tempCnt = self._binDataFrame(df,v,bins)
 
             for name in ['mcdiboson','mcz','mcw','mct','mctt']:
-                df    = DFCutter(selection+'_fakes', nbjet, name, njet).getDataFrame()
+                df    = DFCutter(selection+'_fakes', nbjet, name, njet,self.folderOfPickles).getDataFrame()
                 temp1,temp2 = self._binDataFrame(df,v,bins)
                 tempShp -= temp1
                 tempCnt -= temp2
@@ -133,11 +134,11 @@ class DFTemplater():
 
         elif selection in ["etau",'mutau']:
             fakeSF = common.getFakeSF(selection)
-            df   = DFCutter(selection+'_ss', nbjet, "data2016", njet).getDataFrame()
+            df   = DFCutter(selection+'_ss', nbjet, "data", njet,self.folderOfPickles).getDataFrame()
             tempShp,tempCnt = self._binDataFrame(df,v,bins)
 
             for name in ['mcdiboson','mcz','mcw','mct','mctt']:
-                df    = DFCutter(selection+'_ss', nbjet, name, njet).getDataFrame()
+                df    = DFCutter(selection+'_ss', nbjet, name, njet,self.folderOfPickles).getDataFrame()
                 temp1,temp2 = self._binDataFrame(df,v,bins)
                 tempShp -= temp1
                 tempCnt -= temp2

@@ -2,15 +2,16 @@ import numpy as np
 
 
 def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
-    isData = ('2016' in name)
+    isData = ('201' in name) 
     isDilepton = not ('4j' in selection)
     isMCZ = 'zjets' in name
     isTauReweight = 'tauReweight' in name
+    isSingleElectronTrigger = selection in ["ee","emu","etau","e4j","etau_fakes","e4j_fakes"]
     
     out_dict = {}
     
     # 0. Filling Event Info
-    if selection in ['emu','emu_tau']:
+    if selection in ['emu','emutau']:
         out_dict['runNumber']    =  tree.runNumber
         out_dict['evtNumber']    =  tree.evtNumber
     
@@ -32,9 +33,12 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
 
     
     if isData:
-        out_dict['eventWeight']  =  scaleFactor * tree.eventWeight 
+        out_dict['eventWeight']  =  scaleFactor * tree.eventWeight
     else:
-        out_dict['eventWeight']  =  scaleFactor * tree.eventWeight * tree.genWeight
+        out_dict['eventWeight']  =  scaleFactor * tree.eventWeight * tree.genWeight /tree.topPtWeight
+    if isSingleElectronTrigger:
+        out_dict['eleTriggerVarTagSyst']    =  tree.eleTriggerVarTagSyst
+        out_dict['eleTriggerVarProbeSyst']  =  tree.eleTriggerVarProbeSyst
     
     out_dict['topPtWeight']   =  tree.topPtWeight
     out_dict['topPtVar']      =  tree.topPtVar
@@ -75,7 +79,7 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     
     
     # 2. Filling tau info
-    if selection in ['etau','mutau','ee_tau','mumu_tau','emu_tau']:
+    if selection in ['etau','mutau','eetau','mumutau','emutau']:
         out_dict['tauMVA']            = tree.tauMVA
         out_dict['tauDecayMode']      = tree.tauDecayMode
         out_dict['tauVetoedJetPt']    = tree.tauVetoedJetPt
@@ -89,12 +93,12 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
             out_dict['tauGenFlavor']      = tree.tauGenFlavor
             out_dict['tauGenFlavorHad']   = tree.tauGenFlavorHad
 
-        if selection in ['ee_tau','mumu_tau','emu_tau']:
-            leptonTauP4 = tree.leptonTauP4
-            out_dict['tauPt']  = leptonTauP4.Pt()
-            out_dict['tauEta'] = leptonTauP4.Eta()
-            out_dict['tauPhi'] = leptonTauP4.Phi()
-            out_dict['tauMass']= leptonTauP4.M()
+        if selection in ['eetau','mumutau','emutau']:
+            leptonThreeP4 = tree.leptonThreeP4
+            out_dict['tauPt']  = leptonThreeP4.Pt()
+            out_dict['tauEta'] = leptonThreeP4.Eta()
+            out_dict['tauPhi'] = leptonThreeP4.Phi()
+            out_dict['tauMass']= leptonThreeP4.M()
         else:
             out_dict['tauMass']= lep2.M()
 

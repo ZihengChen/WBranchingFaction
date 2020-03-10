@@ -170,7 +170,7 @@ class NSignal:
 # super class
 class BFSolver:
 
-    def __init__(self, a, xs = 832+35.85*2, lumin=35847, bte=0.1785, btm=0.1736 ):
+    def __init__(self, a, xs = 832+35.85*2, lumin=35847, bte=0.1782, btm=0.1739 ):
 
             
         self.xs = xs
@@ -225,7 +225,7 @@ class BFSolver:
 # 3D Inheritance of BFSolver
 class BFSolver3D (BFSolver):
 
-    def __init__(self, a, xs = 832+35.85*2, lumin=35847, bte=0.1785, btm=0.1736  ):
+    def __init__(self, a, xs = 832+35.85*2, lumin=35847, bte=0.1782, btm=0.1739  ):
         super().__init__(a, xs, lumin, bte, btm)
     
     def evaluateLeftSideOfQuadEqn(self,paraBW):
@@ -249,7 +249,7 @@ class BFSolver3D (BFSolver):
 
 # 1D Inheritance of BFSolver
 class BFSolver1D (BFSolver):
-    def __init__(self, a, xs = 832+35.85*2, lumin=35847, bte=0.1785, btm=0.1736, bWe=0.1071, bWm=0.1063 ):
+    def __init__(self, a, xs = 832+35.85*2, lumin=35847, bte=0.1782, btm=0.1739, bWe=0.1071, bWm=0.1063 ):
         super().__init__(a, xs, lumin, bte, btm)
         self.bWe,self.bWm = bWe,bWm
 
@@ -266,7 +266,7 @@ class BFSolver1D (BFSolver):
 
 # R solver 1D
 class RSovler:
-    def __init__(self, a, xs = 832+35.85*2, lumin=35847, bwl = 0.1080, bte=0.1785, btm=0.1736 ):
+    def __init__(self, a, xs = 832+35.85*2, lumin=35847, bwl = 0.1080, bte=0.1782, btm=0.1739 ):
         
         self.xs = xs
         self.lumin = lumin

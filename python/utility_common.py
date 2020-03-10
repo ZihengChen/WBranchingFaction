@@ -52,6 +52,7 @@ def WWBranchNames():
 def getEfficiency(k,n,alpha=0.317):
     isZero = np.logical_or(k==0, n==0)
 
+    
     center = k/n
     lower  = beta.ppf(  alpha/2,k+1,n-k+1)
     higher = beta.ppf(1-alpha/2,k+1,n-k+1)
@@ -61,6 +62,8 @@ def getEfficiency(k,n,alpha=0.317):
 
     center[isZero] = 0
     var[isZero] = 0
+    
+    var[center>=1] = 0
 
     return center,var
 

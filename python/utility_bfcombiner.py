@@ -28,7 +28,9 @@ class BFCombiner():
     def chisquared_r(self,param):
         # two paramters
         # r1,r2,l
-        r1,r2,l = param[0],param[1],param[2]
+        r,l = param[0],param[1]
+        r1 = r
+        r2 = r
 
         lep = 1./r1 + 1./r2 + 1.
 
@@ -52,9 +54,9 @@ class BFCombiner():
         if self.paramTypy=='r':
             result = minimize(
                 fun = self.chisquared_r, 
-                x0  = np.array([1.,1.,0.3240]),
+                x0  = np.array([1.,0.3240]),
                 method = 'SLSQP',
-                bounds = [(0.9,1.1),(0.9,1.1),(0,1)]
+                bounds = [(0.9,1.1),(0,1)]
                 )
         else:
             result = minimize(

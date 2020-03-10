@@ -5,17 +5,23 @@ import utility_commonPlot as commonp
 
 
 class PredictiveModel():
-    def __init__(self,x):
+    def __init__(self,x, splitJetFlavor=False):
         self.x = x  
         self.c = x.shape[0]
         self.t = x.shape[1]
         self.b = x.shape[2]
 
+        self.splitJetFlavor = splitJetFlavor
+
     def predict(self, params, returnTemplates=False):
         
         x = self.x.copy()
 
-        nsf,nxs,neff = 12,7,2
+        nxs,neff = 7,2
+        if self.splitJetFlavor:
+          nsf = 12
+        else:
+          nsf = 6
         # splite parameters
         end = 0
         params_sf  = params[end:end+nsf]
@@ -51,30 +57,29 @@ class PredictiveModel():
 
         for i in range(5):
             # y[:,i*5+0:i*5+4,:] = y[:,i*5+0:i*5+4,:] * params[0] # pt = 20-25 GeV
-            # ########################
             
-            # y[:,i*5+0:i*5+3,0:1] = y[:,i*5+0:i*5+3,0:1] * params[0] # pt = 20-25 GeV
-            # y[:,i*5+0:i*5+3,1:2] = y[:,i*5+0:i*5+3,1:2] * params[1] # pt = 25-30 GeV
-            # y[:,i*5+0:i*5+3,2:4] = y[:,i*5+0:i*5+3,2:4] * params[2] # pt = 30-40 GeV
-            # y[:,i*5+0:i*5+3,4:6] = y[:,i*5+0:i*5+3,4:6] * params[3] # pt = 40-50 GeV
-            # y[:,i*5+0:i*5+3,6:9] = y[:,i*5+0:i*5+3,6:9] * params[4] # pt = 50-60 GeV
-            # y[:,i*5+0:i*5+3,9: ] = y[:,i*5+0:i*5+3,9: ] * params[5] # pt = 60-   GeV
+            if self.splitJetFlavor:
+              y[:,i*5+0:i*5+1,0:1] = y[:,i*5+0:i*5+1,0:1] * params[0] # pt = 20-25 GeV
+              y[:,i*5+0:i*5+1,1:2] = y[:,i*5+0:i*5+1,1:2] * params[1] # pt = 25-30 GeV
+              y[:,i*5+0:i*5+1,2:5] = y[:,i*5+0:i*5+1,2:5] * params[2] # pt = 30-40 GeV
+              y[:,i*5+0:i*5+1,4:6] = y[:,i*5+0:i*5+1,4:6] * params[3] # pt = 40-50 GeV
+              y[:,i*5+0:i*5+1,6:9] = y[:,i*5+0:i*5+1,6:9] * params[4] # pt = 50-60 GeV
+              y[:,i*5+0:i*5+1,9: ] = y[:,i*5+0:i*5+1,9: ] * params[5] # pt = 60-   GeV
 
+              y[:,i*5+1:i*5+2,0:1] = y[:,i*5+1:i*5+2,0:1] * params[6] # pt = 20-25 GeV
+              y[:,i*5+1:i*5+2,1:2] = y[:,i*5+1:i*5+2,1:2] * params[7] # pt = 25-30 GeV
+              y[:,i*5+1:i*5+2,2:4] = y[:,i*5+1:i*5+2,2:4] * params[8] # pt = 30-40 GeV
+              y[:,i*5+1:i*5+2,4:6] = y[:,i*5+1:i*5+2,4:6] * params[9] # pt = 40-50 GeV
+              y[:,i*5+1:i*5+2,6:9] = y[:,i*5+1:i*5+2,6:9] * params[10] # pt = 50-60 GeV
+              y[:,i*5+1:i*5+2,9: ] = y[:,i*5+1:i*5+2,9: ] * params[11] # pt = 60-   GeV
 
-            ########################
-            y[:,i*5+0:i*5+1,0:1] = y[:,i*5+0:i*5+1,0:1] * params[0] # pt = 20-25 GeV
-            y[:,i*5+0:i*5+1,1:2] = y[:,i*5+0:i*5+1,1:2] * params[1] # pt = 25-30 GeV
-            y[:,i*5+0:i*5+1,2:5] = y[:,i*5+0:i*5+1,2:5] * params[2] # pt = 30-40 GeV
-            y[:,i*5+0:i*5+1,4:6] = y[:,i*5+0:i*5+1,4:6] * params[3] # pt = 40-50 GeV
-            y[:,i*5+0:i*5+1,6:9] = y[:,i*5+0:i*5+1,6:9] * params[4] # pt = 50-60 GeV
-            y[:,i*5+0:i*5+1,9: ] = y[:,i*5+0:i*5+1,9: ] * params[5] # pt = 60-   GeV
-
-            y[:,i*5+1:i*5+2,0:1] = y[:,i*5+1:i*5+2,0:1] * params[6] # pt = 20-25 GeV
-            y[:,i*5+1:i*5+2,1:2] = y[:,i*5+1:i*5+2,1:2] * params[7] # pt = 25-30 GeV
-            y[:,i*5+1:i*5+2,2:4] = y[:,i*5+1:i*5+2,2:4] * params[8] # pt = 30-40 GeV
-            y[:,i*5+1:i*5+2,4:6] = y[:,i*5+1:i*5+2,4:6] * params[9] # pt = 40-50 GeV
-            y[:,i*5+1:i*5+2,6:9] = y[:,i*5+1:i*5+2,6:9] * params[10] # pt = 50-60 GeV
-            y[:,i*5+1:i*5+2,9: ] = y[:,i*5+1:i*5+2,9: ] * params[11] # pt = 60-   GeV
+            else:
+              y[:,i*5+0:i*5+2,0:1] = y[:,i*5+0:i*5+2,0:1] * params[0] # pt = 20-25 GeV
+              y[:,i*5+0:i*5+2,1:2] = y[:,i*5+0:i*5+2,1:2] * params[1] # pt = 25-30 GeV
+              y[:,i*5+0:i*5+2,2:4] = y[:,i*5+0:i*5+2,2:4] * params[2] # pt = 30-40 GeV
+              y[:,i*5+0:i*5+2,4:6] = y[:,i*5+0:i*5+2,4:6] * params[3] # pt = 40-50 GeV
+              y[:,i*5+0:i*5+2,6:9] = y[:,i*5+0:i*5+2,6:9] * params[4] # pt = 50-60 GeV
+              y[:,i*5+0:i*5+2,9: ] = y[:,i*5+0:i*5+2,9: ] * params[5] # pt = 60-   GeV
         return y
 
 
@@ -87,7 +92,7 @@ class PredictiveModel():
         ttxs   = params[0]*0.05 + 1
         txs    = params[1]*0.05 + 1
         wxs    = params[2]*0.05 + 1
-        zxs0   = params[3]*0.05 + 1  - 0.05
+        zxs0   = params[3]*0.05 + 1  #- 0.05 # Z0jet has an normalization correction
         zxs1   = params[4]*0.05 + 1  #- 0.05
         vvxs   = params[5]*0.10 + 1
         lumin  = params[6]*.025 + 1

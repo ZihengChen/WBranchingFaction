@@ -3,11 +3,12 @@ from utility_dfcutter import *
 from utility_bfsolver import Yield
 
 class DFCounter():
-    def __init__(self,trigger,usetag):
+    def __init__(self,trigger,usetag, folderOfPickles="pickles_2016"):
         self.variation = ""
 
         self.trigger = trigger
         self.usetag  = usetag
+        self.folderOfPickles = folderOfPickles
 
         self._setConfiguration(trigger,usetag)
 
@@ -79,7 +80,7 @@ class DFCounter():
     #############################
 
     def getNData(self,selection,nbjet):
-        df = DFCutter(selection,nbjet,"data2016").getDataFrame()
+        df = DFCutter(selection,nbjet,"data",folderOfPickles=self.folderOfPickles).getDataFrame()
         n = np.sum(df.eventWeight)
         nVar = n
         return n, nVar # 1,1
@@ -89,7 +90,7 @@ class DFCounter():
         
         n, nVar = [], []
         for name in ["mct","mctt"]:
-            df = DFCutter(selection,nbjet,name).getDataFrame(self.variation)
+            df = DFCutter(selection,nbjet,name,folderOfPickles=self.folderOfPickles).getDataFrame(self.variation)
             n.append( np.sum(df.eventWeight) )
             nVar.append( np.sum(df.eventWeight**2) )
 
@@ -99,7 +100,7 @@ class DFCounter():
     def getNMCbg(self,selection,nbjet):
         n, nVar = [], []
         for name in ["mcdiboson","mcz","mcw"]:
-            df = DFCutter(selection,nbjet,name).getDataFrame(self.variation) # get MC dataframe with variation
+            df = DFCutter(selection,nbjet,name,folderOfPickles=self.folderOfPickles).getDataFrame(self.variation) # get MC dataframe with variation
             n.append( np.sum(df.eventWeight) )
             nVar.append( np.sum(df.eventWeight**2) )
 
@@ -111,11 +112,11 @@ class DFCounter():
         if selection == "mu4j":
             fakeSF = common.getFakeSF('mu')
 
-            temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame()
+            temp = DFCutter(selection+'_fakes',nbjet,"data",folderOfPickles=self.folderOfPickles).getDataFrame()
             n    = np.sum(temp.eventWeight)
             nVar = np.sum(temp.eventWeight**2)
             for name in ['mcdiboson','mcz', 'mcw','mct','mctt']:
-                temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame()
+                temp  = DFCutter(selection+'_fakes',nbjet,name,folderOfPickles=self.folderOfPickles).getDataFrame()
                 n    -= np.sum(temp.eventWeight)
                 nVar += np.sum(temp.eventWeight**2)
 
@@ -125,11 +126,11 @@ class DFCounter():
         elif selection == "e4j":
             fakeSF = common.getFakeSF('e')
 
-            temp = DFCutter(selection+'_fakes',nbjet,"data2016").getDataFrame()
+            temp = DFCutter(selection+'_fakes',nbjet,"data", folderOfPickles=self.folderOfPickles).getDataFrame()
             n    = np.sum(temp.eventWeight)
             nVar = np.sum(temp.eventWeight**2)
             for name in ['mcdiboson','mcz', 'mcw','mct','mctt']:
-                temp  = DFCutter(selection+'_fakes',nbjet,name).getDataFrame()
+                temp  = DFCutter(selection+'_fakes',nbjet,name,folderOfPickles=self.folderOfPickles).getDataFrame()
                 n    -= np.sum(temp.eventWeight)
                 nVar += np.sum(temp.eventWeight**2)
 
@@ -139,11 +140,11 @@ class DFCounter():
         elif selection == "mutau":
             fakeSF = common.getFakeSF(selection)
 
-            temp = DFCutter(selection+'_ss',nbjet,"data2016").getDataFrame()
+            temp = DFCutter(selection+'_ss',nbjet,"data",folderOfPickles=self.folderOfPickles).getDataFrame()
             n    = np.sum(temp.eventWeight)
             nVar = np.sum(temp.eventWeight**2)
             for name in ['mcdiboson','mcz','mcw','mct','mctt']:
-                temp  = DFCutter(selection+'_ss',nbjet,name).getDataFrame()
+                temp  = DFCutter(selection+'_ss',nbjet,name,folderOfPickles=self.folderOfPickles).getDataFrame()
                 n    -= np.sum(temp.eventWeight)
                 nVar += np.sum(temp.eventWeight**2)
 
@@ -153,11 +154,11 @@ class DFCounter():
         elif selection == "etau":
             fakeSF = common.getFakeSF(selection)
 
-            temp = DFCutter(selection+'_ss',nbjet,"data2016").getDataFrame()
+            temp = DFCutter(selection+'_ss',nbjet,"data",folderOfPickles=self.folderOfPickles).getDataFrame()
             n    = np.sum(temp.eventWeight)
             nVar = np.sum(temp.eventWeight**2)
             for name in ['mcdiboson','mcz', 'mcw','mct','mctt']:
-                temp  = DFCutter(selection+'_ss',nbjet,name).getDataFrame()
+                temp  = DFCutter(selection+'_ss',nbjet,name,folderOfPickles=self.folderOfPickles).getDataFrame()
                 n    -= np.sum(temp.eventWeight)
                 nVar += np.sum(temp.eventWeight**2)
 
@@ -175,7 +176,7 @@ class DFCounter():
 
         # tW
         nGenMCt = self.dfNGen.query("name=='t'" ).ngen.values[0]
-        df = DFCutter(selection,nbjet,"mct").getDataFrame(self.variation)
+        df = DFCutter(selection,nbjet,"mct",folderOfPickles=self.folderOfPickles).getDataFrame(self.variation)
         nMCt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
 
         accMCt, accMCtVar = common.getEfficiency(nMCt, nGenMCt)
@@ -185,34 +186,34 @@ class DFCounter():
             
         if "tauReweight" in self.variation:
             nGenMCtt = self.dfNGen[self.dfNGen.name=='tt_tauReweight'].ngen.values[0]
+            df = DFCutter(selection,nbjet,'mctt',folderOfPickles=self.folderOfPickles).getDataFrame(self.variation)
+            nMCtt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
+            num = nMCtt 
+            den = np.array(nGenMCtt)
+
         elif ('fsr' in self.variation) or ('isr' in self.variation) or ('ue' in self.variation) or ('meps' in self.variation):
             nGenMCtt = self.dfNGen[self.dfNGen.name=='tt_'+self.variation].ngen.values[0]
+            df = DFCutter(selection,nbjet,'mctt',folderOfPickles=self.folderOfPickles).getDataFrame(self.variation)
+            nMCtt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
+            num = nMCtt 
+            den = np.array(nGenMCtt)           
+
         else:
+            # inclusive
             nGenMCtt = self.dfNGen[self.dfNGen.name=='tt'].ngen.values[0]
-
-        df = DFCutter(selection,nbjet,'mctt').getDataFrame(self.variation)
-        nMCtt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
-        num = nMCtt 
-        den = nGenMCtt
-        
-        # else:
-        #     # inclusive tt
-        #     nGenMCtt = self.dfNGen[self.dfNGen.name=='tt'].ngen.values[0]
-        #     df = DFCutter(selection,nbjet,'mctt').getDataFrame(self.variation)
-        #     nMCtt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
-            
-        #     # leptonic tt
-        #     nGenMCtt_2l2nu = self.dfNGen[self.dfNGen.name=='tt_2l2nu'].ngen.values[0]
-        #     df = DFCutter(selection,nbjet,'mctt_2l2nu').getDataFrame(self.variation)
-        #     nMCtt_2l2nu = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
-            
-        #     # semilep tt
-        #     nGenMCtt_semilepton = self.dfNGen[self.dfNGen.name=='tt_semilepton'].ngen.values[0]
-        #     df = DFCutter(selection,nbjet,'mctt_semilepton').getDataFrame(self.variation)
-        #     nMCtt_semilepton = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
-
-        #     num = nMCtt + nMCtt_2l2nu + nMCtt_semilepton
-        #     den = nGenMCtt + nGenMCtt_2l2nu + nGenMCtt_semilepton
+            df = DFCutter(selection,nbjet,'mctt',folderOfPickles=self.folderOfPickles).getDataFrame(self.variation)
+            nMCtt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
+            # leptonic
+            nGenMCtt_2l2nu = self.dfNGen[self.dfNGen.name=='tt_2l2nu'].ngen.values[0]
+            df = DFCutter(selection,nbjet,'mctt_2l2nu',folderOfPickles=self.folderOfPickles).getDataFrame(self.variation)
+            nMCtt_2l2nu = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
+            # semilep
+            nGenMCtt_semilepton = self.dfNGen[self.dfNGen.name=='tt_semilepton'].ngen.values[0]
+            df = DFCutter(selection,nbjet,'mctt_semilepton',folderOfPickles=self.folderOfPickles).getDataFrame(self.variation)
+            nMCtt_semilepton = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
+            # combine all
+            num = nMCtt + nMCtt_2l2nu + nMCtt_semilepton
+            den = np.array(nGenMCtt) + np.array(nGenMCtt_2l2nu) + np.array(nGenMCtt_semilepton)
         
 
         accMCtt, accMCttVar = common.getEfficiency(num, den)
@@ -268,7 +269,9 @@ class DFCounter():
             self.nbjet = ">1"
 
         # read nGen from file
-        NGenJSonFiles = glob.glob( self.baseDir + "data/pickles/ngen*.json")
+        print(self.baseDir + "data/"+self.folderOfPickles)
+        NGenJSonFiles = glob.glob( self.baseDir + "data/" + self.folderOfPickles + "/ngen*.json")
+       
         self.dfNGen = pd.concat([ pd.read_json(json) for json in NGenJSonFiles],ignore_index=True)
    
         self.arrayToMatrix = np.array([ 
@@ -286,7 +289,7 @@ class DFCounter():
         # # variated tt
         # if self.variation in ['FSRUp','FSRDown','ISRUp','ISRDown','UEUp','UEDown','MEPSUp','MEPSDown']:
         #     nGenMCtt = self.dfNGen[self.dfNGen.name=='ttbar_inclusive_'+self.variation].ngen.values[0]
-        #     df = DFCutter(selection,nbjet,"mctt").getDataFrame(self.variation)
+        #     df = DFCutter(selection,nbjet,"mctt",folderOfPickles=self.folderOfPickles).getDataFrame(self.variation)
         #     nMCtt = self._countDataFrameByTauDecay(df, normToLumin=False, withWeights=True)
 
         #     num = nMCtt 
