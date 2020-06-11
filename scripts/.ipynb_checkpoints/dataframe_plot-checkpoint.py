@@ -18,5 +18,5 @@ def plotDataFrame(slt):
 if __name__ == '__main__':
 
     selections = ["emu","mumu","mutau","mu4j","ee","emu2","etau","e4j"]
-    pool = Pool(2)
+    pool = Pool(8)
     pool.map(plotDataFrame, selections)

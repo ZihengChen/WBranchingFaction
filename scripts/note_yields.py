@@ -14,7 +14,7 @@ def getN(counts, i_trnb, i_channel):
     # QCD
     tempn = counts.nfake[i_trnb][i_channel]
     tempnVar = counts.nfakeVar[i_trnb][i_channel]
-    tempnVar += (0.25*tempn)**2 # add QCD rate
+    # tempnVar += (0.25*tempn)**2 # add QCD rate
     n.append( tempn ) 
     nVar.append( tempnVar )
     nsum += tempn
@@ -23,7 +23,7 @@ def getN(counts, i_trnb, i_channel):
     # VV
     tempn = counts.nmcbg[i_trnb][i_channel][0]
     tempnVar = counts.nmcbgVar[i_trnb][i_channel][0]
-    tempnVar += (0.10*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
+    # tempnVar += (0.10*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
     n.append( tempn ) 
     nVar.append( tempnVar )
     nsum += tempn
@@ -32,7 +32,7 @@ def getN(counts, i_trnb, i_channel):
     # Z
     tempn = counts.nmcbg[i_trnb][i_channel][1]
     tempnVar = counts.nmcbgVar[i_trnb][i_channel][1]
-    tempnVar += (0.10*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
+    # tempnVar += (0.10*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
     n.append( tempn ) 
     nVar.append( tempnVar )
     nsum += tempn
@@ -41,7 +41,7 @@ def getN(counts, i_trnb, i_channel):
     # W
     tempn = counts.nmcbg[i_trnb][i_channel][2]
     tempnVar = counts.nmcbgVar[i_trnb][i_channel][2]
-    tempnVar += (0.05*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
+    # tempnVar += (0.05*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
     n.append( tempn ) 
     nVar.append( tempnVar )
     nsum += tempn
@@ -50,7 +50,7 @@ def getN(counts, i_trnb, i_channel):
     # t
     tempn = counts.nmcsg[i_trnb][i_channel][0]
     tempnVar = counts.nmcsgVar[i_trnb][i_channel][0]
-    tempnVar += (0.05*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
+    # tempnVar += (0.05*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
     n.append( tempn ) 
     nVar.append( tempnVar )
     nsum += tempn
@@ -59,7 +59,7 @@ def getN(counts, i_trnb, i_channel):
      # tt
     tempn = counts.nmcsg[i_trnb][i_channel][1]
     tempnVar = counts.nmcsgVar[i_trnb][i_channel][1]
-    tempnVar += (0.05*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
+    # tempnVar += (0.05*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
     n.append( tempn ) 
     nVar.append( tempnVar )
     nsum += tempn

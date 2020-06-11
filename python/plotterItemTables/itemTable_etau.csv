@@ -1,9 +1,9 @@
 index,var,lower,upper,step,xlabel
 1,lepton1_eta,-5,5,0.2,$\eta_{e}$
-2,lepton1_pt,0,150,5,$p^T_{e}$ [GeV]
+2,lepton1_pt,30,80,1,$p^T_{e}$ [GeV]
 3,lepton1_mt,0,200,5,$m^T_{e}$ [GeV]
 4,lepton2_eta,-5,5,0.2,$\eta_{\tau}$
-5,lepton2_pt,0,150,5,$p^T_{\tau}$ [GeV]
+5,lepton2_pt,20,70,1,$p^T_{\tau}$ [GeV]
 6,lepton2_mt,0,200,5,$m^T_{\tau}$ [GeV]
 7,lepton_delta_eta,0,4.5,0.1,$\Delta \eta_{e\tau}$
 8,lepton_delta_phi,0,3.2,0.1,$\Delta \phi_{e\tau}$

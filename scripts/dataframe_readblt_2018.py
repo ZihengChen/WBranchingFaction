@@ -10,7 +10,7 @@ def run(configs):
     rd.readBLT()
 
 if __name__ == '__main__':
-    filename = "2018_20200305.root"# "Run2018_20200112.root"
+    filename = "Run2018_20200521.root"# "Run2018_20200112.root"
 
     selections = ["ee","mumu","emu",
                 "mutau","etau","mutau_fakes","etau_fakes",

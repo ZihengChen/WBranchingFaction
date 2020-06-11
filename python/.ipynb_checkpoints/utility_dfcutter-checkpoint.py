@@ -105,7 +105,7 @@ class DFCutter:
 
         sltcut  = {
                 'mumu'  : ' (lepton1_pt > 25) & (lepton2_pt > 10) ' + lmveto + oppoSign + zveto,
-                'ee'    : ' (lepton1_pt > 30) & (lepton2_pt > 30) ' + lmveto + oppoSign + zveto,
+                'ee'    : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign + zveto,
                 'emu'   : ' (trTest==1 | (trTest==3 & lepton1_pt>lepton2_pt))  & lepton1_pt>25 & lepton2_pt>20 ' + lmveto + oppoSign, 
                 'emu2'  : ' (trTest==2 | (trTest==3 & lepton1_pt<lepton2_pt))  & lepton1_pt>10 & lepton2_pt>30 ' + lmveto + oppoSign, 
                 
@@ -182,10 +182,6 @@ class DFCutter:
                     sltfl = df.tauGenFlavor<4
                     slt = np.logical_and(sltpt, sltfl)
                     df.loc[slt, 'eventWeight'] *= sfljet
-
-            # # top pt reweighting
-            # if self.name in ["mctt","mctt_semilepton","mctt_2l2nu","mct"]:
-            #     df.eventWeight *= df.topPtWeight
 
         # reindex the df
         df.reset_index(drop=True, inplace=True)
@@ -277,7 +273,7 @@ class DFCutter:
 
         if variation == 'TopPtReweightDown':
             if self.name in ["mctt","mctt_semilepton","mctt_2l2nu","mct"]:
-                df.eventWeight *= (1-df.topPtVar**0.5/df.topPtWeight) #df.topPtWeight
+                df.eventWeight *= df.topPtWeight
 
 
         #################

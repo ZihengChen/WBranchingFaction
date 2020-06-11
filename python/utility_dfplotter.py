@@ -95,6 +95,10 @@ class DFPlotter:
         elif self.nbjet == '>1':
             self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/2b/'.format(self.folderOfPickles, self.selection)
             self.nbjetSubtitle = r"$n_b \geq 2$"
+        
+        elif self.nbjet == '>=1':
+            self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/12b/'.format(self.folderOfPickles, self.selection)
+            self.nbjetSubtitle = r"$n_b \geq 1$"
 
         elif self.nbjet == '<1':
             self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/0b/'.format(self.folderOfPickles, self.selection)
@@ -470,7 +474,6 @@ class ASingleKinematicPlot:
             if selection is not None:
                 if '0b' in plotoutdir:
                     fig.savefig(plotoutdir+'{}_0b_{}.pdf'.format(selection,self.v))
-
                 if '1b' in plotoutdir:
                     fig.savefig(plotoutdir+'{}_1b_{}.pdf'.format(selection,self.v))
                 if '2b' in plotoutdir:

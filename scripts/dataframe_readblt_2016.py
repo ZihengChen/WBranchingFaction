@@ -16,11 +16,12 @@ if __name__ == '__main__':
               "mutau","etau","mutau_fakes","etau_fakes",
               "mu4j","mu4j_fakes","e4j","e4j_fakes"]
 
-    filename = "Run2016_20200114.root"
+    filename = "Run2016_20200525.root" #golden
     ee = BLTReader(filename, selection="ee", inputRootType="",outputFolder=outputFolder)
     ee.outputNGen()
+    
 
-    filename_mcttsys = "Run2016_ttsys_20200114.root"
+    fiilename_mcttsys = "Run2016_20200525.root"
     ee = BLTReader(filename_mcttsys, selection="ee",inputRootType="mcttsys",outputFolder=outputFolder)
     ee.outputNGen()
 
@@ -28,8 +29,3 @@ if __name__ == '__main__':
     configs += [(filename_mcttsys, slt, "mcttsys") for slt in selections]
     pool = Pool(16)
     pool.map(run, configs)
-
-
-    
- 
-
