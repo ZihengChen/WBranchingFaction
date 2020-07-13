@@ -63,12 +63,6 @@ class DFCutter:
         elif self.name == 'mctt_hadron':
             dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_hadron.pkl')
 
-
-        # elif self.name in ['data2016B','data2016C','data2016D','data2016E','data2016F','data2016G','data2016H']:
-        #     period = self.name[-1]
-        #     pickles = glob.glob( self.pickleDirectry + data/*{}.pkl'.format(period) )
-        #     dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles],ignore_index=True)
-
         # for Z,W,VV,data
         else:
             # print(self.pickleDirectry + '{}/*.pkl'.format(self.name))
@@ -111,8 +105,8 @@ class DFCutter:
                 
                 'mutau' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
                 'etau'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
-                'mutau_ss' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
-                'etau_ss'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
+                # 'mutau_ss' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
+                # 'etau_ss'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
 
                 'mu4j'  : ' (lepton1_pt > 30) ' ,
                 'e4j'   : ' (lepton1_pt > 30) ' ,
@@ -123,8 +117,8 @@ class DFCutter:
 
                 'mutau_fakes' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
                 'etau_fakes'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
-                'mutau_fakes_ss' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
-                'etau_fakes_ss'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
+                # 'mutau_fakes_ss' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
+                # 'etau_fakes_ss'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
               
                 'emutau' : '((trTest == 1 | trTest == 3) & (lepton1_pt > 25) & (lepton2_pt > 20))  | ((trTest == 2 | trTest == 3 ) & (lepton1_pt > 10) & (lepton2_pt > 30))' + lmveto + oppoSign, 
                 'mumutau'  : ' (lepton1_pt > 25) & (lepton2_pt > 10) '+ lmveto + oppoSign,
@@ -182,10 +176,26 @@ class DFCutter:
                     sltfl = df.tauGenFlavor<4
                     slt = np.logical_and(sltpt, sltfl)
                     df.loc[slt, 'eventWeight'] *= sfljet
+        
+        # reindex the df
+        df.reset_index(drop=True, inplace=True)
+        # apply fake SF
+        if self.selection in ['etau_fakes','e4j_fakes','mutau_fakes','mu4j_fakes']:
+            etabin = np.array([-2.5, -2.0, -1.8, -1.444, -1.1, -0.8, -0.4, 0.0, 0.4, 0.8, 1.1, 1.444, 1.8, 2.0, 2.5])
+            if self.selection in ['etau_fakes','e4j_fakes']:
+                ptbin = np.array([30,32,34,36,38,40,45,50,55,60,80])        
+                sf = np.load(self.baseDir+"plots/singlelep/123j1b/SF_e_2d.npy")
 
-            # # top pt reweighting
-            # if self.name in ["mctt","mctt_semilepton","mctt_2l2nu","mct"]:
-            #     df.eventWeight *= df.topPtWeight
+            elif self.selection in ['mutau_fakes','mu4j_fakes']:
+                ptbin = np.array([25,26,28,30,32,34,36,38,40,45,50,55,60,80])
+                sf = np.load(self.baseDir+"plots/singlelep/123j1b/SF_mu_2d.npy")
+
+            j = np.searchsorted(etabin, df.lepton1_eta)
+            i = np.searchsorted(ptbin, df.lepton1_pt)
+            sfpad = np.pad(sf,((1,1),(1,1)),constant_values=((0, 0),(0,0)))
+            w = sfpad[i,j]
+            df.eventWeight = df.eventWeight*w
+
 
         # reindex the df
         df.reset_index(drop=True, inplace=True)

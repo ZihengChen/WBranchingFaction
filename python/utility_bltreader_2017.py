@@ -126,10 +126,7 @@ class BLTReader:
             # get crosssection for the name
             xs = self.xsTable[name]
             # get nGenTotal for the name
-            histogram = self.inputRootFile.Get('TotalEvents_'+name)
-            # correct a typo in root file
-            if name == "ttbar_inclusive_isrUp": 
-              histogram = self.inputRootFile.Get('TotalEvents_ttbar_inclusive_ifsrUp')              
+            histogram = self.inputRootFile.Get('TotalEvents_'+name)        
             print('TotalEvents_'+name)
             nGenTotal = histogram.GetBinContent(1) - 2*histogram.GetBinContent(10)
             # calculate SF to lumin

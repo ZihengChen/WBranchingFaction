@@ -23,15 +23,15 @@ def getBaseDirectory():
 def getFakeSF(obj):
     sf = 0
     if obj == "e":
-        sf = 0.12
+        sf = 1.0 #0.12
     elif obj == 'mu':
-        sf = 0.09
+        sf = 1.0 #0.09
     elif obj == 'tau':
         sf = 1.0
     elif obj == 'etau':
-        sf = 1.157
+        sf = 1.0 #1.157
     elif obj == 'mutau':
-        sf = 1.059
+        sf = 1.0 #1.059
 
     return sf
 
@@ -99,4 +99,39 @@ def symlink( src, tar):
         os.remove(tar)
     os.symlink(src, tar)
 
+def get_cross_section(name):
+    crossections = {
+        'ww'              : 12178,
+        'wz_2l2q'         : 5595,
+        'wz_3lnu'         : 4430,
+        'zz_2l2nu'        : 564,
+        'zz_2l2q'         : 3220,
+        'zz_4l'           : 1210,
+        # Z
+        'zjets_m-10to50_amcatnlo'  : 18610000,
+        'zjets_m-50_amcatnlo'      :  5765400,
+        'z0jets_m-50_amcatnlo':4757000,
+        'z1jets_m-50_amcatnlo':884400,
+        'z2jets_m-50_amcatnlo':338900,
+        # W
+        'w1jets'          :  9493000,
+        'w2jets'          :  3120000,
+        'w3jets'          :  942300,
+        'w4jets'          :  524100,
+        # top
+        't_tw'            :  35850,
+        'tbar_tw'         :  35850,
+        'ttbar_inclusive' :  832000,
+        't_t'             :  136020,
+        'tbar_t'          :   80950,
+        # gjets
+        'gjets_ht40to100': 17410000,
+        'gjets_ht100to200': 5363000,
+        'gjets_ht200to400': 1178000,
+        'gjets_ht400to600':  131800,
+        'gjets_ht600toinf':  44270,
+        
+    }
+    xs = crossections.get(name, 0)
+    return xs
     

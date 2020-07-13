@@ -18,9 +18,11 @@ class DFPlotter:
 
     def getDataFrameList(self, variation=''):
         Data = DFCutter(self.selection, self.nbjet, 'data', self.njet,self.folderOfPickles).getDataFrame(variation)
-        MCzz = DFCutter(self.selection, self.nbjet, 'mcdiboson',self.njet,self.folderOfPickles).getDataFrame(variation)
+        MCvv = DFCutter(self.selection, self.nbjet, 'mcdiboson',self.njet,self.folderOfPickles).getDataFrame(variation)
+        MCg  = DFCutter(self.selection, self.nbjet, 'mcg',      self.njet,self.folderOfPickles).getDataFrame(variation)
         MCz  = DFCutter(self.selection, self.nbjet, 'mcz',      self.njet,self.folderOfPickles).getDataFrame(variation)
         MCw  = DFCutter(self.selection, self.nbjet, 'mcw',      self.njet,self.folderOfPickles).getDataFrame(variation)
+        MCto = DFCutter(self.selection, self.nbjet, 'mctother', self.njet,self.folderOfPickles).getDataFrame(variation)
         MCt  = DFCutter(self.selection, self.nbjet, 'mct',      self.njet,self.folderOfPickles).getDataFrame(variation)
         MCtt = DFCutter(self.selection, self.nbjet, 'mctt',     self.njet,self.folderOfPickles).getDataFrame(variation)
 
@@ -29,13 +31,13 @@ class DFPlotter:
         MCsgList = [MCsg.query(q) for q in self.mcsgQueryList]
 
         # combine all dataframes as a list
-        dfList = [MCzz,MCz,MCw] + MCsgList + [Data]
+        dfList = [MCvv,MCg,MCz,MCw,MCto] + MCsgList + [Data]
 
         
         # add fakes if in mu4j and e4j
         if self.selection in ['mu4j','e4j']:
 
-            names = ['data','mcdiboson','mcz','mcw','mct','mctt']
+            names = ['data','mcdiboson','mcg','mcz','mcw','mctother','mct','mctt']
 
             Fake = pd.DataFrame()
             for name in names:
@@ -50,11 +52,12 @@ class DFPlotter:
         # add fakes if in mutau and etau
         if self.selection in ['mutau','etau']:
 
-            names = ['data','mcdiboson','mcz','mcw','mct','mctt']
+            names = ['data','mcdiboson','mcg','mcz','mcw','mctother','mct','mctt']
 
             Fake = pd.DataFrame()
             for name in names:
-                temp =  DFCutter(self.selection+'_ss',self.nbjet,name,self.njet,self.folderOfPickles).getDataFrame(variation)
+                # temp =  DFCutter(self.selection+'_ss',self.nbjet,name,self.njet,self.folderOfPickles).getDataFrame(variation)
+                temp =  DFCutter(self.selection+'_fakes',self.nbjet,name,self.njet,self.folderOfPickles).getDataFrame(variation)
                 if not name == 'data':
                     temp.eventWeight = -1*temp.eventWeight
                 Fake = Fake.append(temp,ignore_index=True)
@@ -89,19 +92,19 @@ class DFPlotter:
 
         # MARK -- config output plot directory
         if self.nbjet == '==1':
-            self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/1b/'.format(self.folderOfPickles, self.selection)
+            self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/1b'.format(self.folderOfPickles, self.selection)
             self.nbjetSubtitle = r"$n_b = 1$"
             
         elif self.nbjet == '>1':
-            self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/2b/'.format(self.folderOfPickles, self.selection)
+            self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/2b'.format(self.folderOfPickles, self.selection)
             self.nbjetSubtitle = r"$n_b \geq 2$"
         
         elif self.nbjet == '>=1':
-            self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/12b/'.format(self.folderOfPickles, self.selection)
+            self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/12b'.format(self.folderOfPickles, self.selection)
             self.nbjetSubtitle = r"$n_b \geq 1$"
 
         elif self.nbjet == '<1':
-            self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/0b/'.format(self.folderOfPickles, self.selection)
+            self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/0b'.format(self.folderOfPickles, self.selection)
             self.nbjetSubtitle = r"$n_b = 0$"
 
     
@@ -115,16 +118,16 @@ class DFPlotter:
                 'genCategory in [2]',
                 'genCategory in [13,14,15]'
             ]
-            self.labelList = ['Diboson','Z+Jets','W+Jets',
+            self.labelList = ['Diboson',r'$\gamma$+Jets','Z+Jets','W+Jets','Top other',
                 r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow \mu + \mu$',
                 r'$tt/tW \rightarrow \mu+ \tau$',
                 'data'
             ]
-            self.colorList = ['#a32020', '#e0301e', '#eb8c00','gold', '#49feec', 'deepskyblue', 'mediumpurple', 'k']
+            self.colorList = ['#a32020','#e0301e','C1','gold','C2','#49feec','deepskyblue','C0','mediumpurple','k']
             self.pp = pd.read_csv(baseDirectory+'python/plotterItemTables/itemTable_mumu.csv')
-            self.adjust = [1,1,1,1,1,1,1]
+            self.adjust = [1,1,1,1,1,1,1,1,1]
             self.subtitle = r'$\mu \mu$ channel, $n_j \geq 2$, '+self.nbjetSubtitle
             #self.hasFake = False
         # ee
@@ -135,16 +138,16 @@ class DFPlotter:
                 'genCategory in [1]',
                 'genCategory in [10,11,12]'
             ]
-            self.labelList = ['Diboson','Z+Jets','W+Jets',
+            self.labelList = ['Diboson',r'$\gamma$+Jets','Z+Jets','W+Jets','Top other',
                 r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow e + e$',
                 r'$tt/tW \rightarrow e + \tau$',
                 'data'
             ]
-            self.colorList = ['#a32020', '#e0301e', '#eb8c00','gold', '#49feec', 'deepskyblue', 'mediumpurple', 'k']
+            self.colorList = ['#a32020','#e0301e','C1','gold','C2','#49feec','deepskyblue','C0','mediumpurple','k']
             self.pp = pd.read_csv(baseDirectory+'python/plotterItemTables/itemTable_ee.csv')
-            self.adjust = [1,1,1,1,1,1,1]
+            self.adjust = [1,1,1,1,1,1,1,1,1]
             self.subtitle = r'$e e$ channel, $n_j \geq 2$, '+self.nbjetSubtitle
             #self.hasFake = False
         
@@ -157,7 +160,7 @@ class DFPlotter:
                 'genCategory in [10,11,12]',
                 'genCategory in [13,14,15]'
             ]
-            self.labelList = ['Diboson','Z+Jets','W+Jets',
+            self.labelList = ['Diboson',r'$\gamma$+Jets','Z+Jets','W+Jets','Top other',
                 r'$tt/tW \rightarrow$ (other)',
                 r'$tt/tW \rightarrow l + l$ (other)',
                 r'$tt/tW \rightarrow e + \mu$', 
@@ -165,9 +168,9 @@ class DFPlotter:
                 r'$tt/tW \rightarrow \mu + \tau$',
                 'data'
             ]
-            self.colorList = ['#a32020','#e0301e','#eb8c00','gold','springgreen','#49feec','deepskyblue','mediumpurple','k']
+            self.colorList = ['#a32020','#e0301e','C1','gold','springgreen','C2','#49feec','deepskyblue','C0','mediumpurple','k']
             self.pp = pd.read_csv(baseDirectory+'python/plotterItemTables/itemTable_emu.csv')
-            self.adjust = [1,1,1,1,1,1,1,1]
+            self.adjust = [1,1,1,1,1,1,1,1,1,1]
             if self.selection == "emu":
                 self.subtitle = r'$\mu e$ channel, $n_j \geq 2$, '+self.nbjetSubtitle
             else:
@@ -183,7 +186,7 @@ class DFPlotter:
                 'genCategory in [18,19,20]',
                 'genCategory in [13,14,15]'
             ]
-            self.labelList = ['Diboson','Z+Jets','W+Jets',
+            self.labelList = ['Diboson',r'$\gamma$+Jets','Z+Jets','W+Jets','Top other',
                 r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow l + l$ (other) ',
                 r'$tt/tW \rightarrow \mu + h$', 
@@ -191,11 +194,10 @@ class DFPlotter:
                 r'$tt/tW \rightarrow \mu + \tau$',
                 'data'
             ]
-            self.colorList = ['#a32020','#e0301e','#eb8c00','gold','springgreen','#49feec','deepskyblue','mediumpurple','k']
+            self.colorList = ['#a32020','#e0301e','C1','gold','springgreen','C2','#49feec','deepskyblue','C0','mediumpurple','k']
             self.pp = pd.read_csv(baseDirectory+'python/plotterItemTables/itemTable_mutau.csv')
-            self.adjust = [1,1,1,1,1,1,1,1,1]
+            self.adjust = [1,1,1,1,1,1,1,1,1,1,1,1,1]
             self.subtitle = r'$\mu \tau$ channel, $n_j \geq 2$, '+self.nbjetSubtitle
-            #self.adjust = [1/.95,1/.95,1/.95,1/.95,1/.95,1/.95,.89/.95]
             #self.hasFake = False
             if self.selection == 'mutau':
                 self.fakeSF = common.getFakeSF('mutau')
@@ -213,7 +215,7 @@ class DFPlotter:
                 'genCategory in [18,19,20]',
                 'genCategory in [10,11,12]'
             ]
-            self.labelList = ['Diboson','Z+Jets','W+Jets',
+            self.labelList = ['Diboson',r'$\gamma$+Jets','Z+Jets','W+Jets','Top other',
                 r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow l + l$ (other) ',
                 r'$tt/tW \rightarrow e + h$', 
@@ -221,11 +223,10 @@ class DFPlotter:
                 r'$tt/tW \rightarrow e + \tau$',
                 'data'
             ]
-            self.colorList = ['#a32020','#e0301e','#eb8c00','gold','springgreen','#49feec','deepskyblue','mediumpurple','k']
+            self.colorList = ['#a32020','#e0301e','C1','gold','springgreen','C2','#49feec','deepskyblue','C0','mediumpurple','k']
             self.pp = pd.read_csv(baseDirectory+'python/plotterItemTables/itemTable_etau.csv')
-            self.adjust = [1,1,1,1,1,1,1,1,1]
+            self.adjust = [1,1,1,1,1,1,1,1,1,1,1]
             self.subtitle = r'$e \tau$ channel, $n_j \geq 2$, '+self.nbjetSubtitle
-            #self.adjust = [1/.95,1/.95,1/.95,1/.95,1/.95,1/.95,.89/.95]
             #self.hasFake = False
             if self.selection == 'etau':
                 self.fakeSF = common.getFakeSF('etau')
@@ -241,7 +242,7 @@ class DFPlotter:
                 'genCategory in [17]',
                 'genCategory in [13,14,15]'
             ]
-            self.labelList = ['Diboson','Z+Jets','W+Jets',
+            self.labelList = ['Diboson',r'$\gamma$+Jets','Z+Jets','W+Jets','Top other',
                 r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow \mu + h$',
@@ -249,8 +250,8 @@ class DFPlotter:
                 'data'
             ]
             self.pp = pd.read_csv(baseDirectory+'python/plotterItemTables/itemTable_mu4j.csv')
-            self.colorList = ['#a32020','#e0301e','#eb8c00','gold','#49feec','deepskyblue','mediumpurple','k']
-            self.adjust = [1,1,1,1,1,1,1]
+            self.colorList = ['#a32020','#e0301e','C1','gold','C2','#49feec','deepskyblue','C0','mediumpurple','k']
+            self.adjust = [1,1,1,1,1,1,1,1,1]
             self.subtitle = r'$\mu + jets$ channel, $n_j \geq 4$, '+self.nbjetSubtitle
 
             if self.selection == 'mu4j':
@@ -268,7 +269,7 @@ class DFPlotter:
                 'genCategory in [16]',
                 'genCategory in [10,11,12]'
             ]
-            self.labelList = ['Diboson','Z+Jets','W+Jets',
+            self.labelList = ['Diboson',r'$\gamma$+Jets','Z+Jets','W+Jets','Top other',
                 r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow e + h$',
@@ -276,8 +277,8 @@ class DFPlotter:
                 'data'
             ]
             self.pp = pd.read_csv(baseDirectory+'python/plotterItemTables/itemTable_e4j.csv')
-            self.colorList = ['#a32020','#e0301e','#eb8c00','gold','#49feec','deepskyblue','mediumpurple','k']
-            self.adjust = [1,1,1,1,1,1,1]
+            self.colorList = ['#a32020','#e0301e','C1','gold','C2','#49feec','deepskyblue','C0','mediumpurple','k']
+            self.adjust = [1,1,1,1,1,1,1,1,1]
             self.subtitle = r'$e + jets$ channel, $n_j \geq 4$, '+self.nbjetSubtitle
 
             if self.selection == 'e4j':
@@ -358,7 +359,7 @@ class ASingleKinematicPlot:
         variable = np.concatenate(self.variable_list)
         weight   = np.concatenate(self.weight_list)
         yieldBg,_= np.histogram(variable, self.mybin, weights=weight)
-        err = 0.05 * yieldBg
+        err = 0.10 * yieldBg
         return err
     
 
@@ -368,7 +369,7 @@ class ASingleKinematicPlot:
                 arr[i]=into
         return arr
 
-    def makePlot(self, plotoutdir=None, selection=None):
+    def makePlot(self, plotoutdir=None, selection=None, showDiffInLower=False):
         plt.rc('figure',facecolor='w')
         fig, axes = plt.subplots(2, 1, sharex=True, 
                                  gridspec_kw={'height_ratios':[3,1]},
@@ -411,29 +412,28 @@ class ASingleKinematicPlot:
         ax.errorbar(self.center, self.hdata, yerr=self.hdata**0.5,
                     color=self.color_list[-1], 
                     label=self.label_list[-1],
-                    fmt='.',markersize=10)
+                    fmt='.',markersize=5)
 
         # 1.3. plot settings
         self.ynorm = max(self.hdata.max(),self.mctot.max())
-        if self.xl in ['lepton_delta_phi','bjet_delta_phi','lbjet_delta_phi','tauMVA']:
-            ax.legend(fontsize=10,loc='upper left')
-        else:
-            ax.legend(fontsize=10,loc='upper right')
-            if self.logscale:
-                ax.text(0.04*self.b+0.96*self.a, 4*self.ynorm, 
-                        r'CMS $preliminary$',
-                        style='italic',fontsize='15',fontweight='bold')
+
+        ax.legend(fontsize=9,loc='upper right')
+
+        if self.logscale:
+            ax.text(0.04*self.b+0.96*self.a, 4*self.ynorm, 
+                    r'CMS $preliminary$',
+                    style='italic',fontsize='15',fontweight='bold')
+            
+            ax.text(0.04*self.b+0.96*self.a, 3*self.ynorm, 
+                    r'CMS $preliminary$',
+                    style='italic',fontsize='15',fontweight='bold')
                 
-                ax.text(0.04*self.b+0.96*self.a, 3*self.ynorm, 
-                        r'CMS $preliminary$',
-                        style='italic',fontsize='15',fontweight='bold')
-                    
-            else:
-                ax.text(0.04*self.b+0.96*self.a, 1.35*self.ynorm, 
-                        r'CMS $preliminary$',
-                        style='italic',fontsize='15',fontweight='bold')
-                ax.text(0.04*self.b+0.96*self.a, 1.2*self.ynorm, 
-                        self.subtitle,fontsize='11')
+        else:
+            ax.text(0.04*self.b+0.96*self.a, 1.35*self.ynorm, 
+                    r'CMS $preliminary$',
+                    style='italic',fontsize='15',fontweight='bold')
+            ax.text(0.04*self.b+0.96*self.a, 1.2*self.ynorm, 
+                    self.subtitle,fontsize='11')
 
             
         ax.grid(True,linestyle='--',alpha=0.5)
@@ -454,17 +454,28 @@ class ASingleKinematicPlot:
         
         ######################### 2. Ratio Plots #############################
         ax = axes[1]
-        ax.set_xlim(self.a,self.b)
-        ax.set_ylim(0.5,1.5)
-        ax.axhline(1,lw=1,color='k')
+        if showDiffInLower:
+            ax.set_xlim(self.a,self.b)
+#             ax.errorbar(self.center,  self.hdata - self.mctot, yerr=(self.mcerr**2+self.hdata)**0.5,
+#                         color='k', fmt='.', markersize=5)
+            
+            ax.bar(self.center, self.hdata - self.mctot, self.step, yerr=(self.mcerr**2+self.hdata)**0.5, facecolor='grey')
+            ax.axhline(0,lw=1,color='k')
+            
+        else:
+            ax.set_xlim(self.a,self.b)
+            ax.set_ylim(0.5,1.5)
+            ax.axhline(1,lw=1,color='k')
 
-        ax.errorbar(self.center, np.ones_like(self.mctot), yerr=self.mcerr/self.mctot,
-                    color='k', fmt='none', lw=200/self.mybin.size, mew=0, alpha=0.3)
+            ax.errorbar(self.center, np.ones_like(self.mctot), yerr=self.mcerr/self.mctot,
+                        color='k', fmt='none', lw=200/self.mybin.size, mew=0, alpha=0.3)
 
-        ax.errorbar(self.center, self.hdata/self.mctot, yerr=self.hdata**0.5/self.mctot,
-                    color=self.color_list[-1],
-                    label=self.label_list[-1],
-                    fmt='.',markersize=10)
+            ax.errorbar(self.center, self.hdata/self.mctot, yerr=self.hdata**0.5/self.mctot,
+                        color=self.color_list[-1],
+                        label=self.label_list[-1],
+                        fmt='.',markersize=5)
+            
+
         ax.grid(True,linestyle='--',alpha=0.5)
             
         ######################## 3. End and Save ############################### 
@@ -473,14 +484,14 @@ class ASingleKinematicPlot:
 
             if selection is not None:
                 if '0b' in plotoutdir:
-                    fig.savefig(plotoutdir+'{}_0b_{}.pdf'.format(selection,self.v))
+                    fig.savefig(plotoutdir+'/{}_0b_{}.pdf'.format(selection,self.v))
                 if '1b' in plotoutdir:
-                    fig.savefig(plotoutdir+'{}_1b_{}.pdf'.format(selection,self.v))
+                    fig.savefig(plotoutdir+'/{}_1b_{}.pdf'.format(selection,self.v))
                 if '2b' in plotoutdir:
-                    fig.savefig(plotoutdir+'{}_2b_{}.pdf'.format(selection,self.v))
+                    fig.savefig(plotoutdir+'/{}_2b_{}.pdf'.format(selection,self.v))
 
             else:
-                fig.savefig(plotoutdir+'{}.png'.format(self.v),dpi=300)
+                fig.savefig(plotoutdir+'/{}.png'.format(self.v),dpi=300)
 
             #
 

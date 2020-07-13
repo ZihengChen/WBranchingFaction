@@ -79,11 +79,6 @@ class BLTReader:
             self.makePickle(name)
         print(self.selection + ' finished!')
 
-        # pool = Pool(16)
-        # pool.map(self.makePickle, self.mclist + self.datalist)
-
-        
-
     # MARK-1 -- ntuple to pickle
     def makePickle(self,name):
         scaleFactor = self._getScaleFactor(name)
@@ -151,6 +146,7 @@ class BLTReader:
                     'zz_2l2nu'        : 564,
                     'zz_2l2q'         : 3220,
                     'zz_4l'           : 1210,
+
                     # Z
                     'zjets_m-10to50_amcatnlo'  : 18610000,
                     'zjets_m-50_amcatnlo'      :  5765400,
@@ -162,6 +158,14 @@ class BLTReader:
                     'w2jets'          :  3120000,
                     'w3jets'          :  942300,
                     'w4jets'          :  524100,
+                    
+                    # gjets DR0p4
+                    'gjets_ht40to100': 17410000,
+                    'gjets_ht100to200': 5363000,
+                    'gjets_ht200to400': 1178000,
+                    'gjets_ht400to600':  131800,
+                    'gjets_ht600toinf':  44270,
+
                     # top
                     't_tw'            :  35850,
                     'tbar_tw'         :  35850,
@@ -201,8 +205,11 @@ class BLTReader:
             outputPath += 'mctt/' 
         elif name in self.mcttsyslist:
             outputPath += 'mcttsys/' 
-        elif name in self.mctbglist:
-            outputPath += 'mctbgsys/' 
+        elif name in self.mctother:
+            outputPath += 'mctother/' 
+        elif name in self.mcglist:
+            outputPath += 'mcg/' 
+
         return outputPath
 
     def _getNameList(self):
@@ -232,16 +239,18 @@ class BLTReader:
         self.mcdibosonlist  = [ 'ww','wz_2l2q','wz_3lnu','zz_2l2nu','zz_2l2q','zz_4l']
         self.mczlist        = [ 'zjets_m-10to50_amcatnlo','zjets_m-50_amcatnlo'] #+ ['z0jets_m-50_amcatnlo','z1jets_m-50_amcatnlo','z2jets_m-50_amcatnlo']
         self.mcwlist        = [ 'w1jets','w2jets','w3jets','w4jets' ]
+        self.mcglist        = [ 'gjets_ht40to100', 'gjets_ht100to200', 'gjets_ht200to400', 'gjets_ht400to600', 'gjets_ht600toinf']
         self.mctlist        = [ 't_tw','tbar_tw']
-        self.mctbglist      = [ 't_t','tbar_t']
+        self.mctother       = [ 't_t','tbar_t']
         self.mcttlist       = [ 'ttbar_inclusive']+['ttbar_2l2nu','ttbar_semilepton']
+        
         self.mcttsyslist    = [ 'ttbar_inclusive_tauReweight',
                                 'ttbar_inclusive_fsrUp','ttbar_inclusive_fsrDown',
                                 'ttbar_inclusive_isrUp','ttbar_inclusive_isrDown',
                                 'ttbar_inclusive_ueUp','ttbar_inclusive_ueDown',
                                 'ttbar_inclusive_mepsUp','ttbar_inclusive_mepsDown']
 
-        self.mclist = self.mctbglist+self.mcdibosonlist+self.mcwlist+self.mczlist+self.mctlist+self.mcttlist
+        self.mclist = self.mctother+self.mcdibosonlist+self.mcwlist+self.mczlist+self.mctlist+self.mcttlist+self.mcglist
         
         
 
