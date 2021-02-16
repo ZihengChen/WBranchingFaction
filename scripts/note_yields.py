@@ -29,7 +29,7 @@ def getN(counts, i_trnb, i_channel):
     nsum += tempn
     nsumVar += tempnVar
     
-    # Z
+    # g
     tempn = counts.nmcbg[i_trnb][i_channel][1]
     tempnVar = counts.nmcbgVar[i_trnb][i_channel][1]
     # tempnVar += (0.10*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
@@ -38,7 +38,7 @@ def getN(counts, i_trnb, i_channel):
     nsum += tempn
     nsumVar += tempnVar
     
-    # W
+    # z
     tempn = counts.nmcbg[i_trnb][i_channel][2]
     tempnVar = counts.nmcbgVar[i_trnb][i_channel][2]
     # tempnVar += (0.05*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
@@ -46,8 +46,27 @@ def getN(counts, i_trnb, i_channel):
     nVar.append( tempnVar )
     nsum += tempn
     nsumVar += tempnVar
+
+    # w
+    tempn = counts.nmcbg[i_trnb][i_channel][3]
+    tempnVar = counts.nmcbgVar[i_trnb][i_channel][3]
+    # tempnVar += (0.05*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
+    n.append( tempn ) 
+    nVar.append( tempnVar )
+    nsum += tempn
+    nsumVar += tempnVar
+
+    # t other
+    tempn = counts.nmcbg[i_trnb][i_channel][4]
+    tempnVar = counts.nmcbgVar[i_trnb][i_channel][4]
+    # tempnVar += (0.05*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
+    n.append( tempn ) 
+    nVar.append( tempnVar )
+    nsum += tempn
+    nsumVar += tempnVar
+
     
-    # t
+    # tw
     tempn = counts.nmcsg[i_trnb][i_channel][0]
     tempnVar = counts.nmcsgVar[i_trnb][i_channel][0]
     # tempnVar += (0.05*tempn)**2 + (0.025*tempn)**2 # add xs and lumin
@@ -102,7 +121,7 @@ beginTable = r'''\begin{sidewaystable}[p]
     \small
     \begin{tabular}{l|cccccc|cc}
     \hline
-        & QCD & VV  & Z & W & tW & tt & total & data      \\
+        & QCD & VV  & $\gamma$ & Z & W & t & tW & tt & total & data      \\
     \hline
     
 '''

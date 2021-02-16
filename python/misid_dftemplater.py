@@ -33,7 +33,7 @@ class DFTemplater():
 
                 if self.varation == '':
                     # targets
-                    df = DFCutter(selection,nbjet,'data2016',njet,self.folderOfPickles).getDataFrame()
+                    df = DFCutter(selection,nbjet,'data',njet,self.folderOfPickles).getDataFrame()
                     tempShp,tempShpVar, tempCnt,tempCntVar = self._binDataFrame(df,v,bins)
                     targetsShp.append(tempShp)
                     targetsCnt.append(tempCnt)
@@ -58,15 +58,17 @@ class DFTemplater():
         chTemplatesShp,chTemplatesCnt = [],[]
         chTemplatesShpVar,chTemplatesCntVar = [],[]
 
-        breakdownList = [   'tauGenFlavor<=5 and tauGenFlavor>=4',  # heavy quark  -> tauID
-                            'tauGenFlavor<=3 and tauGenFlavor>=1',  # light quark  -> tauID
+        breakdownList = [   'tauGenFlavor<=5 and tauGenFlavor>4',  # heavy quark  -> tauID
+                            'tauGenFlavor<=4 and tauGenFlavor>=1',  # light quark  -> tauID
                             'tauGenFlavor==21',                     # gluon  -> tauID
                             'tauGenFlavor==26 or tauGenFlavor==0',  # lepton -> tauID
-                            'tauGenFlavor==15'                     # tau_h  -> tauID
+                            'tauGenFlavor==15'                      # tau_h  -> tauID
                         ] 
 
 
-        for name in ['mctt','mct','mcw','mcz','mcdi+-0.0
+
+        for name in ['mctt','mct','mcz','mcdiboson']:
+            print(name)
             df = DFCutter(selection,nbjet,name,njet, self.folderOfPickles).getDataFrame(self.varation)
             for q in breakdownList:
                 dfi = df.query(q)

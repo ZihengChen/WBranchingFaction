@@ -9,11 +9,6 @@ class DFPlotter:
         self.nbjet = nbjet
         self.njet  = njet
         self.folderOfPickles = folderOfPickles
-        self.period = "2016"
-        if "2017" in folderOfPickles:
-          self.period = "2017"
-        if "2018" in folderOfPickles:
-          self.period = "2018"
         self._setConfiguration() 
 
     def getDataFrameList(self, variation=''):
@@ -25,7 +20,8 @@ class DFPlotter:
         MCto = DFCutter(self.selection, self.nbjet, 'mctother', self.njet,self.folderOfPickles).getDataFrame(variation)
         MCt  = DFCutter(self.selection, self.nbjet, 'mct',      self.njet,self.folderOfPickles).getDataFrame(variation)
         MCtt = DFCutter(self.selection, self.nbjet, 'mctt',     self.njet,self.folderOfPickles).getDataFrame(variation)
-
+        
+        
         # get signal MC dataframes
         MCsg = pd.concat([MCt,MCtt],ignore_index=True)
         MCsgList = [MCsg.query(q) for q in self.mcsgQueryList]
@@ -36,16 +32,21 @@ class DFPlotter:
         
         # add fakes if in mu4j and e4j
         if self.selection in ['mu4j','e4j']:
-
+              # data driven
+                
             names = ['data','mcdiboson','mcg','mcz','mcw','mctother','mct','mctt']
-
             Fake = pd.DataFrame()
             for name in names:
-                temp =  DFCutter(self.selection+'_fakes',self.nbjet,name,self.njet,self.folderOfPickles).getDataFrame(variation)
+                temp =  DFCutter(self.selection+'_fakes',self.nbjet,name,self.njet,self.folderOfPickles).getDataFrame()
                 if not name == 'data':
                     temp.eventWeight = -1*temp.eventWeight
                 Fake = Fake.append(temp,ignore_index=True)
-
+            
+            # MC QCD
+            MCqcd = DFCutter(self.selection, self.nbjet, 'mcqcd',   self.njet,self.folderOfPickles).getDataFrame()
+            normCorrection = MCqcd.eventWeight.sum()/Fake.eventWeight.sum()    
+            Fake.eventWeight = Fake.eventWeight* normCorrection
+            print(normCorrection) 
             dfList = [Fake] + dfList
 
 
@@ -56,11 +57,20 @@ class DFPlotter:
 
             Fake = pd.DataFrame()
             for name in names:
-                # temp =  DFCutter(self.selection+'_ss',self.nbjet,name,self.njet,self.folderOfPickles).getDataFrame(variation)
-                temp =  DFCutter(self.selection+'_fakes',self.nbjet,name,self.njet,self.folderOfPickles).getDataFrame(variation)
+                temp =  DFCutter(self.selection+'_ss',self.nbjet,name,self.njet,self.folderOfPickles).getDataFrame()
+                # temp =  DFCutter(self.selection+'_fakes',self.nbjet,name,self.njet,self.folderOfPickles).getDataFrame()
                 if not name == 'data':
                     temp.eventWeight = -1*temp.eventWeight
                 Fake = Fake.append(temp,ignore_index=True)
+
+            Fake.eventWeight *= common.getFakeSF(self.selection)
+            
+            # # MC QCD
+            # MCqcd = DFCutter(self.selection, self.nbjet, 'mcqcd',   self.njet,self.folderOfPickles).getDataFrame()
+            # normCorrection = MCqcd.eventWeight.sum()/Fake.eventWeight.sum()   
+            # print(normCorrection) 
+            # Fake.eventWeight = Fake.eventWeight* normCorrection
+
 
             dfList = [Fake] + dfList
             
@@ -76,8 +86,7 @@ class DFPlotter:
             v,a,b,step,xl = row['var'],row['lower'],row['upper'],row['step'],row['xlabel']
 
             sk = ASingleKinematicPlot(v,a,b,step,dfList,adjust=self.adjust)
-                
-            sk.settingPlot(xl,self.labelList, self.colorList,logscale=False, withXsErr=True, period=self.period, subtitle=self.subtitle)
+            sk.settingPlot(xl,self.labelList, self.colorList,logscale=False, withXsErr=True, subtitle=self.subtitle)
             sk.makePlot(self.outputPlotDir, self.selection)
 
             print('making plots -- {} nbjet{}: {}/{}'.format(self.selection, self.nbjet, index+1, len(self.pp)) )
@@ -95,6 +104,11 @@ class DFPlotter:
             self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/1b'.format(self.folderOfPickles, self.selection)
             self.nbjetSubtitle = r"$n_b = 1$"
             
+        if self.nbjet == '>=0':
+            self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/12b'.format(self.folderOfPickles, self.selection)
+            self.nbjetSubtitle = r"$n_b \geq 0$"
+            
+
         elif self.nbjet == '>1':
             self.outputPlotDir = baseDirectory+'plots/kinematics_{}/{}/2b'.format(self.folderOfPickles, self.selection)
             self.nbjetSubtitle = r"$n_b \geq 2$"
@@ -200,9 +214,8 @@ class DFPlotter:
             self.subtitle = r'$\mu \tau$ channel, $n_j \geq 2$, '+self.nbjetSubtitle
             #self.hasFake = False
             if self.selection == 'mutau':
-                self.fakeSF = common.getFakeSF('mutau')
                 self.colorList = ['grey'] + self.colorList
-                self.adjust    = [self.fakeSF] + self.adjust
+                self.adjust    = [1.0] + self.adjust
                 self.labelList = ['QCD']+self.labelList
             
         
@@ -229,9 +242,8 @@ class DFPlotter:
             self.subtitle = r'$e \tau$ channel, $n_j \geq 2$, '+self.nbjetSubtitle
             #self.hasFake = False
             if self.selection == 'etau':
-                self.fakeSF = common.getFakeSF('etau')
                 self.colorList = ['grey'] + self.colorList
-                self.adjust    = [self.fakeSF] + self.adjust
+                self.adjust    = [1.0] + self.adjust
                 self.labelList = ['QCD']+self.labelList
 
         # mu4j
@@ -255,10 +267,9 @@ class DFPlotter:
             self.subtitle = r'$\mu + jets$ channel, $n_j \geq 4$, '+self.nbjetSubtitle
 
             if self.selection == 'mu4j':
-                self.fakeSF = common.getFakeSF('mu')
 
                 self.colorList = ['grey'] + self.colorList
-                self.adjust    = [self.fakeSF] + self.adjust
+                self.adjust    = [1.0] + self.adjust
                 self.labelList = ['QCD']+self.labelList
 
         # e4j
@@ -282,10 +293,9 @@ class DFPlotter:
             self.subtitle = r'$e + jets$ channel, $n_j \geq 4$, '+self.nbjetSubtitle
 
             if self.selection == 'e4j':
-                self.fakeSF = common.getFakeSF('e')
 
                 self.colorList = ['grey'] + self.colorList
-                self.adjust    = [self.fakeSF] + self.adjust
+                self.adjust    = [1.0] + self.adjust
                 self.labelList = ['QCD']+self.labelList
 
 
@@ -304,8 +314,6 @@ class ASingleKinematicPlot:
             self.adjust = np.ones(self.n)
         else:
             self.adjust = adjust
-        
-        #self.hasFake = hasFake
 
         self.variable_list  = [mc[v].values for mc in df_list[0:-1]]
         self.weight_list    = [mc['eventWeight'].values * self.adjust[i] for i,mc in enumerate(df_list[0:-1])]
@@ -321,8 +329,8 @@ class ASingleKinematicPlot:
                     isstacked  = True,
                     figuresize = (6,5.4),
                     withXsErr = False,
-                    period = "2016",
-                    subtitle = ""
+                    subtitle = "",
+                    hasFake = True
                     ):
         self.xl = xl
         self.label_list = label_list
@@ -331,14 +339,23 @@ class ASingleKinematicPlot:
         self.isstacked  = isstacked
         self.figuresize = figuresize
         self.withXsErr = withXsErr
-        self.period = period
         self.subtitle = subtitle
+        self.hasFake = hasFake
     
     def getHistogramError(self):
         variable = np.concatenate(self.variable_list)
         weight   = np.concatenate(self.weight_list)
         err,_    = np.histogram(variable, self.mybin, weights=weight**2)
         err      = err**0.5
+        
+        if self.hasFake:
+            variable = self.variable_list[0]
+            weight   = self.weight_list[0]
+            yieldBg,_= np.histogram(variable, self.mybin, weights=weight)
+            errqcdNorm = 0.30 * yieldBg   
+            
+            err = (err**2 + errqcdNorm**2)**0.5
+        
         return err
     
     def getHistogramErrorWithSystematics(self):
@@ -359,8 +376,9 @@ class ASingleKinematicPlot:
         variable = np.concatenate(self.variable_list)
         weight   = np.concatenate(self.weight_list)
         yieldBg,_= np.histogram(variable, self.mybin, weights=weight)
-        err = 0.10 * yieldBg
+        err = 0.05 * yieldBg
         return err
+
     
 
     def convertZeroInto(self,arr,into=1):
@@ -369,7 +387,7 @@ class ASingleKinematicPlot:
                 arr[i]=into
         return arr
 
-    def makePlot(self, plotoutdir=None, selection=None, showDiffInLower=False):
+    def makePlot(self, plotoutdir=None, selection=None, showDiffInLower=False, normWithMC=False):
         plt.rc('figure',facecolor='w')
         fig, axes = plt.subplots(2, 1, sharex=True, 
                                  gridspec_kw={'height_ratios':[3,1]},
@@ -391,6 +409,7 @@ class ASingleKinematicPlot:
                     )
         mc    = mc[0] # keep only the stacked histogram, ignore the bin edges
         self.mctot = self.convertZeroInto(mc[-1],into=1)
+        
         
         if self.withXsErr:
             self.mcerr = (self.getHistogramError()**2 + self.getHistogramErrorWithSystematics()**2)**0.5
@@ -415,7 +434,7 @@ class ASingleKinematicPlot:
                     fmt='.',markersize=5)
 
         # 1.3. plot settings
-        self.ynorm = max(self.hdata.max(),self.mctot.max())
+        self.ynorm = self.mctot.max() if normWithMC else max(self.hdata.max(),self.mctot.max())
 
         ax.legend(fontsize=9,loc='upper right')
 
@@ -444,22 +463,19 @@ class ASingleKinematicPlot:
             ax.set_ylim(10,10*self.ynorm)
             ax.set_yscale('log')
         
-        if self.period == "2016":
-            ax.set_title('Run 2016, L=35.9/fb (13TeV)',loc='right')
-        if self.period == "2017":
-            ax.set_title('Run 2017, L=41.9/fb (13TeV)',loc='right')
-        if self.period == "2018":
-            ax.set_title('Run 2018, L=59.7/fb (13TeV)',loc='right')
+        ax.set_title('Run 2016, L=35.9/fb (13TeV)',loc='right')
         
         
         ######################### 2. Ratio Plots #############################
         ax = axes[1]
         if showDiffInLower:
             ax.set_xlim(self.a,self.b)
-#             ax.errorbar(self.center,  self.hdata - self.mctot, yerr=(self.mcerr**2+self.hdata)**0.5,
-#                         color='k', fmt='.', markersize=5)
+            dataMinusMC = self.hdata - self.mctot
+            ax.errorbar(self.center,  dataMinusMC, yerr=(self.mcerr**2+self.hdata)**0.5, color='k', fmt='.', markersize=5)
+            ynorm = dataMinusMC.max()
+            ax.set_ylim(-0.5*ynorm, 2*ynorm)
             
-            ax.bar(self.center, self.hdata - self.mctot, self.step, yerr=(self.mcerr**2+self.hdata)**0.5, facecolor='grey')
+            # ax.bar(self.center, self.hdata - self.mctot, self.step, yerr=(self.mcerr**2+self.hdata)**0.5, facecolor='grey')
             ax.axhline(0,lw=1,color='k')
             
         else:

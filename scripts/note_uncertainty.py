@@ -34,8 +34,10 @@ syst_colNames = [
     r'2.5$\%$ err of luminosity',
     r'5$\%$ err of tt XS',
     r'5$\%$ err of tW XS',
+    r'5$\%$ err of t XS',
     r'5$\%$ err of W+Jets XS',
     r'10$\%$ err of Z+Jets XS',
+    r'10$\%$ err of $\gamma$+Jets XS',
     r'10$\%$ err of VV XS',
     r'25$\%$ err of QCD in $e 4j$',
     r'25$\%$ err of QCD in $\mu 4j$',
@@ -67,10 +69,10 @@ syst_colNames = [
     r'Btag',
     r'Mistag',
 
-    # r'tt fsr',
-    # r'tt isr',
-    # r'tt UE',
-    # r'tt MEPS',
+    r'tt fsr',
+    r'tt isr',
+    r'tt UE',
+    r'tt MEPS',
 
 ]
 

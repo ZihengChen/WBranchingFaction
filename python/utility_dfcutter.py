@@ -7,7 +7,7 @@ import os, sys
 
 
 class DFCutter:
-    def __init__(self,selection, nbjet, name,  njet=None, folderOfPickles='pickles_2016'):
+    def __init__(self,selection, nbjet, name,  njet=None, folderOfPickles='pickles'):
         '''
         initialize a DFCutter with selection and name
         For Example, cutter = DFCutter('mumu','mctt')
@@ -48,14 +48,9 @@ class DFCutter:
             elif ('fsr' in variation) or ('isr' in variation) or ('ue' in variation) or ('meps' in variation):
                 dataFrame = pd.read_pickle(self.pickleDirectry + 'mcttsys/ntuple_ttbar_inclusive_{}.pkl'.format(variation))
             else:
-                if "2016" in self.pickleDirectry:
-                  dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_inclusive.pkl')
-                else:
-                  pickles = glob.glob( self.pickleDirectry + '{}/*.pkl'.format(self.name) )
-                  dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles],ignore_index=True)
 
+                dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_inclusive.pkl')
 
-        
         elif self.name == 'mctt_2l2nu':
             dataFrame = pd.read_pickle(self.pickleDirectry + 'mctt/ntuple_ttbar_2l2nu.pkl')
         elif self.name == 'mctt_semilepton':
@@ -67,7 +62,10 @@ class DFCutter:
         else:
             # print(self.pickleDirectry + '{}/*.pkl'.format(self.name))
             pickles = glob.glob( self.pickleDirectry + '{}/*.pkl'.format(self.name) )
-            dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles],ignore_index=True)
+            if pickles:
+                dataFrame = pd.concat([ pd.read_pickle(pickle) for pickle in pickles],ignore_index=True)  
+            else:
+                return pd.DataFrame()
 
         dataFrame.reset_index(drop=True, inplace=True)
         ###############################################
@@ -96,36 +94,36 @@ class DFCutter:
         zveto   = ' & (dilepton_mass<80 | dilepton_mass>102) '
         zmass   = ' & (dilepton_mass>80 & dilepton_mass<102) '
         lmveto  = ' & (dilepton_mass>12) '
+        
+        mtls40  = ' & (lepton1_mt<40) '
 
         sltcut  = {
                 'mumu'  : ' (lepton1_pt > 25) & (lepton2_pt > 10) ' + lmveto + oppoSign + zveto,
-                'ee'    : ' (lepton1_pt > 30) & (lepton2_pt > 30) ' + lmveto + oppoSign + zveto,
+                'ee'    : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign + zveto,
                 'emu'   : ' (trTest==1 | (trTest==3 & lepton1_pt>lepton2_pt))  & lepton1_pt>25 & lepton2_pt>20 ' + lmveto + oppoSign, 
                 'emu2'  : ' (trTest==2 | (trTest==3 & lepton1_pt<lepton2_pt))  & lepton1_pt>10 & lepton2_pt>30 ' + lmveto + oppoSign, 
-                
-                'mutau' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
-                'etau'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
-                # 'mutau_ss' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
-                # 'etau_ss'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
+                'mutau'       : ' (lepton1_pt > 30) & (lepton2_pt > 20)' + lmveto + oppoSign,
+                'etau'        : ' (lepton1_pt > 30) & (lepton2_pt > 20)' + lmveto + oppoSign,
+                'mutau_ss'    : ' (lepton1_pt > 30) & (lepton2_pt > 20)' + lmveto + sameSign,
+                'etau_ss'     : ' (lepton1_pt > 30) & (lepton2_pt > 20)' + lmveto + sameSign,
 
-                'mu4j'  : ' (lepton1_pt > 30) ' ,
-                'e4j'   : ' (lepton1_pt > 30) ' ,
-                'mu4j_fakes'  : ' (lepton1_pt > 30) ',
-                'e4j_fakes'   : ' (lepton1_pt > 30) ',
+                'mutau_fakes'    : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
+                'etau_fakes'     : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
+                'mutau_fakes_ss' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
+                'etau_fakes_ss'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
 
-                #'emutau'   : ' ((trTest==1 & lepton1_pt>25 & lepton2_pt>20) | (trTest==2 & lepton1_pt>10 & lepton2_pt>30) | (trTest==3 & lepton1_pt>25 & lepton2_pt>30))
 
-                'mutau_fakes' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
-                'etau_fakes'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + oppoSign,
-                # 'mutau_fakes_ss' : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
-                # 'etau_fakes_ss'  : ' (lepton1_pt > 30) & (lepton2_pt > 20) ' + lmveto + sameSign,
+                'mu4j'      : ' (lepton1_pt > 30) ', # + mtls40,
+                'e4j'       : ' (lepton1_pt > 30) ', #+ mtls40,
+                'mu4j_fakes': ' (lepton1_pt > 30) ', #+ mtls40,
+                'e4j_fakes' : ' (lepton1_pt > 30) ', #+ mtls40,
+
               
                 'emutau' : '((trTest == 1 | trTest == 3) & (lepton1_pt > 25) & (lepton2_pt > 20))  | ((trTest == 2 | trTest == 3 ) & (lepton1_pt > 10) & (lepton2_pt > 30))' + lmveto + oppoSign, 
                 'mumutau'  : ' (lepton1_pt > 25) & (lepton2_pt > 10) '+ lmveto + oppoSign,
                 'eetau'    : ' (lepton1_pt > 30) & (lepton2_pt > 20) '+ lmveto + oppoSign,
-
-                'mumue'  : ' (lepton1_pt > 25) & (lepton2_pt > 10) ',
-                'eemu'   : ' (lepton1_pt > 30) & (lepton2_pt > 20) ',
+                # 'mumue'  : ' (lepton1_pt > 25) & (lepton2_pt > 10) ',
+                # 'eemu'   : ' (lepton1_pt > 30) & (lepton2_pt > 20) ',
                 }
 
         totalcut = sltcut[self.selection] 
@@ -146,9 +144,6 @@ class DFCutter:
             if (self.selection in ['etau','mutau','etau_ss','mutau_ss']):
                 slt = df.tauGenFlavor!=15
                 df.loc[slt, 'eventWeight'] *= (1/0.92)
-
-                # slt = df.tauGenFlavor==15
-                # df.loc[slt, 'eventWeight'] *= (0.95/0.92)
       
                 #b->tau sf, j->tau scale factor measured in ll+tau region
                 # sf = {(20,25):[1.061694561, 0.976550401], 
@@ -158,12 +153,18 @@ class DFCutter:
                 #       (50,65):[0.897842372, 0.896520371],
                 #       (65,80):[0.857519502, 0.67297619] }
                 
-                sf = {(20,25):[1.00201524, 0.97030279], 
-                      (25,30):[1.1602231 , 0.8759335 ],
-                      (30,40):[1.39581073, 0.82453092],
-                      (40,50):[0.95554603, 0.79587623],
-                      (50,65):[0.86272906, 0.9193196 ],
-                      (65,80):[0.74175916, 0.71058156] }
+                # sf = {(20,25):[1.00201524, 0.97030279], # 201909
+                #       (25,30):[1.1602231 , 0.8759335 ],
+                #       (30,40):[1.39581073, 0.82453092],
+                #       (40,50):[0.95554603, 0.79587623],
+                #       (50,65):[0.86272906, 0.9193196 ],
+                #       (65,80):[0.74175916, 0.71058156] }
+
+                sf = {(20,25):[0.96540497, 1.01758775], 
+                      (25,30):[1.19297859, 0.95282035],
+                      (30,40):[1.39458004, 0.9361863],
+                      (40,50):[0.95523613, 0.89075941],
+                      (50,80):[0.90519364, 0.86459158]} # 202009
 
                 for key in sf.keys():
                     sltpt = np.logical_and(df.lepton2_pt>key[0], df.lepton2_pt<key[1])
@@ -176,23 +177,25 @@ class DFCutter:
                     sltfl = df.tauGenFlavor<4
                     slt = np.logical_and(sltpt, sltfl)
                     df.loc[slt, 'eventWeight'] *= sfljet
-        
-        # reindex the df
-        df.reset_index(drop=True, inplace=True)
-        # apply fake SF
+
+
+        # apply QCD SF
         if self.selection in ['etau_fakes','e4j_fakes','mutau_fakes','mu4j_fakes']:
-            etabin = np.array([-2.5, -2.0, -1.8, -1.444, -1.1, -0.8, -0.4, 0.0, 0.4, 0.8, 1.1, 1.444, 1.8, 2.0, 2.5])
+            
+            measureRegion = "123j1b"
+            
+            etabin = np.array([-2.5, -2.0, -1.8, -1.444, -1.1, -0.6, 0.0, 0.6, 1.1, 1.444, 1.8, 2.0, 2.5])
             if self.selection in ['etau_fakes','e4j_fakes']:
-                ptbin = np.array([30,32,34,36,38,40,45,50,55,60,80])        
-                sf = np.load(self.baseDir+"plots/singlelep/123j1b/SF_e_2d.npy")
+                ptbin = np.array([30,32,34,36,38,40,45,50,60,9999])      
+                sf = np.load(self.baseDir+"plots/singlelep/"+measureRegion+"/SF_e_2d.npy")
 
             elif self.selection in ['mutau_fakes','mu4j_fakes']:
-                ptbin = np.array([25,26,28,30,32,34,36,38,40,45,50,55,60,80])
-                sf = np.load(self.baseDir+"plots/singlelep/123j1b/SF_mu_2d.npy")
+                ptbin = np.array([25,30,32,34,36,38,40,45,50,60,9999])
+                sf = np.load(self.baseDir+"plots/singlelep/"+measureRegion+"/SF_mu_2d.npy")
 
             j = np.searchsorted(etabin, df.lepton1_eta)
             i = np.searchsorted(ptbin, df.lepton1_pt)
-            sfpad = np.pad(sf,((1,1),(1,1)),constant_values=((0, 0),(0,0)))
+            sfpad = np.pad(sf,((1,1),(1,1)),'edge')
             w = sfpad[i,j]
             df.eventWeight = df.eventWeight*w
 
@@ -400,25 +403,25 @@ class DFCutter:
           if self.name =="mctt":
             if variation == 'fsrUp':
                 slt = (df.tauGenFlavor==15)
-                df.loc[slt, 'eventWeight'] /= 0.951
+                df.loc[slt, 'eventWeight'] /= 0.945
                 slt = (df.tauGenFlavor<=6)
-                df.loc[slt, 'eventWeight'] /= 0.606
+                df.loc[slt, 'eventWeight'] /= 0.603
             if variation == 'fsrDown':
                 slt = (df.tauGenFlavor==15)
-                df.loc[slt, 'eventWeight'] /= 1.035
+                df.loc[slt, 'eventWeight'] /= 1.039
                 slt = (df.tauGenFlavor<=6)
-                df.loc[slt, 'eventWeight'] /= 1.381
+                df.loc[slt, 'eventWeight'] /= 1.372
 
             if variation == 'isrUp':
                 slt = (df.tauGenFlavor==15)
-                df.loc[slt, 'eventWeight'] /= 0.985
+                df.loc[slt, 'eventWeight'] /= 0.989
                 slt = (df.tauGenFlavor<=6)
-                df.loc[slt, 'eventWeight'] /= 0.982
+                df.loc[slt, 'eventWeight'] /= 0.978
             if variation == 'isrDown':
                 slt = (df.tauGenFlavor==15)
                 df.loc[slt, 'eventWeight'] /= 1.012
                 slt = (df.tauGenFlavor<=6)
-                df.loc[slt, 'eventWeight'] /= 1.014
+                df.loc[slt, 'eventWeight'] /= 1.017
 
         #     if variation == 'ueUp':
         #         slt = (df.tauGenFlavor==15)

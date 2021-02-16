@@ -23,16 +23,14 @@ def getBaseDirectory():
 def getFakeSF(obj):
     sf = 0
     if obj == "e":
-        sf = 1.0 #0.12
+        sf = 0.5324443693260725
     elif obj == 'mu':
-        sf = 1.0 #0.09
-    elif obj == 'tau':
-        sf = 1.0
-    elif obj == 'etau':
-        sf = 1.0 #1.157
-    elif obj == 'mutau':
-        sf = 1.0 #1.059
+        sf = 0.7801622275255969
 
+    elif obj == 'etau':
+        sf = 1.062 #1.157
+    elif obj == 'mutau':
+        sf = 1.195
     return sf
 
 def matrixToArray(mtx):
@@ -101,37 +99,64 @@ def symlink( src, tar):
 
 def get_cross_section(name):
     crossections = {
-        'ww'              : 12178,
-        'wz_2l2q'         : 5595,
-        'wz_3lnu'         : 4430,
-        'zz_2l2nu'        : 564,
-        'zz_2l2q'         : 3220,
-        'zz_4l'           : 1210,
-        # Z
-        'zjets_m-10to50_amcatnlo'  : 18610000,
-        'zjets_m-50_amcatnlo'      :  5765400,
-        'z0jets_m-50_amcatnlo':4757000,
-        'z1jets_m-50_amcatnlo':884400,
-        'z2jets_m-50_amcatnlo':338900,
-        # W
-        'w1jets'          :  9493000,
-        'w2jets'          :  3120000,
-        'w3jets'          :  942300,
-        'w4jets'          :  524100,
-        # top
-        't_tw'            :  35850,
-        'tbar_tw'         :  35850,
-        'ttbar_inclusive' :  832000,
-        't_t'             :  136020,
-        'tbar_t'          :   80950,
-        # gjets
-        'gjets_ht40to100': 17410000,
-        'gjets_ht100to200': 5363000,
-        'gjets_ht200to400': 1178000,
-        'gjets_ht400to600':  131800,
-        'gjets_ht600toinf':  44270,
-        
-    }
+                    # diboson
+                    'ww'              : 12178,
+                    'wz_2l2q'         : 5595,
+                    'wz_3lnu'         : 4430,
+                    'zz_2l2nu'        : 564,
+                    'zz_2l2q'         : 3220,
+                    'zz_4l'           : 1210,
+
+                    # Z
+                    'zjets_m-10to50_amcatnlo'  : 18810000,
+                    'zjets_m-50_amcatnlo'      :  5941000,
+                    'z0jets_m-50_amcatnlo':4757000,
+                    'z1jets_m-50_amcatnlo':884400,
+                    'z2jets_m-50_amcatnlo':338900,
+                    # W
+                    'w1jets'          :  9625000,
+                    'w2jets'          :  3161000,
+                    'w3jets'          :  958000,
+                    'w4jets'          :  494600,
+                    
+                    # gjets DR0p4
+                    'gjets_ht40to100': 17410000,
+                    'gjets_ht100to200': 5363000,
+                    'gjets_ht200to400': 1178000,
+                    'gjets_ht400to600':  131800,
+                    'gjets_ht600toinf':  44270,
+
+                    # top
+                    't_tw'            :  35850,
+                    'tbar_tw'         :  35850,
+                    'ttbar_inclusive' :  832000,
+                    'ttbar_2l2nu'     :  87340,
+                    'ttbar_semilepton':  364456,
+                    't_t'             :  136020,
+                    'tbar_t'          :   80950,
+
+                    # for systematics
+                    'ttbar_inclusive_tauReweight' :  832000,
+                    'ttbar_inclusive_fsrUp'    :  832000,
+                    'ttbar_inclusive_fsrDown'  :  832000,
+                    'ttbar_inclusive_isrUp'    :  832000,
+                    'ttbar_inclusive_isrDown'  :  832000,
+                    'ttbar_inclusive_ueUp'     :  832000,
+                    'ttbar_inclusive_ueDown'   :  832000,
+                    'ttbar_inclusive_mepsUp'   :  832000,
+                    'ttbar_inclusive_mepsDown' :  832000,
+            
+                    'qcd_ht50to100'   : 246300000000,
+                    'qcd_ht100to200'  : 27990000000,
+                    'qcd_ht200to300'  : 1712000000,
+                    'qcd_ht300to500'  : 347700000,
+                    'qcd_ht500to700'  : 32100000,
+                    'qcd_ht700to1000' : 6831000,
+                    'qcd_ht1000to1500': 1207000,
+                    'qcd_ht1500to2000': 119900,
+                    'qcd_ht2000toInf' : 25240,
+            
+                }
     xs = crossections.get(name, 0)
     return xs
     

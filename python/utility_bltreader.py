@@ -12,7 +12,7 @@ from multiprocessing import Pool
 
 class BLTReader:
 
-    def __init__(self, inputRootFileName, selection="ee", inputRootType="", outputFolder="pickles_2018"):
+    def __init__(self, inputRootFileName, selection="ee", inputRootType="", outputFolder="pickles"):
 
         self.baseDir = common.getBaseDirectory() 
 
@@ -20,8 +20,9 @@ class BLTReader:
         self.inputRootType = inputRootType
         self.outputFolder = outputFolder
 
+
         self.selection = selection
-        self.lumin = 59.688
+        self.lumin = 35.864
 
         self._getCrossection()
         self._getNameList()
@@ -34,26 +35,19 @@ class BLTReader:
         f = self.inputRootFile
 
         if self.inputRootType == "mcttsys":
-          names = [ 'tt_tauReweight',
-                    'tt_fsrUp','tt_fsrDown',
-                    'tt_isrUp','tt_isrDown',
-                    'tt_ueUp','tt_ueDown',
-                    'tt_mepsUp','tt_mepsDown' ]
-          nGens = [ self.getNGen('ttbar_inclusive_tauReweight'),
-                    self.getNGen('ttbar_inclusive_fsrUp'), self.getNGen('ttbar_inclusive_fsrDown'),
-                    self.getNGen('ttbar_inclusive_ifsrUp'),self.getNGen('ttbar_inclusive_isrDown'),
-                    self.getNGen('ttbar_inclusive_ueUp'),  self.getNGen('ttbar_inclusive_ueDown'),
-                    self.getNGen('ttbar_inclusive_mepsUp'),self.getNGen('ttbar_inclusive_mepsDown') ]
+            tags  = [ 'tauReweight', 'fsrUp','fsrDown', 'isrUp','isrDown', 'ueUp','ueDown', 'mepsUp','mepsDown' ]
+            names = [ 'tt_'+tag for tag in tags ]
+            nGens = [ self.getNGen('ttbar_inclusive_'+tag) for tag in tags]
         else:
-          names = [ 't','tt_2l2nu','tt_semilepton','tt_hadronic']
-          nGens = [ self.getNGen('t_tw')+self.getNGen('tbar_tw'), 
-                    self.getNGen('ttbar_2l2nu'),
-                    self.getNGen('ttbar_semilepton'),
-                    self.getNGen('ttbar_hadronic')
-                    ] 
+            names = [ 't','tt','tt_2l2nu','tt_semilepton']
+            nGens = [ self.getNGen('t_tw')+self.getNGen('tbar_tw'), 
+                self.getNGen('ttbar_inclusive'), 
+                self.getNGen('ttbar_2l2nu'), 
+                self.getNGen('ttbar_semilepton')
+                ] 
 
         df = pd.DataFrame({'name':names, 'ngen':nGens })
-        df.to_json(self.baseDir+'data/' + self.outputFolder + '/ngen_{}.json'.format(self.inputRootType))
+        df.to_json(self.baseDir+'data/'+ self.outputFolder+'/ngen_{}.json'.format(self.inputRootType))
         
     def getNGen(self, name):
         histogram = self.inputRootFile.Get('GenCategory_'+name)
@@ -72,7 +66,8 @@ class BLTReader:
     def readBLT(self):
         # loop over all names
         for name in self.mclist + self.datalist:
-        # for name in self.datalist:
+    
+        # for name in self.mcqcdlist:
             self.makePickle(name)
         print(self.selection + ' finished!')
 
@@ -83,10 +78,6 @@ class BLTReader:
 
         common.makeDirectory(outputPath, clear=False)
         tree = self.inputRootFile.Get('{}/bltTree_{}'.format(self.selection,name))
-
-        # correct a typo in root file
-        if name == "ttbar_inclusive_isrUp": 
-            tree = self.inputRootFile.Get('{}/bltTree_ttbar_inclusive_ifsrUp'.format(self.selection,name))
 
         if tree.GetEntriesFast() > 0:
             ntuple = self.fillNtuple(tree, name, scaleFactor)
@@ -116,7 +107,8 @@ class BLTReader:
     #############################
     def _getAllVariables(self, tree, selection, name, scaleFactor):
         if selection in [ 'ee','mumu','emu','mutau','etau','mutau_fakes','etau_fakes',
-                          'mu4j','e4j','mu4j_fakes','e4j_fakes','mumutau','eetau','emutau']:
+                          'mu4j','e4j','mu4j_fakes','e4j_fakes',
+                          'mumutau','eetau','emutau','mumue','eemu']:
             dictionary = getAllVariables_multileptonSelection(tree, selection, name, scaleFactor)
         return dictionary
         
@@ -128,10 +120,9 @@ class BLTReader:
             xs = self.xsTable[name]
             # get nGenTotal for the name
             histogram = self.inputRootFile.Get('TotalEvents_'+name)
-            # correct a typo in root file
-            if name == "ttbar_inclusive_isrUp": 
-              histogram = self.inputRootFile.Get('TotalEvents_ttbar_inclusive_ifsrUp')              
+            
             print('TotalEvents_'+name)
+
             nGenTotal = histogram.GetBinContent(1) - 2*histogram.GetBinContent(10)
             # calculate SF to lumin
             scaleFactor = self.lumin * xs/nGenTotal
@@ -141,34 +132,31 @@ class BLTReader:
     def _getCrossection(self):
         self.xsTable = { 
                     # diboson
-                    'ww'              : 113898,
-                    'wz'              : 23767,
-                    'zz'              : 15878,
+                    'ww'              : 12178,
                     'wz_2l2q'         : 5595,
                     'wz_3lnu'         : 4430,
                     'zz_2l2nu'        : 564,
                     'zz_2l2q'         : 3220,
                     'zz_4l'           : 1210,
-                    
+
                     # Z
-                    'zjets_m-10to50_amcatnlo'  : 18610000,
-                    'zjets_m-50_amcatnlo'      :  5765400,
-                    'DYJetsToLL_m-50' : 5765400,
-                    'DY0JetsToLL'     : 4757000,
-                    'DY1JetsToLL'     :  884400,
-                    'DY2JetsToLL'     :  338900,
-
+                    'zjets_m-10to50_amcatnlo'  : 18810000,
+                    'zjets_m-50_amcatnlo'      :  5941000,
+                    'z0jets_m-50_amcatnlo':4757000,
+                    'z1jets_m-50_amcatnlo':884400,
+                    'z2jets_m-50_amcatnlo':338900,
                     # W
-                    'w1jets'          :  9493000,
-                    'w2jets'          :  3120000,
-                    'w3jets'          :  942300,
-                    'w4jets'          :  524100,
-
-                    'WJetsToLNu_HT_100To200' : 1345000,
-                    'WJetsToLNu_HT_200To400' : 359700,
-                    'WJetsToLNu_HT_400To600' : 48910,
-                    'WJetsToLNu_HT_600To800' : 12050,
-                    'WJetsToLNu_HT_800To1200' : 5501,
+                    'w1jets'          :  9625000,
+                    'w2jets'          :  3161000,
+                    'w3jets'          :  958000,
+                    'w4jets'          :  494600,
+                    
+                    # gjets DR0p4
+                    'gjets_ht40to100': 17410000,
+                    'gjets_ht100to200': 5363000,
+                    'gjets_ht200to400': 1178000,
+                    'gjets_ht400to600':  131800,
+                    'gjets_ht600toinf':  44270,
 
                     # top
                     't_tw'            :  35850,
@@ -176,7 +164,8 @@ class BLTReader:
                     'ttbar_inclusive' :  832000,
                     'ttbar_2l2nu'     :  87340,
                     'ttbar_semilepton':  364456,
-                    'ttbar_hadronic'    :  380204,
+                    't_t'             :  136020,
+                    'tbar_t'          :   80950,
 
                     # for systematics
                     'ttbar_inclusive_tauReweight' :  832000,
@@ -188,6 +177,17 @@ class BLTReader:
                     'ttbar_inclusive_ueDown'   :  832000,
                     'ttbar_inclusive_mepsUp'   :  832000,
                     'ttbar_inclusive_mepsDown' :  832000,
+            
+                    'qcd_ht50to100'   : 246300000000,
+                    'qcd_ht100to200'  : 27990000000,
+                    'qcd_ht200to300'  : 1712000000,
+                    'qcd_ht300to500'  : 347700000,
+                    'qcd_ht500to700'  : 32100000,
+                    'qcd_ht700to1000' : 6831000,
+                    'qcd_ht1000to1500': 1207000,
+                    'qcd_ht1500to2000': 119900,
+                    'qcd_ht2000toInf' : 25240,
+            
                 }
 
     def _getOutputPath(self,name):
@@ -208,27 +208,64 @@ class BLTReader:
             outputPath += 'mctt/' 
         elif name in self.mcttsyslist:
             outputPath += 'mcttsys/' 
+        elif name in self.mctother:
+            outputPath += 'mctother/' 
+        elif name in self.mcglist:
+            outputPath += 'mcg/' 
+        elif name in self.mcqcdlist:
+            outputPath += 'mcqcd/' 
+
         return outputPath
 
     def _getNameList(self):
         ## 1. define the datalist
-        if self.selection in ['mumu','mutau','mutau_fakes','mu4j','mu4j_fakes','mumutau']:
-            self.datalist = ['muon_2018A','muon_2018B', 'muon_2018C','muon_2018D']
+        if self.selection in ['mumu','mutau','mutau_fakes','mu4j','mu4j_fakes','mumutau','mumue']:
+            self.datalist = [
+                'muon_2016B', 'muon_2016C','muon_2016D','muon_2016E',
+                'muon_2016F','muon_2016G','muon_2016H'
+                ]
 
-        elif self.selection in ['ee','etau','etau_fakes','e4j','e4j_fakes','eetau']:
-            self.datalist = ['electron_2018A','electron_2018B', 'electron_2018C','electron_2018D']
+        elif self.selection in ['ee','etau','etau_fakes','e4j','e4j_fakes','eetau','eemu']:
+            self.datalist = [
+                'electron_2016B', 'electron_2016C','electron_2016D','electron_2016E',
+                'electron_2016F','electron_2016G','electron_2016H'
+                ]
 
         elif self.selection in ['emu','emutau']:
-            self.datalist = ['muon_2018A','muon_2018B', 'muon_2018C','muon_2018D']
-            self.datalist+= ['electron_2018A','electron_2018B', 'electron_2018C','electron_2018D']
+            self.datalist = [
+                'muon_2016B', 'muon_2016C','muon_2016D','muon_2016E',
+                'muon_2016F','muon_2016G','muon_2016H',
+                'electron_2016B', 'electron_2016C', 'electron_2016D','electron_2016E',
+                'electron_2016F','electron_2016G','electron_2016H'
+                ]
 
 
         ## 2. define the MC list
-        self.mcdibosonlist  = [ 'ww','wz','zz']
-        self.mczlist        = [ 'DYJetsToLL_m-50']
-        self.mcwlist        = [ 'WJetsToLNu_HT_100To200','WJetsToLNu_HT_200To400','WJetsToLNu_HT_400To600','WJetsToLNu_HT_600To800','WJetsToLNu_HT_800To1200' ]
-        self.mctlist        = [ 't_tw','tbar_tw']       
-        self.mcttlist       = [ 'ttbar_2l2nu','ttbar_semilepton','ttbar_hadronic']
+        self.mcdibosonlist  = [ 'ww','wz_2l2q','wz_3lnu','zz_2l2nu','zz_2l2q','zz_4l']
+        self.mczlist        = [ 'zjets_m-10to50_amcatnlo','zjets_m-50_amcatnlo'] #+ ['z0jets_m-50_amcatnlo','z1jets_m-50_amcatnlo','z2jets_m-50_amcatnlo']
+        self.mcwlist        = [ 'w1jets','w2jets','w3jets','w4jets' ]
+        self.mcglist        = [ 'gjets_ht40to100', 'gjets_ht100to200', 'gjets_ht200to400', 'gjets_ht400to600', 'gjets_ht600toinf']
+        self.mctlist        = [ 't_tw','tbar_tw']
+        self.mctother       = [ 't_t','tbar_t']
+        self.mcttlist       = [ 'ttbar_inclusive']+['ttbar_2l2nu','ttbar_semilepton']
+        
+        self.mcttsyslist    = [ 'ttbar_inclusive_tauReweight',
+                                'ttbar_inclusive_fsrUp','ttbar_inclusive_fsrDown',
+                                'ttbar_inclusive_isrUp','ttbar_inclusive_isrDown',
+                                'ttbar_inclusive_ueUp','ttbar_inclusive_ueDown',
+                                'ttbar_inclusive_mepsUp','ttbar_inclusive_mepsDown']
+        
+        
+        self.mcqcdlist = [ 'qcd_ht50to100','qcd_ht100to200','qcd_ht200to300','qcd_ht300to500','qcd_ht500to700', 'qcd_ht700to1000','qcd_ht1000to1500','qcd_ht1500to2000','qcd_ht2000toInf']
 
-        self.mclist = self.mcdibosonlist+self.mcwlist+self.mczlist+self.mctlist+self.mcttlist
+        self.mclist = self.mctother+self.mcdibosonlist+self.mcwlist+self.mczlist+self.mctlist+self.mcttlist+self.mcglist+self.mcqcdlist
+        
+        
+
+        
+        # overwrite if there is a inputRootType
+        if self.inputRootType == "mcttsys":
+            self.datalist = []
+            self.mclist = self.mcttsyslist
+        
 

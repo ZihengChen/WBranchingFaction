@@ -17,11 +17,11 @@ class PredictiveModel():
         
         x = self.x.copy()
 
-        nxs,neff = 7,2
+        nxs,neff = 6,2
         if self.splitJetFlavor:
-          nsf = 12
+          nsf = 10
         else:
-          nsf = 6
+          nsf = 5
         # splite parameters
         end = 0
         params_sf  = params[end:end+nsf]
@@ -56,30 +56,36 @@ class PredictiveModel():
         ######################
 
         for i in range(5):
-            # y[:,i*5+0:i*5+4,:] = y[:,i*5+0:i*5+4,:] * params[0] # pt = 20-25 GeV
+            # y[:,o1:i*5+4,:] = y[:,o1:i*5+4,:] * params[0] # pt = 20-25 GeV
             
             if self.splitJetFlavor:
-              y[:,i*5+0:i*5+1,0:1] = y[:,i*5+0:i*5+1,0:1] * params[0] # pt = 20-25 GeV
-              y[:,i*5+0:i*5+1,1:2] = y[:,i*5+0:i*5+1,1:2] * params[1] # pt = 25-30 GeV
-              y[:,i*5+0:i*5+1,2:5] = y[:,i*5+0:i*5+1,2:5] * params[2] # pt = 30-40 GeV
-              y[:,i*5+0:i*5+1,4:6] = y[:,i*5+0:i*5+1,4:6] * params[3] # pt = 40-50 GeV
-              y[:,i*5+0:i*5+1,6:9] = y[:,i*5+0:i*5+1,6:9] * params[4] # pt = 50-60 GeV
-              y[:,i*5+0:i*5+1,9: ] = y[:,i*5+0:i*5+1,9: ] * params[5] # pt = 60-   GeV
-
-              y[:,i*5+1:i*5+2,0:1] = y[:,i*5+1:i*5+2,0:1] * params[6] # pt = 20-25 GeV
-              y[:,i*5+1:i*5+2,1:2] = y[:,i*5+1:i*5+2,1:2] * params[7] # pt = 25-30 GeV
-              y[:,i*5+1:i*5+2,2:4] = y[:,i*5+1:i*5+2,2:4] * params[8] # pt = 30-40 GeV
-              y[:,i*5+1:i*5+2,4:6] = y[:,i*5+1:i*5+2,4:6] * params[9] # pt = 40-50 GeV
-              y[:,i*5+1:i*5+2,6:9] = y[:,i*5+1:i*5+2,6:9] * params[10] # pt = 50-60 GeV
-              y[:,i*5+1:i*5+2,9: ] = y[:,i*5+1:i*5+2,9: ] * params[11] # pt = 60-   GeV
+                o1,o2 = i*5+0, i*5+1 # b->tau
+                p1,p2 = 0,15 # tt, tw, Z
+                y[p1:p2,o1:o2,0:1] = y[p1:p2,o1:o2,0:1] * params[0] # pt = 20-25 GeV
+                y[p1:p2,o1:o2,1:2] = y[p1:p2,o1:o2,1:2] * params[1] # pt = 25-30 GeV
+                y[p1:p2,o1:o2,2:5] = y[p1:p2,o1:o2,2:5] * params[2] # pt = 30-40 GeV
+                y[p1:p2,o1:o2,4:6] = y[p1:p2,o1:o2,4:6] * params[3] # pt = 40-50 GeV
+                y[p1:p2,o1:o2,6: ] = y[p1:p2,o1:o2,6: ] * params[4] # pt = 50-60 GeV
+                # y[p1:p2,o1:o2,9: ] = y[p1:p2,o1:o2,9: ] * params[5] # pt = 60-   GeV
+                
+                o1,o2 = i*5+1, i*5+3 # light->tau and g->tau
+                y[p1:p2,o1:o2,0:1] = y[p1:p2,o1:o2,0:1] * params[5] # pt = 20-25 GeV
+                y[p1:p2,o1:o2,1:2] = y[p1:p2,o1:o2,1:2] * params[6] # pt = 25-30 GeV
+                y[p1:p2,o1:o2,2:4] = y[p1:p2,o1:o2,2:4] * params[7] # pt = 30-40 GeV
+                y[p1:p2,o1:o2,4:6] = y[p1:p2,o1:o2,4:6] * params[8] # pt = 40-50 GeV
+                y[p1:p2,o1:o2,6: ] = y[p1:p2,o1:o2,6: ] * params[9] # pt = 50-60 GeV
+                # y[p1:p2,o1:o2,9: ] = y[p1:p2,o1:o2,9: ] * params[11] # pt = 60-   GeV
 
             else:
-              y[:,i*5+0:i*5+2,0:1] = y[:,i*5+0:i*5+2,0:1] * params[0] # pt = 20-25 GeV
-              y[:,i*5+0:i*5+2,1:2] = y[:,i*5+0:i*5+2,1:2] * params[1] # pt = 25-30 GeV
-              y[:,i*5+0:i*5+2,2:4] = y[:,i*5+0:i*5+2,2:4] * params[2] # pt = 30-40 GeV
-              y[:,i*5+0:i*5+2,4:6] = y[:,i*5+0:i*5+2,4:6] * params[3] # pt = 40-50 GeV
-              y[:,i*5+0:i*5+2,6:9] = y[:,i*5+0:i*5+2,6:9] * params[4] # pt = 50-60 GeV
-              y[:,i*5+0:i*5+2,9: ] = y[:,i*5+0:i*5+2,9: ] * params[5] # pt = 60-   GeV
+
+                o1,o2 = i*5+0, i*5+3 # jet->tau
+                p1,p2 = 0,15 # tt, tw, Z
+                y[p1:p2,o1:o2,0:1] = y[p1:p2,o1:o2,0:1] * params[0] # pt = 20-25 GeV
+                y[p1:p2,o1:o2,1:2] = y[p1:p2,o1:o2,1:2] * params[1] # pt = 25-30 GeV
+                y[p1:p2,o1:o2,2:4] = y[p1:p2,o1:o2,2:4] * params[2] # pt = 30-40 GeV
+                y[p1:p2,o1:o2,4:6] = y[p1:p2,o1:o2,4:6] * params[3] # pt = 40-50 GeV
+                y[p1:p2,o1:o2,6: ] = y[p1:p2,o1:o2,6: ] * params[4] # pt = 50-60 GeV
+                # y[p1:p2,o1:o2,9: ] = y[p1:p2,o1:o2,9: ] * params[5] # pt = 60-   GeV
         return y
 
 
@@ -91,22 +97,20 @@ class PredictiveModel():
         # defining perturbation
         ttxs   = params[0]*0.05 + 1
         txs    = params[1]*0.05 + 1
-        wxs    = params[2]*0.05 + 1
-        zxs0   = params[3]*0.05 + 1  #- 0.05 # Z0jet has an normalization correction
-        zxs1   = params[4]*0.05 + 1  #- 0.05
-        vvxs   = params[5]*0.10 + 1
-        lumin  = params[6]*.025 + 1
+        zxs0   = params[2]*0.05 + 1  #- 0.05 # Z0jet has an normalization correction
+        zxs1   = params[3]*0.05 + 1  #+ 0.05
+        vvxs   = params[4]*0.10 + 1
+        lumin  = params[5]*.025 + 1
         ######################
         y[:, 0: 5, :]= x[:, 0: 5,:] * ttxs * lumin  # tt
         y[:, 5:10, :]= x[:, 5:10,:] * txs  * lumin  # tW
-        y[:,10:15,:] = x[:,10:15,:] * wxs  * lumin  # W+jets
-        y[0,15:20,:] = x[0,15:20,:] * zxs0 * lumin  # Z+0jets
-        y[2,15:20,:] = x[2,15:20,:] * zxs0 * lumin  # Z+0jets
-        y[4,15:20,:] = x[4,15:20,:] * zxs0 * lumin  # Z+0jets
-        y[1,15:20,:] = x[1,15:20,:] * zxs1 * lumin  # Z+1jets
-        y[3,15:20,:] = x[3,15:20,:] * zxs1 * lumin  # Z+1jets
-        y[5,15:20,:] = x[5,15:20,:] * zxs1 * lumin  # Z+1jets
-        y[:,20:25,:] = x[:,20:25,:] * vvxs * lumin  # VV
+        y[0,10:15,:] = x[0,10:15,:] * zxs0 * lumin  # Z+0jets
+        y[2,10:15,:] = x[2,10:15,:] * zxs0 * lumin  # Z+0jets
+        y[4,10:15,:] = x[4,10:15,:] * zxs0 * lumin  # Z+0jets
+        y[1,10:15,:] = x[1,10:15,:] * zxs1 * lumin  # Z+1jets
+        y[3,10:15,:] = x[3,10:15,:] * zxs1 * lumin  # Z+1jets
+        y[5,10:15,:] = x[5,10:15,:] * zxs1 * lumin  # Z+1jets
+        y[:,15:20,:] = x[:,15:20,:] * vvxs * lumin  # VV
 
         return y
     
@@ -117,8 +121,8 @@ class PredictiveModel():
 
         ######################
         # defining perturbation
-        effe = params[0]*0.01 + 1
-        effm = params[1]*0.01 + 1
+        effe = params[0]*0.02 + 1
+        effm = params[1]*0.02 + 1
         ######################
 
         y[0,:,:] = x[0,:,:] * effe * effm

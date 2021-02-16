@@ -40,6 +40,9 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     if isSingleElectronTrigger:
         out_dict['eleTriggerVarTagSyst']    =  tree.eleTriggerVarTagSyst
         out_dict['eleTriggerVarProbeSyst']  =  tree.eleTriggerVarProbeSyst
+        out_dict['prefiringWeight'] = tree.prefiringWeight
+        out_dict['prefiringVar'] = tree.prefiringVar
+        
     
 
     out_dict['topPtWeight']   =  tree.topPtWeight

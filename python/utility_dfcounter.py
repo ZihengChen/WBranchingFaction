@@ -3,7 +3,7 @@ from utility_dfcutter import *
 from utility_bfsolver import Yield
 
 class DFCounter():
-    def __init__(self,trigger,usetag, folderOfPickles="pickles_2016"):
+    def __init__(self,trigger,usetag, folderOfPickles="pickles"):
         self.variation = ""
 
         self.trigger = trigger
@@ -49,7 +49,7 @@ class DFCounter():
             nVar.append(tempVar)
         n = np.array(n)
         nVar = np.array(nVar)
-        return n,nVar # 4x3,4x3
+        return n,nVar # 4x5,4x5
 
     def returnNFake(self):
         n,nVar = [],[]
@@ -99,72 +99,48 @@ class DFCounter():
 
     def getNMCbg(self,selection,nbjet):
         n, nVar = [], []
-        for name in ["mcdiboson","mcz","mcw"]:
+        for name in ["mcdiboson",'mcg',"mcz","mcw",'mctother']:
             df = DFCutter(selection,nbjet,name,folderOfPickles=self.folderOfPickles).getDataFrame(self.variation) # get MC dataframe with variation
             n.append( np.sum(df.eventWeight) )
             nVar.append( np.sum(df.eventWeight**2) )
 
-        return np.array(n), np.array(nVar) # 3,3 for VV,Z,W
+        return np.array(n), np.array(nVar) # 5,5 for VV,gamma,Z,W,t-tchannel
 
     
     def getNFake(self,selection,nbjet):
 
-        if selection == "mu4j":
-            fakeSF = common.getFakeSF('mu')
 
-            temp = DFCutter(selection+'_fakes',nbjet,"data",folderOfPickles=self.folderOfPickles).getDataFrame()
-            n    = np.sum(temp.eventWeight)
-            nVar = np.sum(temp.eventWeight**2)
-            for name in ['mcdiboson','mcz', 'mcw','mct','mctt']:
-                temp  = DFCutter(selection+'_fakes',nbjet,name,folderOfPickles=self.folderOfPickles).getDataFrame()
-                n    -= np.sum(temp.eventWeight)
-                nVar += np.sum(temp.eventWeight**2)
+        # add fakes if in mu4j and e4j
+        if selection in ['mu4j','e4j']:
+            #   # data driven
+                
+            # names = ['data','mcdiboson','mcg','mcz','mcw','mctother','mct','mctt']
+            # Fake = pd.DataFrame()
+            # for name in names:
+            #     temp =  DFCutter(self.selection+'_fakes',self.nbjet,name,self.njet,self.folderOfPickles).getDataFrame()
+            #     if not name == 'data':
+            #         temp.eventWeight = -1*temp.eventWeight
+            #     Fake = Fake.append(temp,ignore_index=True)
+            
+            # MC QCD
+            MCqcd = DFCutter(selection, nbjet, 'mcqcd',folderOfPickles=self.folderOfPickles).getDataFrame()
+            n     = np.sum( MCqcd.eventWeight )
+            nVar  = np.sum( MCqcd.eventWeight**2 )
 
-            n *= fakeSF
-            nVar *= fakeSF**2
-        
-        elif selection == "e4j":
-            fakeSF = common.getFakeSF('e')
+        elif selection in ['mutau','etau']:
 
-            temp = DFCutter(selection+'_fakes',nbjet,"data", folderOfPickles=self.folderOfPickles).getDataFrame()
-            n    = np.sum(temp.eventWeight)
-            nVar = np.sum(temp.eventWeight**2)
-            for name in ['mcdiboson','mcz', 'mcw','mct','mctt']:
-                temp  = DFCutter(selection+'_fakes',nbjet,name,folderOfPickles=self.folderOfPickles).getDataFrame()
-                n    -= np.sum(temp.eventWeight)
-                nVar += np.sum(temp.eventWeight**2)
+            names = ['data','mcdiboson','mcg','mcz','mcw','mctother','mct','mctt']
 
-            n *= fakeSF
-            nVar *= fakeSF**2
+            n, nVar = 0, 0
+            for name in names:
+                temp =  DFCutter(selection+'_ss',nbjet,name,folderOfPickles=self.folderOfPickles).getDataFrame()
+                if name == 'data': n += np.sum(temp.eventWeight)
+                else: n -= np.sum(temp.eventWeight)
+                nVar += np.sum(temp.eventWeight**2)                  
 
-        elif selection == "mutau":
             fakeSF = common.getFakeSF(selection)
-
-            temp = DFCutter(selection+'_ss',nbjet,"data",folderOfPickles=self.folderOfPickles).getDataFrame()
-            n    = np.sum(temp.eventWeight)
-            nVar = np.sum(temp.eventWeight**2)
-            for name in ['mcdiboson','mcz','mcw','mct','mctt']:
-                temp  = DFCutter(selection+'_ss',nbjet,name,folderOfPickles=self.folderOfPickles).getDataFrame()
-                n    -= np.sum(temp.eventWeight)
-                nVar += np.sum(temp.eventWeight**2)
-
-            n *= fakeSF
-            nVar *= fakeSF**2
-
-        elif selection == "etau":
-            fakeSF = common.getFakeSF(selection)
-
-            temp = DFCutter(selection+'_ss',nbjet,"data",folderOfPickles=self.folderOfPickles).getDataFrame()
-            n    = np.sum(temp.eventWeight)
-            nVar = np.sum(temp.eventWeight**2)
-            for name in ['mcdiboson','mcz', 'mcw','mct','mctt']:
-                temp  = DFCutter(selection+'_ss',nbjet,name,folderOfPickles=self.folderOfPickles).getDataFrame()
-                n    -= np.sum(temp.eventWeight)
-                nVar += np.sum(temp.eventWeight**2)
-
-            n *= fakeSF
-            nVar *= fakeSF**2
-
+            n     *= fakeSF
+            nVar  *= fakeSF**2
 
         else:
             n,nVar = 0,0

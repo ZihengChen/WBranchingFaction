@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from utility_bltreader_2016 import *
+from utility_bltreader import *
 from multiprocessing import Pool
 
 def run(configs):
@@ -9,13 +9,13 @@ def run(configs):
     rd.readBLT()
 
 if __name__ == '__main__':
-    selections = ["eemu","mumue","eetau","mumutau","emutau"]
+    selections = ["eetau","mumutau","emutau"]
 
 
-    filename = "Run2016_llx_20200414.root"
-    folder = "pickles_2016_llx_VTtau"
+    filename = "Run2016_lltauTight_20200908.root"
+    folder = "pickles_lltauTight"
     configs = [(filename, slt, "", folder) for slt in selections]
 
 
-    pool = Pool(5)
+    pool = Pool(3)
     pool.map(run, configs)
