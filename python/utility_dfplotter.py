@@ -128,15 +128,15 @@ class DFPlotter:
         if self.selection in ['mumu']:
             self.mcsgQueryList = [
                 'genCategory>=16',
-                'genCategory in [1,3,4,5,6,7,8,9,10,11,12]',
+                'genCategory in [1,3,4,5,6,7,8,9,10,11,12,13,15]',
                 'genCategory in [2]',
-                'genCategory in [13,14,15]'
+                'genCategory in [14]'
             ]
             self.labelList = ['Diboson',r'$\gamma$+Jets','Z+Jets','W+Jets','Top other',
                 r'$tt/tW \rightarrow$ other',
                 r'$tt/tW \rightarrow ll$ other',
                 r'$tt/tW \rightarrow \mu + \mu$',
-                r'$tt/tW \rightarrow \mu+ \tau$',
+                r'$tt/tW \rightarrow \mu+ \tau_\mu$',
                 'data'
             ]
             self.colorList = ['#a32020','#e0301e','C1','gold','C2','#49feec','deepskyblue','C0','mediumpurple','k']
@@ -169,17 +169,17 @@ class DFPlotter:
         elif self.selection in ['emu','emu2']:
             self.mcsgQueryList = [
                 'genCategory>=16',
-                'genCategory in [1,2,4,5,6,7,8,9]',
+                'genCategory in [1,2,4,5,6,7,8,9,10,12,14,15]',
                 'genCategory in [3]',
-                'genCategory in [10,11,12]',
-                'genCategory in [13,14,15]'
+                'genCategory in [11]',
+                'genCategory in [13]'
             ]
             self.labelList = ['Diboson',r'$\gamma$+Jets','Z+Jets','W+Jets','Top other',
-                r'$tt/tW \rightarrow$ (other)',
-                r'$tt/tW \rightarrow l + l$ (other)',
+                r'$tt/tW \rightarrow$ other',
+                r'$tt/tW \rightarrow ll$ (other)',
                 r'$tt/tW \rightarrow e + \mu$', 
-                r'$tt/tW \rightarrow e + \tau$',
-                r'$tt/tW \rightarrow \mu + \tau$',
+                r'$tt/tW \rightarrow e + \tau_\mu$',
+                r'$tt/tW \rightarrow \mu + \tau_e$',
                 'data'
             ]
             self.colorList = ['#a32020','#e0301e','C1','gold','springgreen','C2','#49feec','deepskyblue','C0','mediumpurple','k']
@@ -439,13 +439,12 @@ class ASingleKinematicPlot:
         ax.legend(fontsize=9,loc='upper right')
 
         if self.logscale:
-            ax.text(0.04*self.b+0.96*self.a, 4*self.ynorm, 
+            ax.text(0.04*self.b+0.96*self.a, 6*self.ynorm, 
                     r'CMS $preliminary$',
                     style='italic',fontsize='15',fontweight='bold')
             
-            ax.text(0.04*self.b+0.96*self.a, 3*self.ynorm, 
-                    r'CMS $preliminary$',
-                    style='italic',fontsize='15',fontweight='bold')
+            ax.text(0.04*self.b+0.96*self.a, 2*self.ynorm, 
+                    self.subtitle,fontsize='11')
                 
         else:
             ax.text(0.04*self.b+0.96*self.a, 1.35*self.ynorm, 
@@ -460,7 +459,7 @@ class ASingleKinematicPlot:
         ax.set_ylim(1,1.5*self.ynorm)
         
         if self.logscale:
-            ax.set_ylim(10,10*self.ynorm)
+            ax.set_ylim(1,20*self.ynorm)
             ax.set_yscale('log')
         
         ax.set_title('Run 2016, L=35.9/fb (13TeV)',loc='right')
@@ -497,19 +496,22 @@ class ASingleKinematicPlot:
         ######################## 3. End and Save ############################### 
         ax.set_xlabel(self.xl,fontsize=13)
         if plotoutdir is not None:
-
+            outfilename = plotoutdir+'/{}'.format(self.v)
+            
             if selection is not None:
                 if '0b' in plotoutdir:
-                    fig.savefig(plotoutdir+'/{}_0b_{}.pdf'.format(selection,self.v))
+                    outfilename = plotoutdir+'/{}_0b_{}'.format(selection,self.v)
                 if '1b' in plotoutdir:
-                    fig.savefig(plotoutdir+'/{}_1b_{}.pdf'.format(selection,self.v))
+                    outfilename = plotoutdir+'/{}_1b_{}'.format(selection,self.v)
                 if '2b' in plotoutdir:
-                    fig.savefig(plotoutdir+'/{}_2b_{}.pdf'.format(selection,self.v))
+                    outfilename = plotoutdir+'/{}_2b_{}'.format(selection,self.v)
 
-            else:
-                fig.savefig(plotoutdir+'/{}.png'.format(self.v),dpi=300)
 
-            #
+            if self.logscale:
+                outfilename = outfilename + "_logscale"
+                
+            plt.savefig(outfilename+".pdf")
+            
 
 
 

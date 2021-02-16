@@ -85,6 +85,11 @@ class DFCutter:
 
         dataFrame = self._postProcessDataFrame(dataFrame,variation)
 
+        # if 'lepton1_sip3d' in dataFrame.columns:
+        #     dataFrame["lepton1_sip3d"] = dataFrame["lepton1_sip3d"].apply(np.abs)
+
+        # if 'lepton2_sip3d' in dataFrame.columns:
+        #     dataFrame["lepton2_sip3d"] = dataFrame["lepton2_sip3d"].apply(np.abs)
 
         return dataFrame
 
@@ -199,6 +204,7 @@ class DFCutter:
             w = sfpad[i,j]
             df.eventWeight = df.eventWeight*w
 
+        
 
         # reindex the df
         df.reset_index(drop=True, inplace=True)

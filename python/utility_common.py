@@ -28,9 +28,9 @@ def getFakeSF(obj):
         sf = 0.7801622275255969
 
     elif obj == 'etau':
-        sf = 1.062 #1.157
+        sf = 1.062 #from 2j0b region
     elif obj == 'mutau':
-        sf = 1.195
+        sf = 1.195 # from 2j0b region
     return sf
 
 def matrixToArray(mtx):

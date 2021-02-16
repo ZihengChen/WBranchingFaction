@@ -62,6 +62,8 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
     out_dict['lepton1_eta']     = lep1.Eta()
     out_dict['lepton1_phi']     = lep1.Phi()
     out_dict['lepton1_mt']      = (2*lep1.Pt()*tree.met*(1-np.cos(lep1.Phi()-tree.metPhi )))**0.5
+
+    
     
     if isDilepton:
         lep2 = tree.leptonTwoP4
@@ -72,17 +74,28 @@ def getAllVariables_multileptonSelection( tree, selection, name, scaleFactor):
         out_dict['lepton2_eta']     = lep2.Eta()
         out_dict['lepton2_phi']     = lep2.Phi()
         out_dict['lepton2_mt']      = (2*lep2.Pt()*tree.met*(1-np.cos(lep2.Phi()-tree.metPhi )))**0.5
-
+        
         out_dict['lepton_delta_eta']= abs(lep1.Eta() - lep2.Eta())
         out_dict['lepton_delta_phi']= abs(lep1.DeltaPhi(lep2))
-        out_dict['lepton_delta_r']  = lep1.DeltaR(lep2)
-            
+        out_dict['lepton_delta_r']  = lep1.DeltaR(lep2)         
         # dilepton
         dilepton = lep1 + lep2
         out_dict['dilepton_mass']      = dilepton.M()
         out_dict['dilepton_pt']        = dilepton.Pt()
     
-    
+    # lepton impact parameters
+    if not selection in ['eetau','mumutau','emutau']:
+        out_dict['lepton1_d0']      = tree.leptonOneD0
+        out_dict['lepton1_dZ']      = tree.leptonOneDz
+        out_dict['lepton1_sip3d']   = tree.leptonOneSip3d
+        if isDilepton:
+            out_dict['lepton2_d0']      = tree.leptonTwoD0
+            out_dict['lepton2_dZ']      = tree.leptonTwoDz
+            out_dict['lepton2_sip3d']   = tree.leptonTwoSip3d
+
+
+
+
     # 2. Filling tau info
     if selection in ['etau','mutau','eetau','mumutau','emutau']:
         if selection in ['eetau','mumutau','emutau']:
